@@ -1,0 +1,77 @@
+/* Login.css */
+
+.form-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  input[type="text"],
+  input[type="password"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  input[type="text"]:focus,
+  input[type="password"]:focus {
+    border-color: #7c66e3;
+    outline: none;
+    box-shadow: 0 0 4px rgba(124, 102, 227, 0.4);
+  }
+  
+  button[type="submit"] {
+    padding: 10px 15px;
+    background-color: #7c66e3;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #6955d1;
+  }
+  
+  button[type="submit"]:disabled {
+    background-color: #bbb;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: #d9534f;
+    background-color: #f8d7da;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+  }
+  
