@@ -1,21 +1,21 @@
-import { MainRoute } from "../../Pages/Route/MainRoute/MainRoute";
-import { Footer } from "../Footer/Footer";
-import { Header } from "../Header/Header";
-import { Menu } from "../Menu/Menu";
-import "./MainLayout.css";
+// src/components/MainLayout/MainLayout.tsx
+import Navbar from '../../Pages/Navbar/Navbar';
+import { MainRoute } from '../../Pages/Route/MainRoute/MainRoute';
+import { Footer } from '../Footer/Footer';
+import './MainLayout.css';
 
 export function MainLayout(): JSX.Element {
   return (
     <div className="MainLayout">
       <header>
-        <Header />
+        {/* Navbar is part of the header */}
+        <Navbar />
       </header>
-      <div className="menu-container">
-        <Menu />
-      </div>
+
       <main>
         <MainRoute />
       </main>
+
       <footer>
         <Footer />
       </footer>

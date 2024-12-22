@@ -1,13 +1,13 @@
-import React from 'react';
-import { BrowserRouter } from "react-router-dom";
-import { MainRoute } from './Pages/Route/MainRoute/MainRoute';
+// src/App.tsx
+import { BrowserRouter as Router } from 'react-router-dom';
+import { MainLayout } from './Layout/MainLayout/MainLayout';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <BrowserRouter>
-      <MainRoute />
-    </BrowserRouter>
+    <Router>
+      <MainLayout />
+    </Router>
   );
-};
+}
 
 export default App;

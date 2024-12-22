@@ -1,0 +1,72 @@
+
+.container {
+    padding: 4rem 2rem;
+    background-color: #ffffff;
+    min-height: 80vh;
+  }
+  
+  .heading {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #333333;
+    text-align: center;
+  }
+  
+  .profileSection,
+  .activitiesSection,
+  .actionsSection {
+    margin-bottom: 2rem;
+  }
+  
+  .profileSection h3,
+  .activitiesSection h3,
+  .actionsSection h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #6B73FF;
+  }
+  
+  .profileSection p,
+  .activitiesSection li {
+    font-size: 1rem;
+    color: #555555;
+    margin-bottom: 0.5rem;
+  }
+  
+  .activitiesSection ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+  }
+  
+  .actionsSection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .actionButton {
+    padding: 0.75rem 1.5rem;
+    background-color: #6B73FF;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .actionButton:hover {
+    background-color: #575bff;
+  }
+  
+  .loading,
+  .error {
+    padding: 4rem 2rem;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #555555;
+  }
+  
+  .error {
+    color: #ff4d4f;
+  }
+  

@@ -1,0 +1,346 @@
+/* src/components/RecipesPage/RecipesPage.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.ctaButton {
+  background-color: #ff5722;
+  color: #fff;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  font-weight: 600;
+}
+
+.ctaButton:hover {
+  background-color: #e64a19;
+}
+
+/* Filter Section */
+.filterSection {
+  text-align: center;
+}
+
+.filterSection h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.filterButton {
+  background-color: #ffeeee;
+  border: none;
+  border-radius: 20px;
+  padding: 0.6rem 1.2rem;
+  color: #ff5722;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.filterButton:hover {
+  background-color: #ff5722;
+  color: #ffffff;
+}
+
+.activeFilter {
+  background-color: #ff5722; /* Primary color */
+  color: #fff;
+}
+
+/* Search Section */
+.searchSection {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.searchInput {
+  padding: 0.6rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  width: 300px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.searchInput:focus {
+  border-color: #ff5722;
+  outline: none;
+}
+
+/* Recipes Grid */
+.recipesGrid {
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.recipeCard {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.recipeCard:hover {
+  transform: translateY(-5px);
+}
+
+.recipeImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.recipeName {
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.recipeDescription {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.recipeButton {
+  background-color: #f48fb1;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.recipeButton:hover {
+  background-color: #ec407a;
+}
+
+.noRecipes {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Pagination Controls */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pageButton {
+  background-color: #ff5722;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.pageButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: #e64a19;
+}
+
+.pageInfo {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Cooking Tips Section */
+.tipsSection {
+  text-align: center;
+}
+
+.tipsTitle {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-gap: 2rem;
+}
+
+.tipCard {
+  background-color: #ffe0b2;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.tipCard:hover {
+  transform: translateY(-5px);
+}
+
+.tipIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.tipHeading {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.tipCard p {
+  color: #555;
+}
+
+/* Newsletter Section */
+.newsletterSection {
+  background: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
+  text-align: center;
+  padding: 3rem 1rem;
+  border-radius: 12px;
+}
+
+.newsletterSection h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.newsletterSection p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.newsletterForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.newsletterInput {
+  padding: 0.6rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  width: 250px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.newsletterInput:focus {
+  border-color: #ff5722;
+}
+
+.newsletterButton {
+  background-color: #ff9800;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.newsletterButton:hover {
+  background-color: #fb8c00;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recipesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .tipsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .ctaButton,
+  .filterButton,
+  .recipeButton,
+  .newsletterButton {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .searchInput,
+  .newsletterInput {
+    width: 100%;
+  }
+}

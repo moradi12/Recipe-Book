@@ -1,0 +1,35 @@
+/* src/components/MainLayout/MainLayout.css */
+
+.MainLayout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #fafafa;
+    font-family: Arial, sans-serif;
+  }
+  
+  .MainLayout header {
+    /* We don’t want extra top padding here, 
+       because the navbar is fixed. We'll handle it in <main>. */
+  }
+  
+  .menu-container {
+    /* Possibly hidden on mobile, or placed below the navbar. Adjust if needed. */
+    margin-top: 60px; /* or remove if you want the menu directly under the navbar */
+  }
+  
+  .MainLayout main {
+    flex: 1;
+    padding: 2rem;
+    /* This pushes the main content below the 60px fixed navbar */
+    padding-top: 80px; 
+  }
+  
+  /* Footer */
+  .MainLayout footer {
+    background-color: #f06292;
+    padding: 1rem;
+    color: #fff;
+    text-align: center;
+  }
+  

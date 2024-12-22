@@ -1,0 +1,200 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+  
+  /* Hero Section */
+  .hero {
+    position: relative;
+    text-align: center;
+    margin-bottom: 3rem;
+    overflow: hidden;
+  }
+  
+  .heroContent {
+    position: relative;
+    z-index: 2;
+  }
+  
+  .title {
+    font-size: 3rem;
+    margin: 1rem 0;
+    color: #333;
+  }
+  
+  .subtitle {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .ctaButton {
+    padding: 0.75rem 1.5rem;
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .ctaButton:hover {
+    background-color: #e64a19;
+  }
+  
+  .animatedBackground {
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 150%;
+    height: 150%;
+    background: linear-gradient(135deg, #ffe0b2 0%, #ffc107 100%);
+    z-index: 1;
+    transform: rotate(25deg);
+  }
+  
+  /* Features Section */
+  .features {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  .features h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .featuresGrid {
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    margin-top: 1rem;
+  }
+  
+  .featureCard {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .featureCard .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .featureCard h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .featureCard p {
+    color: #666;
+  }
+  
+  /* Recipe Highlights Section */
+  .highlights {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  .highlights h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .recipesGrid {
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .recipeCard {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .recipeImage {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .recipeCard h3 {
+    margin-top: 0.5rem;
+    font-size: 1.4rem;
+    color: #333;
+  }
+  
+  .recipeCard p {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  /* Testimonials Section */
+  .testimonials {
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+  
+  .testimonials h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .carousel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+  }
+  
+  .testimonial {
+    max-width: 700px;
+    background: #ffecd2;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  .testimonial p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  
+  .testimonial h4 {
+    color: #333;
+    font-size: 1rem;
+    text-align: right;
+  }
+  
+  /* CTA Section */
+  .cta {
+    text-align: center;
+    margin: 4rem 0;
+  }
+  
+  .cta h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  

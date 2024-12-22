@@ -1,18 +1,30 @@
 import { Route, Routes } from "react-router-dom";
-import { Main } from "../../../Layout/Main/Main";
+import Contact from "../../Contact Page/Contact";
+import Dashboard from "../../Dashboard/Dashboard";
+import Features from "../../Features/Features";
+import FoodHomePage from "../../FoodHomePage/FoodHomePage";
+import HomePage from "../../HomePage/OldHomePage";
 import Login from "../../Login/Login";
 import { Page404 } from "../../Page404/Page404";
+import RecipesPage from "../../RecipesPage/RecipesPage";
 import Register from "../../Register/Register";
 
 export function MainRoute(): JSX.Element {
   return (
-    <div className="MainRoute">
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Page404 />} />
-      </Routes>
-    </div>
+    <Routes>
+      {/* Example: top-level route */}
+      <Route path="/" element={<HomePage />} />
+      
+      <Route path="/food" element={<FoodHomePage />} />
+      
+      <Route path="/recipes" element={<RecipesPage />} />
+      <Route path="/features" element={<Features />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+
+      <Route path="*" element={<Page404 />} />
+    </Routes>
   );
 }

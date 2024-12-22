@@ -1,0 +1,114 @@
+/* src/components/Navbar/Navbar.module.css */
+
+/* Reset / Box-sizing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar Container */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f06292; /* Soft pink */
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Logo / Brand */
+.logo a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Hamburger Menu (hidden on large screens) */
+.hamburger {
+  display: none;
+  cursor: pointer;
+}
+
+.bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px auto;
+  transition: all 0.3s ease-in-out;
+  background-color: #fff;
+}
+
+/* Nav Links Container */
+.navLinks {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  transition: all 0.3s ease-in-out;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navLinks li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navLinks li a:hover,
+.navLinks li a.active {
+  color: #fce4ec; /* Very light pink */
+}
+
+/* Visual Divider */
+.divider {
+  color: #fff;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+  align-self: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  /* Show the hamburger icon on mobile */
+  .hamburger {
+    display: block;
+  }
+
+  /* Hide nav links by default on mobile */
+  .navLinks {
+    position: absolute;
+    top: 4.3rem; /* Height of navbar */
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background-color: #f06292;
+    gap: 1rem;
+    padding: 1rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-15px);
+  }
+
+  /* When active, show menu */
+  .navLinks.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Adjust link spacing */
+  .navLinks li {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+
+  /* Ensure divider is centered */
+  .divider {
+    display: none; /* Optional: Hide divider on mobile */
+  }
+}

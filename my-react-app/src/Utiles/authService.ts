@@ -1,6 +1,8 @@
 // Services/authService.ts
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import { LoginResponse } from '../Models/Auth';
+import { UserType } from '../Models/UserType';
 
 const TOKEN_KEY = 'jwtToken';
 
@@ -103,3 +105,25 @@ export function setToken(token: string): void {
 export function removeToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
+
+// src/Utiles/authService.ts
+/**
+ * Decodes the JWT token to retrieve the user type.
+ * @returns The user type if found in the token, otherwise null.
+ */
+export function getUserType(): UserType | null {
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const decoded: { userType: UserType } = jwtDecode(token);
+    return decoded.userType || null;
+  } catch (error) {
+    console.error('Failed to decode token:', error);
+    return null;
+  }
+}
+
+
