@@ -1,8 +1,7 @@
-// src/components/Navbar/Navbar.tsx
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { isAuthenticated, logout } from '../../Utiles/authService';
-import styles from './Navbar.module.css';
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { isAuthenticated, logout } from "../../Utiles/authService";
+import styles from "./Navbar.module.css";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,18 +17,33 @@ const Navbar: React.FC = () => {
       setIsAuth(isAuthenticated());
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
   const handleLogout = () => {
     logout();
     setIsAuth(false);
-    navigate('/login');
+    navigate("/login");
     setIsOpen(false);
   };
+
+  // Close the menu if clicked outside the navbar
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const navbar = document.querySelector(`.${styles.navbar}`);
+      if (navbar && !navbar.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className={styles.navbar}>
@@ -48,7 +62,7 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Navigation Links */}
-      <ul className={`${styles.navLinks} ${isOpen ? styles.active : ''}`}>
+      <ul className={`${styles.navLinks} ${isOpen ? styles.active : ""}`}>
         {/* Main Links */}
         <li>
           <NavLink to="/" onClick={() => setIsOpen(false)}>
@@ -63,6 +77,27 @@ const Navbar: React.FC = () => {
         <li>
           <NavLink to="/recipes" onClick={() => setIsOpen(false)}>
             Recipes
+          </NavLink>
+        </li>
+
+        <li>
+        <NavLink to="/recipe/1" onClick={() => setIsOpen(false)}>
+         Recipe 1
+       </NavLink>
+        </li>
+
+
+
+
+        
+        <li>
+          <NavLink to="/recipes/create" onClick={() => setIsOpen(false)}>
+            Create Recipe
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/recipes/manage" onClick={() => setIsOpen(false)}>
+            Manage Recipes
           </NavLink>
         </li>
         <li>
@@ -102,26 +137,6 @@ const Navbar: React.FC = () => {
         <li className={styles.divider}>|</li>
 
         {/* Secondary Links */}
-        <li>
-          <NavLink to="/all" onClick={() => setIsOpen(false)}>
-            Recipe
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/all/companies" onClick={() => setIsOpen(false)}>
-            List of Companies
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/add/recipe" onClick={() => setIsOpen(false)}>
-            Add Recipe
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/admin/customers" onClick={() => setIsOpen(false)}>
-            Customer List
-          </NavLink>
-        </li>
         <li>
           <NavLink to="/dashboard" onClick={() => setIsOpen(false)}>
             Dashboard

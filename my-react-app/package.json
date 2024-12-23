@@ -13,6 +13,7 @@
     "@mui/material": "^6.2.1",
     "@reduxjs/toolkit": "^2.5.0",
     "@types/react-router-dom": "^5.3.3",
+    "axios": "^1.7.9",
     "axios-jwt": "^4.0.3",
     "framer-motion": "^11.15.0",
     "jwt-decode": "^4.0.0",
@@ -21,6 +22,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.0.2",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1"

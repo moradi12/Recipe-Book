@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/recipes")
 public class RecipeController {
@@ -63,8 +63,7 @@ public class RecipeController {
      * Create a new recipe.
      */
     @PostMapping
-    public ResponseEntity<RecipeResponse> createRecipe(
-            @Valid @RequestBody RecipeCreateRequest request,
+    public ResponseEntity<RecipeResponse> createRecipe( @RequestBody RecipeCreateRequest request,
             HttpServletRequest httpRequest) throws LoginException {
         UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
         User user = userRepository.findById(userDetails.getUserId())
@@ -74,7 +73,6 @@ public class RecipeController {
         RecipeResponse response = recipeService.toRecipeResponse(recipe);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
     /**
      * Retrieve all recipes with pagination and sorting.
      */

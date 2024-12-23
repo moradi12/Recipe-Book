@@ -1,0 +1,164 @@
+.create-recipe-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+}
+
+.create-recipe-container h2 {
+  font-size: 2rem;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.create-recipe-error {
+  background-color: #fff5f5;
+  color: #c53030;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border-left: 5px solid #c53030;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.gluten-info {
+  background-color: #edf2f7;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+
+.gluten-info label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1rem;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.gluten-info input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #a0aec0;
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.gluten-info input[type="checkbox"]:checked {
+  background-color: #38a169;
+  border-color: #38a169;
+}
+
+.ingredient-container {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  align-items: center;
+}
+
+.ingredient-container input,
+.ingredient-container select {
+  padding: 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background-color: #f7fafc;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ingredient-container input:focus,
+.ingredient-container select:focus {
+  border-color: #3182ce;
+  outline: none;
+  box-shadow: 0 0 5px rgba(49, 130, 206, 0.4);
+}
+
+.ingredient-container button,
+.create-recipe-container button[type="submit"] {
+  background-color: #3182ce;
+  color: white;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.ingredient-container button:hover,
+.create-recipe-container button[type="submit"]:hover:not(:disabled) {
+  background-color: #2b6cb0;
+  transform: translateY(-2px);
+}
+
+.ingredient-list {
+  background-color: #edf2f7;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.ingredient-list h4 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.ingredient-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+  color: #000000; /* Ensure text color is black */
+  font-weight: 500; /* Optional: Add weight for better visibility */
+}
+
+.ingredient-list li:last-child {
+  margin-bottom: 0;
+}
+
+.ingredient-list button {
+  background-color: #fc8181;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: background-color 0.3s, transform 0.2s;
+  cursor: pointer;
+}
+
+.ingredient-list button:hover {
+  background-color: #e53e3e;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .ingredient-container {
+    grid-template-columns: 1fr;
+  }
+
+  .ingredient-container button {
+    width: 100%;
+  }
+}
