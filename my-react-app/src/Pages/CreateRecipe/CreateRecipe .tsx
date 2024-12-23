@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import { Recipe } from "../../Models/Recipe";
 import { RecipeService } from "../../Service/RecipeService";
 import RecipeForm from "../RecipeForm/RecipeForm";
-import "./CreateRecipe.css";
+import './CreateRecipe.css';
 
 const CreateRecipe: React.FC = () => {
   const [recipe, setRecipe] = useState<Partial<Recipe>>({
@@ -15,16 +15,16 @@ const CreateRecipe: React.FC = () => {
     servings: 0,
     dietaryInfo: "",
     containsGluten: true,
+    status: "DRAFT", 
   });
 
   const [newIngredient, setNewIngredient] = useState("");
+  const [ingredientAmount, setIngredientAmount] = useState("");
   const [measurementUnit, setMeasurementUnit] = useState("grams");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRecipe((prevRecipe) => ({
       ...prevRecipe,
@@ -39,10 +39,20 @@ const CreateRecipe: React.FC = () => {
     }));
   };
 
-  const handleAddIngredient = () => {
-    if (!newIngredient.trim()) return;
+  const handleIngredientAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "" || /^[0-9]*\.?[0-9]+$/.test(value)) {
+      setIngredientAmount(value);
+    }
+  };
 
-    const ingredientWithUnit = `${newIngredient.trim()} (${measurementUnit})`;
+  const handleAddIngredient = () => {
+    if (!newIngredient.trim() || !ingredientAmount.trim()) {
+      setError("Both ingredient name and amount are required.");
+      return;
+    }
+
+    const ingredientWithUnit = `${ingredientAmount} ${measurementUnit} of ${newIngredient.trim()}`;
 
     if (recipe.ingredients?.includes(ingredientWithUnit)) {
       setError("Ingredient already exists.");
@@ -55,10 +65,16 @@ const CreateRecipe: React.FC = () => {
     }));
 
     setNewIngredient("");
+    setIngredientAmount("");
     setError(null);
   };
 
   const handleSubmit = async () => {
+    if (!recipe.name || !recipe.title || !recipe.description) {
+      setError("Please fill in all the required fields.");
+      return;
+    }
+
     setError(null);
     setIsSubmitting(true);
 
@@ -76,12 +92,13 @@ const CreateRecipe: React.FC = () => {
           servings: 0,
           dietaryInfo: "",
           containsGluten: true,
+          status: "DRAFT",
         });
       } else {
         setError("Failed to create the recipe. Please try again.");
       }
     } catch (err) {
-      setError("Failed to create the recipe. Please try again.");
+      setError("Error creating recipe. Please try again.");
       console.error("Error creating recipe:", err);
     } finally {
       setIsSubmitting(false);
@@ -114,6 +131,12 @@ const CreateRecipe: React.FC = () => {
           value={newIngredient}
           onChange={(e) => setNewIngredient(e.target.value)}
         />
+        <input
+          type="text"
+          placeholder="Amount"
+          value={ingredientAmount}
+          onChange={handleIngredientAmountChange}
+        />
         <select
           value={measurementUnit}
           onChange={(e) => setMeasurementUnit(e.target.value)}
@@ -127,15 +150,15 @@ const CreateRecipe: React.FC = () => {
       </div>
 
       {recipe.ingredients && recipe.ingredients.length > 0 && (
-        <div className="ingredients-list">
-          <h4>Ingredients:</h4>
-          <ul>
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+  <div className="ingredients-list">
+    <h4>Ingredients:</h4>
+    <ul>
+      {recipe.ingredients.map((ingredient, index) => (
+        <li key={index}>{ingredient}</li>
+      ))}
+    </ul>
+  </div>
+)}
 
       <button
         className="submit-button"

@@ -81,15 +81,11 @@ const Navbar: React.FC = () => {
         </li>
 
         <li>
-        <NavLink to="/recipe/1" onClick={() => setIsOpen(false)}>
-         Recipe 1
-       </NavLink>
+          <NavLink to="/recipe/1" onClick={() => setIsOpen(false)}>
+            Recipe 1
+          </NavLink>
         </li>
 
-
-
-
-        
         <li>
           <NavLink to="/recipes/create" onClick={() => setIsOpen(false)}>
             Create Recipe

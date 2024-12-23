@@ -13,11 +13,12 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
   const handleNumberInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { value, name } = e.target;
     const numericValue = Number(value);
 
-    // Ensure the value is greater than 0 or an empty string
-    if ((numericValue > 0 || value === "") && name !== "") {
+    // Ensure the value is a positive number or empty string
+    if ((!isNaN(numericValue) && numericValue >= 0) || value === "") {
       onInputChange(e);
     }
   };
@@ -47,7 +48,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.description || ""}
         onChange={onInputChange}
         placeholder="Enter a brief description"
-        multiline={true}
+        multiline
       />
       <FormInput
         label="Preparation Steps"
@@ -56,7 +57,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.preparationSteps || ""}
         onChange={onInputChange}
         placeholder="Enter steps"
-        multiline={true}
+        multiline
       />
       <FormInput
         label="Cooking Time (mins)"

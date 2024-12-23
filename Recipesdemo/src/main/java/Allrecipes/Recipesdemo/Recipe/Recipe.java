@@ -17,45 +17,32 @@ import java.util.*;
 @AllArgsConstructor
 @Builder
 public class Recipe {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
     @Column(nullable = false)
     private String title;
-
     @Lob
     private String description;
-
     @ElementCollection
     @CollectionTable(name = "recipe_ingredients", joinColumns = @JoinColumn(name = "recipe_id"))
     @Column(name = "ingredient")
     private List<String> ingredients = new ArrayList<>();
-
     @Lob
     private String preparationSteps;
-
     private int cookingTime;
     private int servings;
     private String dietaryInfo;
-
     @Enumerated(EnumType.STRING)
     private RecipeStatus status;
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
-
     @Column(nullable = false)
     private boolean containsGluten = true;
-
-
     @ManyToMany
 //    @JoinTable(
 //            name = "recipe_categories",

@@ -33,6 +33,7 @@ export function MainRoute(): JSX.Element {
       <Route path="/recipes/manage" element={<RecipeManagement />} />
       <Route path="/recipes/:id" element={<RecipeDetails />} />
       <Route path="/recipe/:id" element={<RecipeComponent  />} /> {/* New route for RecipeComponent */}
+
       {/* Shopping List */}
       <Route path="/shopping-list/add" element={<AddShoppingListForm onAdd={() => {}} />} />
       <Route path="/shopping-list/item/add" element={<AddShoppingListItemForm onAdd={() => {}} />} />
