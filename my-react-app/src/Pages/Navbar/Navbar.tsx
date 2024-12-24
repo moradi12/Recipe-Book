@@ -1,3 +1,4 @@
+// src/Components/Navbar/Navbar.tsx
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../../Utiles/authService";
@@ -79,13 +80,16 @@ const Navbar: React.FC = () => {
             Recipes
           </NavLink>
         </li>
-
+        <li>
+          <NavLink to="/all" onClick={() => setIsOpen(false)}>
+            All Recipes
+          </NavLink>
+        </li>
         <li>
           <NavLink to="/recipe/1" onClick={() => setIsOpen(false)}>
             Recipe 1
           </NavLink>
         </li>
-
         <li>
           <NavLink to="/recipes/create" onClick={() => setIsOpen(false)}>
             Create Recipe

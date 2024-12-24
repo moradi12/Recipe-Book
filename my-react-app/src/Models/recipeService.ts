@@ -3,11 +3,14 @@
 import { getToken } from "../Utiles/authService";
 import { Recipe } from "./Recipe";
 
-/**
- * Fetches all recipes from the backend.
- * @returns Promise resolving to an array of Recipe objects.
- * @throws Error if the fetch operation fails.
- */
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage || 'An error occurred while fetching data');
+  }
+  return response.json();
+}
+
 export async function fetchRecipes(): Promise<Recipe[]> {
   const token = getToken();
   const response = await fetch('/api/recipes', {
@@ -16,21 +19,9 @@ export async function fetchRecipes(): Promise<Recipe[]> {
       'Content-Type': 'application/json',
     },
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch recipes');
-  }
-
-  const data: Recipe[] = await response.json();
-  return data;
+  return handleResponse<Recipe[]>(response);
 }
 
-/**
- * Fetches a single recipe by its ID.
- * @param id - The ID of the recipe to fetch.
- * @returns Promise resolving to a Recipe object.
- * @throws Error if the fetch operation fails.
- */
 export async function fetchRecipeById(id: number): Promise<Recipe> {
   const token = getToken();
   const response = await fetch(`/api/recipes/${id}`, {
@@ -39,11 +30,5 @@ export async function fetchRecipeById(id: number): Promise<Recipe> {
       'Content-Type': 'application/json',
     },
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch recipe details');
-  }
-
-  const data: Recipe = await response.json();
-  return data;
+  return handleResponse<Recipe>(response);
 }

@@ -17,9 +17,6 @@ export interface Recipe {
   categories: Category[]; // Matches `Set<Category> categories` in Java class
 }
 
-export interface RecipeResponse extends Recipe {
-  createdByUsername: string; // Specific to the response, added for convenience
-}
 
 // Models/User.ts
 export interface User {
@@ -33,4 +30,37 @@ export interface User {
 export interface Category {
   id: number;
   name: string; // Assuming categories have an ID and name
+}
+export interface RecipeResponse {
+  id: number;
+  name: string;
+  title: string;
+  description: string;
+  ingredients: string[];
+  preparationSteps: string;
+  cookingTime: number;
+  servings: number;
+  dietaryInfo?: string;
+  containsGluten: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: User;
+  categories: Category[];
+}
+export interface APIRecipeResponse {
+  id: number;
+  title: string;
+  description: string;
+  ingredients: string[];
+  preparationSteps: string;
+  cookingTime: number;
+  servings: number;
+  dietaryInfo?: string;
+  containsGluten: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  createdByUsername: string;
+  categories: { id: number; name: string }[];
 }

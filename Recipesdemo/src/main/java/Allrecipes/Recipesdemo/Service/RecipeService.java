@@ -28,6 +28,25 @@ public class RecipeService {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
     }
+    /**
+     * Retrieve all recipes from the database with pagination and mapping to RecipeResponse.
+     */
+    public Page<RecipeResponse> getAllRecipesWithResponse(Pageable pageable) {
+        Page<Recipe> recipesPage = recipeRepository.findAll(pageable);
+        return recipesPage.map(this::toRecipeResponse);
+    }
+
+    /**
+     * Retrieve all recipes from the database.
+     */
+    public List<RecipeResponse> getAllRecipes() {
+        List<Recipe> recipes = recipeRepository.findAll();
+        return recipes.stream()
+                .map(this::toRecipeResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
     /**
      * Create a new recipe.

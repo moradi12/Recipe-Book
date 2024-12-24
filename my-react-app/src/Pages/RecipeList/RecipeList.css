@@ -1,0 +1,82 @@
+/* RecipeList.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    color: black;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  thead {
+    background-color: #f7f7f7;
+  }
+  
+  th,
+  td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eaeaea;
+    color: black; /* Set font color to black */
+  }
+  
+  th {
+    font-weight: bold;
+  }
+  
+  tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  button.bg-blue-500 {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  button.bg-blue-500:hover {
+    background-color: #0056b3;
+  }
+  
+  button.bg-gray-300 {
+    background-color: #eaeaea;
+    cursor: not-allowed;
+  }
+  
+  .flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  button[disabled] {
+    opacity: 0.6;
+  }
+  
+  span {
+    margin: 0 10px;
+    font-weight: bold;
+    font-size: 16px;
+    color: black; /* Set font color to black */
+  }
+  

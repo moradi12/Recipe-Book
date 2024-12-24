@@ -1,3 +1,4 @@
+// src/Routes/MainRoute.tsx
 import { Route, Routes } from "react-router-dom";
 import Contact from "../../Contact Page/Contact";
 import CreateRecipe from "../../CreateRecipe/CreateRecipe ";
@@ -6,9 +7,11 @@ import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import HomePage from "../../HomePage/OldHomePage";
 import Login from "../../Login/Login";
+import ManageRecipes from "../../ManageRecipes/ManageRecipes";
 import { Page404 } from "../../Page404/Page404";
 import RecipeComponent from "../../RecipeComponent/RecipeComponent";
 import RecipeDetails from "../../RecipeDetails/RecipeDetails";
+import RecipeList from "../../RecipeList/RecipeList";
 import RecipeManagement from "../../RecipeManagement/RecipeManagement";
 import RecipesPage from "../../RecipesPage/RecipesPage";
 import Register from "../../Register/Register";
@@ -27,12 +30,14 @@ export function MainRoute(): JSX.Element {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/all" element={<RecipeList />} />
 
       {/* Recipe-related routes */}
       <Route path="/recipes/create" element={<CreateRecipe />} />
       <Route path="/recipes/manage" element={<RecipeManagement />} />
       <Route path="/recipes/:id" element={<RecipeDetails />} />
-      <Route path="/recipe/:id" element={<RecipeComponent  />} /> {/* New route for RecipeComponent */}
+      <Route path="/recipe/:id" element={<RecipeComponent />} /> {/* Existing route */}
+      <Route path="/recipes/manage" element={<ManageRecipes />} /> {/* New route for ManageRecipes */}
 
       {/* Shopping List */}
       <Route path="/shopping-list/add" element={<AddShoppingListForm onAdd={() => {}} />} />

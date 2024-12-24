@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin
 @RestController
 @RequestMapping("/api/recipes")
 public class RecipeController {
@@ -46,6 +46,33 @@ public class RecipeController {
         this.categoryRepository = categoryRepository;
         this.jwtUtil = jwtUtil;
     }
+
+    /**
+     * Retrieve all recipes from the database.
+     */
+    @GetMapping("/all")
+    public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
+        List<RecipeResponse> recipes = recipeService.getAllRecipes();
+        return ResponseEntity.ok(recipes);
+    }
+
+
+    /**
+     * Retrieve all recipes with pagination and sorting.
+     */
+    @GetMapping
+    public ResponseEntity<Page<RecipeResponse>> getAllRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        Pageable pageable = PageRequest.of(page, size,
+                sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
+        Page<RecipeResponse> recipesPage = recipeService.getAllRecipesWithResponse(pageable);
+        return ResponseEntity.ok(recipesPage);
+    }
+
+
 
     /**
      * Helper method to extract UserDetails from the JWT token in the Authorization header.
@@ -76,16 +103,6 @@ public class RecipeController {
     /**
      * Retrieve all recipes with pagination and sorting.
      */
-    @GetMapping
-    public ResponseEntity<Page<RecipeResponse>> getAllRecipes(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<Recipe> recipePage = recipeService.getAllRecipes(pageable);
-        Page<RecipeResponse> dtoPage = recipePage.map(recipeService::toRecipeResponse);
-        return ResponseEntity.ok(dtoPage);
-    }
 
     /**
      * Retrieve a recipe by ID.
