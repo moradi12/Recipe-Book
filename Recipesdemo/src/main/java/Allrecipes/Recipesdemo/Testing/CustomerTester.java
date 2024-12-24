@@ -94,6 +94,48 @@ public class CustomerTester implements CommandLineRunner {
 
             testRecipe = recipeService.createRecipe(recipeRequest, customer1);
             System.out.println("Added Test Recipe: " + testRecipe);
+
+
+            Category category1 = categoryService.createCategory(FoodCategories.VEGETARIAN);
+            RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
+                    .title("Hearty Vegetable Stew")
+                    .description("A delicious and filling vegetable stew, perfect for cold evenings.")
+                    .ingredients(List.of("Carrots", "Potatoes", "Onions", "Celery", "Vegetable Stock"))
+                    .preparationSteps("Chop all vegetables. Cook in a pot with stock until tender.")
+                    .cookingTime(60)
+                    .servings(4)
+                    .dietaryInfo("Vegetarian")
+                    .build();
+            Recipe recipe1 = recipeService.createRecipe(recipeRequest1, customer1);
+            System.out.println("Added Recipe: " + recipe1.getTitle());
+
+            Category category2 = categoryService.createCategory(FoodCategories.SEAFOOD);
+            RecipeCreateRequest recipeRequest2 = RecipeCreateRequest.builder()
+                    .title("Garlic Butter Shrimp Pasta")
+                    .description("Quick and easy shrimp pasta with a garlic butter sauce.")
+                    .ingredients(List.of("Shrimp", "Pasta", "Garlic", "Butter", "Parsley"))
+                    .preparationSteps("Cook pasta. Saute shrimp with garlic in butter. Combine and garnish with parsley.")
+                    .cookingTime(20)
+                    .servings(2)
+                    .dietaryInfo("Seafood")
+                    .build();
+            Recipe recipe2 = recipeService.createRecipe(recipeRequest2, customer1);
+            System.out.println("Added Recipe: " + recipe2.getTitle());
+
+            Category category3 = categoryService.createCategory(FoodCategories.DESSERT);
+            RecipeCreateRequest recipeRequest3 = RecipeCreateRequest.builder()
+                    .title("Classic Chocolate Brownies")
+                    .description("Rich, fudgy chocolate brownies with a crackly top.")
+                    .ingredients(List.of("Butter", "Sugar", "Cocoa powder", "Flour", "Eggs"))
+                    .preparationSteps("Mix all ingredients and bake in a preheated oven at 350°F for 20 minutes.")
+                    .cookingTime(20)
+                    .servings(8)
+                    .dietaryInfo("Dessert")
+                    .build();
+            Recipe recipe3 = recipeService.createRecipe(recipeRequest3, customer1);
+            System.out.println("Added Recipe: " + recipe3.getTitle());
+
+
         } catch (Exception e) {
             System.out.println("Error adding test recipe: " + e.getMessage());
         }
