@@ -1,4 +1,3 @@
-// src/Pages/RecipeList/RecipeList.tsx
 import { AxiosError } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -15,23 +14,22 @@ const RecipeList: React.FC = () => {
 
   useEffect(() => {
     const fetchRecipes = async () => {
-        try {
-          setLoading(true);
-          const response = await getPaginatedRecipes(page, 10, 'createdAt', 'asc');
-          console.log(response); // Log the response here
-          setRecipes(response.content);
-          setTotalPages(response.totalPages);
-        } catch (error: unknown) {
-          if (error instanceof AxiosError) {
-            setError(error.response?.data?.message || 'Failed to fetch recipes');
-          } else {
-            setError('An unexpected error occurred');
-          }
-        } finally {
-          setLoading(false);
+      try {
+        setLoading(true);
+        const response = await getPaginatedRecipes(page, 10, 'createdAt', 'asc');
+        setRecipes(response.content);
+        setTotalPages(response.totalPages);
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          setError(error.response?.data?.message || 'Failed to fetch recipes');
+        } else {
+          setError('An unexpected error occurred');
         }
-      };
-      
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRecipes();
   }, [page]);
 
@@ -44,7 +42,7 @@ const RecipeList: React.FC = () => {
   };
 
   if (loading) return <p>Loading recipes...</p>;
-  if (error) return <p className="text-red-500">Error: {error}</p>;
+  if (error) return <p className="text-red-500 font-bold">Error: {error}</p>;
 
   return (
     <div className="container mx-auto p-4">
@@ -59,6 +57,8 @@ const RecipeList: React.FC = () => {
             <th className="py-2 px-4 border-b">Servings</th>
             <th className="py-2 px-4 border-b">Created By</th>
             <th className="py-2 px-4 border-b">Status</th>
+            <th className="py-2 px-4 border-b">Ingredients</th>
+            <th className="py-2 px-4 border-b">Dietary Info</th>
             <th className="py-2 px-4 border-b">Actions</th>
           </tr>
         </thead>
@@ -74,8 +74,16 @@ const RecipeList: React.FC = () => {
                 <td className="py-2 px-4 border-b">{recipe.createdBy.username}</td>
                 <td className="py-2 px-4 border-b">{recipe.status}</td>
                 <td className="py-2 px-4 border-b">
+                  {recipe.ingredients.map(ingredient => (
+                    <div key={ingredient.id}>
+                      {ingredient.name} - {ingredient.quantity}
+                    </div>
+                  ))}
+                </td>
+                <td className="py-2 px-4 border-b">{recipe.dietaryInfo || 'N/A'}</td>
+                <td className="py-2 px-4 border-b">
                   <Link to={`/recipes/edit/${recipe.id}`}>
-                    <button className="bg-blue-500 text-white px-3 py-1 rounded">
+                    <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                       Edit
                     </button>
                   </Link>
@@ -84,7 +92,7 @@ const RecipeList: React.FC = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={8} className="py-4 text-center">
+              <td colSpan={10} className="py-4 text-center">
                 No recipes found.
               </td>
             </tr>

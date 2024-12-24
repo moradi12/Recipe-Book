@@ -1,10 +1,13 @@
+import { Ingredient } from "./Ingredient";
+
 // Models/Recipe.ts
 export interface Recipe {
   id: number;
   name: string; // Added to match the `name` field in the Java class
   title: string;
   description: string;
-  ingredients: string[]; // Matches `List<String> ingredients` from Java class
+  // ingredients: string[]; // Matches `List<String> ingredients` from Java class
+  ingredients: Ingredient[]; // Matches `List<Ingredient> ingredients` from Java class
   preparationSteps: string;
   cookingTime: number;
   servings: number;
@@ -36,7 +39,7 @@ export interface RecipeResponse {
   name: string;
   title: string;
   description: string;
-  ingredients: string[];
+  ingredients: Ingredient[];
   preparationSteps: string;
   cookingTime: number;
   servings: number;
@@ -52,7 +55,7 @@ export interface APIRecipeResponse {
   id: number;
   title: string;
   description: string;
-  ingredients: string[];
+  ingredients: { id: string; name: string; quantity: string }[];
   preparationSteps: string;
   cookingTime: number;
   servings: number;
