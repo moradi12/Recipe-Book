@@ -20,7 +20,6 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     @Query("SELECT AVG(r.score) FROM Rating r WHERE r.recipe.id = :recipeId AND r.deleted = false")
     Double findAverageRatingByRecipe(Long recipeId);
 
-    // Fetch all ratings for a recipe with pagination
     Page<Rating> findByRecipe_Id(Long recipeId, Pageable pageable);
 
     List<Rating> findByRecipe_Id(Long recipeId);
@@ -30,10 +29,6 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     // Fetch all active ratings
     @Query("SELECT r FROM Rating r WHERE r.deleted = false")
     List<Rating> findAllActive();
-
-    // Fetch active ratings for a recipe with pagination
     Page<Rating> findByRecipe_IdAndDeletedFalse(Long recipeId, Pageable pageable);
-
-    // Fetch active ratings by a specific user with pagination
     Page<Rating> findByUser_IdAndDeletedFalse(Long userId, Pageable pageable);
 }

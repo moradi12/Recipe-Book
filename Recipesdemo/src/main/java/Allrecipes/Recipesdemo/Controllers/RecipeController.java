@@ -12,8 +12,6 @@ import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import Allrecipes.Recipesdemo.Service.RecipeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +61,6 @@ public class RecipeController {
     @GetMapping("/all")
     public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
         try {
-            // Fetch all recipes and convert them to RecipeResponse
             List<RecipeResponse> recipes = recipeService.getAllRecipes();
             return ResponseEntity.ok(recipes);
         } catch (Exception e) {
@@ -71,8 +68,6 @@ public class RecipeController {
                     .body(null); // Return a 500 response with no body
         }
     }
-
-
 
 
     @PostMapping
