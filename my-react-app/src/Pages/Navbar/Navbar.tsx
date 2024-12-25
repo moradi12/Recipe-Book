@@ -80,40 +80,7 @@ const Navbar: React.FC = () => {
             Recipes
           </NavLink>
         </li>
-        <li>
-          <NavLink to="/all" onClick={() => setIsOpen(false)}>
-            All Recipes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/recipe/1" onClick={() => setIsOpen(false)}>
-            Recipe 1
-          </NavLink>
-        </li>
 
-
-
-        <li>
-          <NavLink to="/moradi" onClick={() => setIsOpen(false)}>
-            Moradi
-          </NavLink>
-        </li>
-
-
-
-
-
-
-        <li>
-          <NavLink to="/recipes/create" onClick={() => setIsOpen(false)}>
-            Create Recipe
-          </NavLink>
-        </li>
-        {/* <li>
-          <NavLink to="/recipes/manage" onClick={() => setIsOpen(false)}>
-            Manage Recipes
-          </NavLink>
-        </li> */}
         <li>
           <NavLink to="/features" onClick={() => setIsOpen(false)}>
             Features
@@ -151,11 +118,11 @@ const Navbar: React.FC = () => {
         <li className={styles.divider}>|</li>
 
         {/* Secondary Links */}
-        {/* <li>
+        <li>
           <NavLink to="/dashboard" onClick={() => setIsOpen(false)}>
             Dashboard
           </NavLink>
-        </li> */}
+        </li>
       </ul>
     </nav>
   );

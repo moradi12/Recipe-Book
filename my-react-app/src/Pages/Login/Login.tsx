@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { login } from '../../Utiles/authService';
-import { notify } from '../../Utiles/notif'; // Assuming you use a notification library
+import { notify } from '../../Utiles/notif';
 import './Login.css';
 
 const Login: React.FC = () => {
@@ -8,6 +9,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +26,16 @@ const Login: React.FC = () => {
 
       notify.success(`Login successful! Welcome, ${usernameOrEmail}`);
 
-      // Perform additional logic if needed, such as saving the token
-      console.log('Storing token or initiating user session...');
+      // Save the token
+      localStorage.setItem('authToken', token);
 
-      window.location.reload();
+      // Navigate to the home page
+      navigate('/');
+
+      // Programmatically refresh the page
+      setTimeout(() => {
+        window.location.reload();
+      }, 0); // Trigger a reload immediately after navigation
     } catch (err: unknown) {
       console.error('Login failed:', err);
       if (err instanceof Error && err.message === 'Invalid credentials') {
