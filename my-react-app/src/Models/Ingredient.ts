@@ -1,7 +1,7 @@
+// Models/Ingredient.ts
 export interface Ingredient {
-    id: string;
-    recipeId: string;
-    name: string;
-    quantity: string; // e.g., "2 cups", "1 tsp"
-  }
-  
+  id: number; // Optional if used only for requests
+  name: string;
+  quantity: string;
+  unit: string;
+}

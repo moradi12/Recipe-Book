@@ -1,9 +1,6 @@
+// Models/User.ts
 export interface User {
-    id: number;
-    username: string;
-    email: string;
-    userType: string;
-    favorites?: number[];
-  }
-  
-  
+  id: number;
+  username: string;
+  email: string;
+}

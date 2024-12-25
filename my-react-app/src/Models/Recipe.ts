@@ -1,3 +1,4 @@
+import { Category } from "./Category";
 import { Ingredient } from "./Ingredient";
 
 // Models/Recipe.ts
@@ -6,8 +7,8 @@ export interface Recipe {
   name: string; // Added to match the `name` field in the Java class
   title: string;
   description: string;
-  // ingredients: string[]; // Matches `List<String> ingredients` from Java class
-  ingredients: Ingredient[]; // Matches `List<Ingredient> ingredients` from Java class
+  ingredients: { id: number; name: string; quantity: string; unit: string }[];
+
   preparationSteps: string;
   cookingTime: number;
   servings: number;
@@ -17,7 +18,8 @@ export interface Recipe {
   createdAt: string; // LocalDateTime should be represented as ISO string in TypeScript
   updatedAt: string; // LocalDateTime as ISO string
   createdBy: User; // Matches `User createdBy` in Java class
-  categories: Category[]; // Matches `Set<Category> categories` in Java class
+  categories: Category[]; 
+
 }
 
 
@@ -30,10 +32,7 @@ export interface User {
 }
 
 // Models/Category.ts
-export interface Category {
-  id: number;
-  name: string; // Assuming categories have an ID and name
-}
+
 export interface RecipeResponse {
   id: number;
   name: string;

@@ -1,4 +1,3 @@
-// src/Components/Navbar/Navbar.tsx
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../../Utiles/authService";
@@ -31,7 +30,6 @@ const Navbar: React.FC = () => {
     setIsOpen(false);
   };
 
-  // Close the menu if clicked outside the navbar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(`.${styles.navbar}`);
@@ -48,23 +46,20 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={styles.navbar}>
-      {/* Logo */}
       <div className={styles.logo}>
         <NavLink to="/" onClick={() => setIsOpen(false)}>
           Dessert Delights
         </NavLink>
       </div>
 
-      {/* Hamburger Menu */}
       <div className={styles.hamburger} onClick={toggleMenu}>
         <span className={styles.bar} />
         <span className={styles.bar} />
         <span className={styles.bar} />
       </div>
 
-      {/* Navigation Links */}
       <ul className={`${styles.navLinks} ${isOpen ? styles.active : ""}`}>
-        {/* Main Links */}
+        {/* Existing Links */}
         <li>
           <NavLink to="/" onClick={() => setIsOpen(false)}>
             Home
@@ -80,7 +75,6 @@ const Navbar: React.FC = () => {
             Recipes
           </NavLink>
         </li>
-
         <li>
           <NavLink to="/features" onClick={() => setIsOpen(false)}>
             Features
@@ -89,6 +83,34 @@ const Navbar: React.FC = () => {
         <li>
           <NavLink to="/contact" onClick={() => setIsOpen(false)}>
             Contact
+          </NavLink>
+        </li>
+
+
+
+
+        <li>
+          <NavLink to="/add" onClick={() => setIsOpen(false)}>
+            Add 
+          </NavLink>
+        </li>
+
+
+
+        {/* New Links */}
+        <li>
+          <NavLink to="/create-recipe" onClick={() => setIsOpen(false)}>
+            Create Recipe
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/all-recipes" onClick={() => setIsOpen(false)}>
+            View All Recipes
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/categories" onClick={() => setIsOpen(false)}>
+            Categories
           </NavLink>
         </li>
 
@@ -114,10 +136,7 @@ const Navbar: React.FC = () => {
           </li>
         )}
 
-        {/* Divider */}
         <li className={styles.divider}>|</li>
-
-        {/* Secondary Links */}
         <li>
           <NavLink to="/dashboard" onClick={() => setIsOpen(false)}>
             Dashboard
