@@ -34,43 +34,9 @@ public class RecipeController {
         this.jwtUtil = jwtUtil;
     }
 
-    private UserDetails getUserDetailsFromRequest(HttpServletRequest request) throws LoginException {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Missing or invalid Authorization header");
-        }
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
-        return jwtUtil.getUserDetails(token);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<String> getRecipeById(@PathVariable Long id) {
-        try {
-            Recipe recipe = recipeService.getRecipeById(id);
-            return ResponseEntity.ok("Recipe found: " + recipe.getTitle());
-        } catch (RecipeNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Recipe with ID " + id + " not found.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
-        }
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<RecipeResponse>> getAllRecipes() {
-        try {
-            List<RecipeResponse> recipes = recipeService.getAllRecipes();
-            return ResponseEntity.ok(recipes);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
-
     @PostMapping
-    public ResponseEntity<String> createRecipe(
-            @Valid @RequestBody RecipeCreateRequest request,
+    public ResponseEntity<?> createRecipe(
+             @RequestBody RecipeCreateRequest request,
             HttpServletRequest httpRequest) {
         try {
             UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
@@ -84,12 +50,48 @@ public class RecipeController {
                     .body("Invalid request: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred while creating the recipe.");
+        }
+    }
+
+
+    private UserDetails getUserDetailsFromRequest(HttpServletRequest request) throws LoginException {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
+        }
+        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        return jwtUtil.getUserDetails(token);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
+        try {
+            Recipe recipe = recipeService.getRecipeById(id);
+            return ResponseEntity.ok(recipe);
+        } catch (RecipeNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Recipe with ID " + id + " not found.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred.");
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllRecipes() {
+        try {
+            List<RecipeResponse> recipes = recipeService.getAllRecipes();
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred while retrieving recipes.");
+        }
+    }
+
+
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateRecipe(
+    public ResponseEntity<?> updateRecipe(
             @PathVariable Long id,
             @Valid @RequestBody RecipeCreateRequest request,
             HttpServletRequest httpRequest) {
@@ -107,19 +109,18 @@ public class RecipeController {
                     .body("You are not authorized to update this recipe.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
+                    .body("An unexpected error occurred while updating the recipe.");
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRecipe(@PathVariable Long id, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest httpRequest) {
         try {
             UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
             User user = userRepository.findById(userDetails.getUserId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
             recipeService.deleteRecipe(id, user);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body("Recipe deleted successfully.");
+            return ResponseEntity.noContent().build();
         } catch (RecipeNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Recipe with ID " + id + " not found.");
@@ -128,22 +129,22 @@ public class RecipeController {
                     .body("You are not authorized to delete this recipe.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
+                    .body("An unexpected error occurred while deleting the recipe.");
         }
     }
 
     @GetMapping("/search")
-    public ResponseEntity<String> searchRecipes(@RequestParam String title) {
+    public ResponseEntity<?> searchRecipes(@RequestParam String title) {
         try {
             List<RecipeResponse> recipes = recipeService.searchRecipesByTitle(title);
             if (recipes.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("No recipes found with the title containing: " + title);
             }
-            return ResponseEntity.ok("Recipes found matching the title: " + title);
+            return ResponseEntity.ok(recipes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred.");
+                    .body("An unexpected error occurred while searching for recipes.");
         }
     }
 }

@@ -1,6 +1,7 @@
 // src/Routes/MainRoute.tsx
 import { Route, Routes } from "react-router-dom";
 import AddRecipe from "../../AddRecipe/AddRecipe";
+import CreateRecipe from "../../AddRecipe/CreateRecipe";
 import CategoryDropdown from "../../CategoryDropdown/CategoryDropdown";
 import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
@@ -26,6 +27,7 @@ export function MainRoute(): JSX.Element {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/categories" element={<CategoryDropdown />} />
       <Route path="/add" element={<AddRecipe />} />
+      <Route path="/create" element={<CreateRecipe  />} />
 
 
       {/* Catch-all for undefined routes */}
@@ -33,3 +35,4 @@ export function MainRoute(): JSX.Element {
     </Routes>
   );
 }
+export default MainRoute;

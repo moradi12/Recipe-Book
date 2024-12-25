@@ -5,6 +5,8 @@ import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -34,9 +36,9 @@ public class Recipe {
     private List<Ingredient> ingredients = new ArrayList<>();
     @Lob
     private String preparationSteps;
-
+    @Positive
     private int cookingTime;
-
+    @Min(1)
     private int servings;
 
     private String dietaryInfo;

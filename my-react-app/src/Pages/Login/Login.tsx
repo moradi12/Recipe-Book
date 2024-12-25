@@ -1,8 +1,22 @@
+// src/components/Login.tsx
+
+import { jwtDecode } from 'jwt-decode';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../Utiles/authService';
 import { notify } from '../../Utiles/notif';
+import { authState, loginAction } from '../Redux/AuthReducer';
+import { recipeSystem } from '../Redux/store';
 import './Login.css';
+
+type jwtData = {
+  userType: string;
+  userName: string;
+  id: number;
+  sub: string;
+  iat: number;
+  exp: number;
+};
 
 const Login: React.FC = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -10,7 +24,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,18 +38,33 @@ const Login: React.FC = () => {
       console.log('Login successful!');
       console.log('Received JWT Token:', token);
 
-      notify.success(`Login successful! Welcome, ${usernameOrEmail}`);
+      // Store the token in sessionStorage for consistency
+      sessionStorage.setItem('jwt', token);
 
-      // Save the token
-      localStorage.setItem('authToken', token);
+      // Decode the JWT to extract user information
+      const decoded_jwt = jwtDecode<jwtData>(token);
+      console.log('Decoded JWT:', decoded_jwt);
+
+      // Create an authState object
+      const myAuth: authState = {
+        id: decoded_jwt.id,
+        email: decoded_jwt.sub,
+        name: decoded_jwt.userName,
+        token: token,
+        userType: decoded_jwt.userType,
+        isLogged: true,
+      };
+
+      // Dispatch the login action to update the Redux store
+      recipeSystem.dispatch(loginAction(myAuth));
+
+      // Notify the user of successful login
+      notify.success(`Login successful! Welcome, ${usernameOrEmail}`);
 
       // Navigate to the home page
       navigate('/');
 
-      // Programmatically refresh the page
-      setTimeout(() => {
-        window.location.reload();
-      }, 0); // Trigger a reload immediately after navigation
+      // No need to reload the page as Redux state is updated
     } catch (err: unknown) {
       console.error('Login failed:', err);
       if (err instanceof Error && err.message === 'Invalid credentials') {

@@ -1,6 +1,7 @@
 package Allrecipes.Recipesdemo.DTOs;
 
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ public class RecipeDto {
     private String description;
     private List<IngredientDto> ingredients; // Updated to use IngredientDto
     private String preparationSteps;
+    @Positive
     private int cookingTime;
     private int servings;
     private String dietaryInfo;
