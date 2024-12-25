@@ -19,6 +19,9 @@ public interface RatingMapper {
     @Mapping(source = "recipe.name", target = "recipeName")
     @Mapping(source = "user.username", target = "userName")
     RatingResponse toDto(Rating rating);
-}
-    // If needed, add reverse mapping or other mappings
 
+    // Reverse mapping if needed
+    @Mapping(source = "recipeId", target = "recipe.id")
+    @Mapping(source = "userId", target = "user.id")
+    Rating toEntity(RatingResponse ratingResponse);
+}

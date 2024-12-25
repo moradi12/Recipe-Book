@@ -1,5 +1,7 @@
 package Allrecipes.Recipesdemo.Service;
+
 import Allrecipes.Recipesdemo.Entities.Category;
+import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Exceptions.InvalidRecipeDataException;
 import Allrecipes.Recipesdemo.Exceptions.RecipeNotFoundException;
@@ -13,6 +15,7 @@ import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +31,7 @@ public class RecipeService {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
     }
+
     /**
      * Retrieve all recipes from the database with pagination and mapping to RecipeResponse.
      */
@@ -46,8 +50,6 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
-
-
     /**
      * Create a new recipe.
      */
@@ -64,10 +66,18 @@ public class RecipeService {
             }
         }
 
+        List<Ingredient> ingredients = req.getIngredients().stream()
+                .map(dto -> Ingredient.builder()
+                        .name(dto.getName())
+                        .quantity(dto.getQuantity())
+                        .unit(dto.getUnit())
+                        .build())
+                .collect(Collectors.toList());
+
         Recipe recipe = Recipe.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
-                .ingredients(req.getIngredients())
+                .ingredients(ingredients)
                 .preparationSteps(req.getPreparationSteps())
                 .cookingTime(req.getCookingTime())
                 .servings(req.getServings())
@@ -82,7 +92,17 @@ public class RecipeService {
 
         return recipeRepository.save(recipe);
     }
+    public void deleteRecipe(Long id, User user) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
+        // Check if the user is authorized to delete this recipe
+        if (!recipe.getCreatedBy().getId().equals(user.getId())) {
+            throw new UnauthorizedActionException("You do not have permission to delete this recipe");
+        }
+
+        recipeRepository.delete(recipe);
+    }
     /**
      * Update an existing recipe. Only the user who created the recipe can update it.
      */
@@ -107,9 +127,17 @@ public class RecipeService {
             }
         }
 
+        List<Ingredient> ingredients = req.getIngredients().stream()
+                .map(dto -> Ingredient.builder()
+                        .name(dto.getName())
+                        .quantity(dto.getQuantity())
+                        .unit(dto.getUnit())
+                        .build())
+                .collect(Collectors.toList());
+
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
-        existing.setIngredients(req.getIngredients());
+        existing.setIngredients(ingredients);
         existing.setPreparationSteps(req.getPreparationSteps());
         existing.setCookingTime(req.getCookingTime());
         existing.setServings(req.getServings());
@@ -122,20 +150,6 @@ public class RecipeService {
     }
 
     /**
-     * Delete a recipe by its ID. Only the user who created the recipe can delete it.
-     */
-    public void deleteRecipe(Long id, User user) {
-        Recipe existing = recipeRepository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
-
-        if (!existing.getCreatedBy().getId().equals(user.getId())) {
-            throw new UnauthorizedActionException("You do not have permission to delete this recipe");
-        }
-
-        recipeRepository.delete(existing);
-    }
-
-    /**
      * Validate the fields of the recipe request. Throws an exception if validation fails.
      */
     private void validateRecipeRequest(RecipeCreateRequest req) {
@@ -145,8 +159,10 @@ public class RecipeService {
         if (req.getIngredients() == null || req.getIngredients().isEmpty()) {
             throw new InvalidRecipeDataException("Recipe must have at least one ingredient");
         }
-        for (String ingredient : req.getIngredients()) {
-            if (ingredient == null || ingredient.trim().isEmpty()) {
+        for (var ingredient : req.getIngredients()) {
+            if (ingredient.getName() == null || ingredient.getName().trim().isEmpty() ||
+                    ingredient.getQuantity() == null || ingredient.getQuantity().trim().isEmpty() ||
+                    ingredient.getUnit() == null || ingredient.getUnit().trim().isEmpty()) {
                 throw new InvalidRecipeDataException("Invalid ingredient entry");
             }
         }
@@ -159,13 +175,6 @@ public class RecipeService {
     }
 
     /**
-     * Retrieve all recipes from the database with pagination.
-     */
-    public Page<Recipe> getAllRecipes(Pageable pageable) {
-        return recipeRepository.findAll(pageable);
-    }
-
-    /**
      * Convert a Recipe entity to a RecipeResponse DTO.
      */
     public RecipeResponse toRecipeResponse(Recipe recipe) {
@@ -173,7 +182,9 @@ public class RecipeService {
                 .id(recipe.getId())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
-                .ingredients(formatIngredients(recipe.getIngredients()))
+                .ingredients(recipe.getIngredients().stream()
+                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
+                        .collect(Collectors.toList()))
                 .preparationSteps(recipe.getPreparationSteps())
                 .cookingTime(recipe.getCookingTime())
                 .servings(recipe.getServings())
@@ -183,36 +194,22 @@ public class RecipeService {
                 .build();
     }
 
-    /**
-     * Format a list of ingredients into a single comma-separated string.
-     */
-    private String formatIngredients(List<String> ingredients) {
-        return String.join(", ", ingredients);
-    }
-
-    /**
-     * Retrieve recipes created by a specific user.
-     */
-    public List<RecipeResponse> getRecipesByUserId(Long userId) {
-        return recipeRepository.findByCreatedById(userId).stream()
-                .map(this::toRecipeResponse)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Retrieve a recipe by ID.
-     */
     public Recipe getRecipeById(Long id) {
         return recipeRepository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("Recipe not found with ID: " + id));
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
     }
 
-    /**
-     * Search recipes by title.
-     */
     public List<RecipeResponse> searchRecipesByTitle(String title) {
-        return recipeRepository.findByTitleContainingIgnoreCase(title).stream()
+        if (title == null || title.trim().isEmpty()) {
+            throw new InvalidRecipeDataException("Search title cannot be null or empty");
+        }
+
+        List<Recipe> recipes = recipeRepository.findByTitleContainingIgnoreCase(title);
+        if (recipes.isEmpty()) {
+            throw new RecipeNotFoundException("No recipes found with title containing: " + title);
+        }
+
+        return recipes.stream()
                 .map(this::toRecipeResponse)
                 .collect(Collectors.toList());
-    }
-}
+    }}

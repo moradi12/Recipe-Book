@@ -51,6 +51,12 @@ export interface RecipeResponse {
   createdBy: User;
   categories: Category[];
 }
+
+
+
+
+
+
 export interface APIRecipeResponse {
   id: number;
   title: string;

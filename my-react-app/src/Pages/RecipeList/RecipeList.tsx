@@ -19,6 +19,7 @@ const RecipeList: React.FC = () => {
         const response = await getPaginatedRecipes(page, 10, 'createdAt', 'asc');
         setRecipes(response.content);
         setTotalPages(response.totalPages);
+        setError(null); // Clear any existing errors on success
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
           setError(error.response?.data?.message || 'Failed to fetch recipes');
@@ -104,7 +105,7 @@ const RecipeList: React.FC = () => {
         <button
           onClick={handlePrevious}
           disabled={page === 0}
-          className={`px-4 py-2 mr-2 rounded ${page === 0 ? 'bg-gray-300' : 'bg-blue-500 text-white'}`}
+          className={`px-4 py-2 mr-2 rounded ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
         >
           Previous
         </button>
@@ -114,7 +115,7 @@ const RecipeList: React.FC = () => {
         <button
           onClick={handleNext}
           disabled={page >= totalPages - 1}
-          className={`px-4 py-2 ml-2 rounded ${page >= totalPages - 1 ? 'bg-gray-300' : 'bg-blue-500 text-white'}`}
+          className={`px-4 py-2 ml-2 rounded ${page >= totalPages - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
         >
           Next
         </button>

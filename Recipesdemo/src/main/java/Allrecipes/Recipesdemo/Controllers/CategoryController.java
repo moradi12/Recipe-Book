@@ -63,7 +63,7 @@ public class CategoryController {
     public ResponseEntity<Boolean> checkCategoryExists(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String name) throws LoginException {
-        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
+        jwtUtil.checkUser(authHeader, UserType.ADMIN);
         boolean exists = categoryService.categoryExists(name);
         return ResponseEntity.ok(exists);
     }

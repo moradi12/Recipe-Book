@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-
+    List<Comment> findByRecipeId(Long recipeId);
     /**
      * If your Comment entity has a relationship to Recipe or User,
      * you can add query methods here, for example:

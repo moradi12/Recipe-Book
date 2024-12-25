@@ -1,9 +1,12 @@
 package Allrecipes.Recipesdemo.Mappers;
 
+import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.RecipeReview;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import Allrecipes.Recipesdemo.Recipe.RecipeResponse;
 import Allrecipes.Recipesdemo.Response.RecipeReviewResponse;
+
+import java.util.List;
 
 public class RecipeMapper {
 
@@ -12,7 +15,7 @@ public class RecipeMapper {
                 .id(recipe.getId())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
-                .ingredients(String.join(", ", recipe.getIngredients()))
+                .ingredients(mapIngredientsToStrings(recipe.getIngredients())) // Update here
                 .preparationSteps(recipe.getPreparationSteps())
                 .cookingTime(recipe.getCookingTime())
                 .servings(recipe.getServings())
@@ -22,9 +25,6 @@ public class RecipeMapper {
                 .build();
     }
 
-    /**
-     * Convert a RecipeReview entity to a RecipeReviewResponse DTO.
-     */
     public static RecipeReviewResponse toRecipeReviewResponse(RecipeReview review) {
         return RecipeReviewResponse.builder()
                 .id(review.getId())
@@ -34,5 +34,11 @@ public class RecipeMapper {
                 .userId(review.getUser().getId())
                 .createdAt(review.getCreatedAt())
                 .build();
+    }
+
+    private static List<String> mapIngredientsToStrings(List<Ingredient> ingredients) {
+        return ingredients.stream()
+                .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
+                .toList();
     }
 }

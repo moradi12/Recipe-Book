@@ -32,6 +32,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.name || ""}
         onChange={onInputChange}
         placeholder="Enter recipe name"
+        aria-label="Recipe Name"
       />
       <FormInput
         label="Title"
@@ -40,6 +41,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.title || ""}
         onChange={onInputChange}
         placeholder="Enter title"
+        aria-label="Title"
       />
       <FormInput
         label="Description"
@@ -49,6 +51,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         onChange={onInputChange}
         placeholder="Enter a brief description"
         multiline
+        aria-label="Description"
       />
       <FormInput
         label="Preparation Steps"
@@ -56,8 +59,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         name="preparationSteps"
         value={recipe.preparationSteps || ""}
         onChange={onInputChange}
-        placeholder="Enter steps"
+        placeholder="Enter preparation steps"
         multiline
+        aria-label="Preparation Steps"
       />
       <FormInput
         label="Cooking Time (mins)"
@@ -66,6 +70,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.cookingTime?.toString() || ""}
         onChange={handleNumberInputChange}
         placeholder="Enter cooking time in minutes"
+        aria-label="Cooking Time"
       />
       <FormInput
         label="Servings"
@@ -74,6 +79,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
         value={recipe.servings?.toString() || ""}
         onChange={handleNumberInputChange}
         placeholder="Enter number of servings"
+        aria-label="Servings"
       />
     </div>
   );

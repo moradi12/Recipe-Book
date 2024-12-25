@@ -141,11 +141,15 @@ const CreateRecipe: React.FC = () => {
           value={measurementUnit}
           onChange={(e) => setMeasurementUnit(e.target.value)}
         >
-          <option value="grams">Grams</option>
-          <option value="milligrams">Milligrams</option>
-          <option value="ml">Milliliters</option>
-          <option value="cup">Cup</option>
-        </select>
+  <option value="grams">Grams</option>
+  <option value="milligrams">Milligrams</option>
+  <option value="kg">Kilograms</option> {/* Added kg */}
+  <option value="ml">Milliliters</option>
+  <option value="liters">Liters</option> {/* Added liters */}
+  <option value="cup">Cup</option>
+  <option value="tbsp">Tablespoons</option> {/* Added tablespoons */}
+  <option value="tsp">Teaspoons</option> {/* Added teaspoons */}
+  <option value="pieces">Pieces</option> {/* Added pieces */}        </select>
         <button onClick={handleAddIngredient}>Add Ingredient</button>
       </div>
 

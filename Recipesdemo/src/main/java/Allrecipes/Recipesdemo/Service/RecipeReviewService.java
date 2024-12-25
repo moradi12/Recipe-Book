@@ -9,11 +9,11 @@ import Allrecipes.Recipesdemo.Repositories.RecipeReviewRepository;
 import Allrecipes.Recipesdemo.Repositories.RecipeRepository;
 import Allrecipes.Recipesdemo.Request.RecipeReviewRequest;
 import Allrecipes.Recipesdemo.Response.RecipeReviewResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeReviewService {
@@ -27,21 +27,17 @@ public class RecipeReviewService {
         this.recipeRepository = recipeRepository;
     }
 
-    /**
-     * Add a review to a recipe.
-     *
-     * @param request The review creation request.
-     * @param user    The user submitting the review.
-     * @return The saved RecipeReview entity.
-     */
     public RecipeReview addReview(RecipeReviewRequest request, User user) {
         Recipe recipe = recipeRepository.findById(request.getRecipeId())
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe not found with ID: " + request.getRecipeId()));
 
-        // Optionally, enforce one review per user per recipe
         RecipeReview existingReview = recipeReviewRepository.findByRecipeIdAndUserId(recipe.getId(), user.getId());
         if (existingReview != null) {
             throw new InvalidRecipeDataException("User has already reviewed this recipe");
+        }
+
+        if (request.getScore() < 1 || request.getScore() > 5) {
+            throw new InvalidRecipeDataException("Score must be between 1 and 5");
         }
 
         RecipeReview review = RecipeReview.builder()
@@ -55,13 +51,21 @@ public class RecipeReviewService {
         return recipeReviewRepository.save(review);
     }
 
-    public List<RecipeReviewResponse> getReviewsByRecipeId(Long recipeId) {
-        List<RecipeReview> reviews = recipeReviewRepository.findByRecipeId(recipeId);
-        return reviews.stream()
-                .map(this::toRecipeReviewResponse)
-                .collect(Collectors.toList());
+    public Page<RecipeReviewResponse> getReviewsByRecipeId(Long recipeId, Pageable pageable) {
+        Page<RecipeReview> reviews = recipeReviewRepository.findByRecipeId(recipeId, pageable);
+        return reviews.map(this::toRecipeReviewResponse);
     }
 
+    public void deleteReview(Long reviewId, User user) {
+        RecipeReview review = recipeReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RecipeNotFoundException("Review not found with ID: " + reviewId));
+
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new InvalidRecipeDataException("You are not authorized to delete this review");
+        }
+
+        recipeReviewRepository.delete(review);
+    }
     public RecipeReviewResponse toRecipeReviewResponse(RecipeReview review) {
         return RecipeReviewResponse.builder()
                 .id(review.getId())

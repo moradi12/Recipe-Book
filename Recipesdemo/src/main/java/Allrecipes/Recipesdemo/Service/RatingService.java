@@ -3,6 +3,7 @@ package Allrecipes.Recipesdemo.Service;
 import Allrecipes.Recipesdemo.Entities.Rating;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Exceptions.ResourceNotFoundException;
+import Allrecipes.Recipesdemo.Exceptions.UnauthorizedActionException;
 import Allrecipes.Recipesdemo.Rating.RatingResponse;
 import Allrecipes.Recipesdemo.Rating.RatingUpdateRequest;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
@@ -12,15 +13,14 @@ import Allrecipes.Recipesdemo.Repositories.UserRepository;
 import Allrecipes.Recipesdemo.Request.RatingCreateRequest;
 import Allrecipes.Recipesdemo.Response.RatingMapper;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service layer providing CRUD operations for ratings.
- */
 @Service
 @RequiredArgsConstructor
 public class RatingService {
@@ -30,12 +30,6 @@ public class RatingService {
     private final UserRepository userRepository;
     private final RatingMapper ratingMapper;
 
-    /**
-     * Creates a new rating.
-     *
-     * @param request The rating creation request.
-     * @return The created rating as a response DTO.
-     */
     @Transactional
     public RatingResponse createRating(RatingCreateRequest request) {
         Recipe recipe = recipeRepository.findById(request.getRecipeId())
@@ -45,7 +39,11 @@ public class RatingService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + request.getUserId()));
 
         if (ratingRepository.existsByRecipeIdAndUserId(recipe.getId(), user.getId())) {
-            throw new IllegalStateException("User has already rated this recipe.");
+            throw new ValidationException("User has already rated this recipe.");
+        }
+
+        if (request.getScore() < 1 || request.getScore() > 5) {
+            throw new ValidationException("Score must be between 1 and 5.");
         }
 
         Rating rating = Rating.builder()
@@ -56,16 +54,9 @@ public class RatingService {
                 .build();
 
         Rating savedRating = ratingRepository.save(rating);
-
         return ratingMapper.toDto(savedRating);
     }
 
-    /**
-     * Retrieves a rating by its ID.
-     *
-     * @param id The ID of the rating.
-     * @return The rating as a response DTO.
-     */
     public RatingResponse getRatingById(Long id) {
         Rating rating = ratingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating not found with id: " + id));
@@ -73,20 +64,19 @@ public class RatingService {
         return ratingMapper.toDto(rating);
     }
 
-    /**
-     * Updates an existing rating.
-     *
-     * @param id      The ID of the rating to update.
-     * @param request The rating update request.
-     * @return The updated rating as a response DTO.
-     */
     @Transactional
-    public RatingResponse updateRating(Long id, RatingUpdateRequest request) {
+    public RatingResponse updateRating(Long id, RatingUpdateRequest request, User requestingUser) {
         Rating rating = ratingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating not found with id: " + id));
 
+        if (!rating.getUser().getId().equals(requestingUser.getId())) {
+            throw new UnauthorizedActionException("You are not authorized to modify this rating.");
+        }
+
         if (request.getScore() != null) {
-            // If desired, you could re-validate the score here.
+            if (request.getScore() < 1 || request.getScore() > 5) {
+                throw new ValidationException("Score must be between 1 and 5.");
+            }
             rating.setScore(request.getScore());
         }
 
@@ -98,60 +88,34 @@ public class RatingService {
         return ratingMapper.toDto(updatedRating);
     }
 
-    /**
-     * Deletes a rating by its ID.
-     *
-     * @param id The ID of the rating to delete.
-     */
     @Transactional
-    public void deleteRating(Long id) {
+    public void deleteRating(Long id, User requestingUser) {
         Rating rating = ratingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Rating not found with id: " + id));
+
+        if (!rating.getUser().getId().equals(requestingUser.getId())) {
+            throw new UnauthorizedActionException("You are not authorized to delete this rating.");
+        }
 
         ratingRepository.delete(rating);
     }
 
-    /**
-     * Retrieves all ratings.
-     *
-     * @return A list of rating response DTOs.
-     */
     public List<RatingResponse> getAllRatings() {
-        return ratingRepository.findAll()
+        return ratingRepository.findAllActive()
                 .stream()
                 .map(ratingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves all ratings for a specific recipe.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return A list of rating response DTOs.
-     */
     public List<RatingResponse> getRatingsByRecipeId(Long recipeId) {
-        if (!recipeRepository.existsById(recipeId)) {
-            throw new ResourceNotFoundException("Recipe not found with id: " + recipeId);
-        }
-
-        return ratingRepository.findByRecipeId(recipeId)
+        return ratingRepository.findByRecipe_IdAndDeletedFalse(recipeId, Pageable.unpaged())
                 .stream()
                 .map(ratingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves all ratings made by a specific user.
-     *
-     * @param userId The ID of the user.
-     * @return A list of rating response DTOs.
-     */
     public List<RatingResponse> getRatingsByUserId(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new ResourceNotFoundException("User not found with id: " + userId);
-        }
-
-        return ratingRepository.findByUserId(userId)
+        return ratingRepository.findByUser_IdAndDeletedFalse(userId, Pageable.unpaged())
                 .stream()
                 .map(ratingMapper::toDto)
                 .collect(Collectors.toList());

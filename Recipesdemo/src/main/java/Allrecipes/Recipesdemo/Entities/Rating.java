@@ -33,4 +33,8 @@ public class Rating {
 
     @Column(length = 500)
     private String comment;
+
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 }

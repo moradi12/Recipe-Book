@@ -20,7 +20,7 @@ public class RecipeCreateRequest {
     private String description;
 
     @NotEmpty(message = "Ingredients cannot be empty")
-    private List<@NotBlank(message = "Ingredient cannot be blank") String> ingredients;
+    private List<IngredientRequest> ingredients;
 
     @NotBlank(message = "Preparation steps are mandatory")
     private String preparationSteps;
@@ -33,7 +33,7 @@ public class RecipeCreateRequest {
 
     private String dietaryInfo;
 
-    private Boolean containsGluten; // Optional
+    private Boolean containsGluten;
 
     private Set<Long> categoryIds;
 

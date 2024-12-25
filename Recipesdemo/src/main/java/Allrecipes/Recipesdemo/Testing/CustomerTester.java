@@ -5,21 +5,18 @@ import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.Comment;
 import Allrecipes.Recipesdemo.Entities.Enums.FoodCategories;
 import Allrecipes.Recipesdemo.Entities.Favorite;
+import Allrecipes.Recipesdemo.Request.IngredientRequest;
 import Allrecipes.Recipesdemo.Rating.RatingResponse;
 import Allrecipes.Recipesdemo.Request.RatingCreateRequest;
 import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
-import Allrecipes.Recipesdemo.Service.CustomerService;
-import Allrecipes.Recipesdemo.Service.CategoryService;
-import Allrecipes.Recipesdemo.Service.CommentService;
-import Allrecipes.Recipesdemo.Service.FavoriteService;
-import Allrecipes.Recipesdemo.Service.RatingService;
-import Allrecipes.Recipesdemo.Service.RecipeService;
+import Allrecipes.Recipesdemo.Service.*;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -44,19 +41,16 @@ public class CustomerTester implements CommandLineRunner {
 
         try {
             addCustomers();
-            addTestRecipe();
+            addTestRecipes();
             printAllCustomers();
             testFavorites();
             testComments();
             testRatings();
         } catch (Exception e) {
-            System.out.println("An unexpected error occurred during CustomerTester: " + e.getMessage());
+            System.err.println("An error occurred in CustomerTester: " + e.getMessage());
         }
     }
 
-    /**
-     * Adds multiple customers to the system.
-     */
     private void addCustomers() {
         System.out.println("\n===== Adding New Customers =====");
 
@@ -67,83 +61,183 @@ public class CustomerTester implements CommandLineRunner {
             customer2 = customerService.registerUser("janeSmith", "jane.smith@example.com", "securePass456");
             System.out.println("Added Customer 2: " + customer2);
 
+            User customer3 = customerService.registerUser("emilyClark", "emily.clark@example.com", "Emily123");
+            System.out.println("Added Customer 3: " + customer3);
+
+            User customer4 = customerService.registerUser("michaelBrown", "michael.brown@example.com", "Brown456");
+            System.out.println("Added Customer 4: " + customer4);
+
+            User customer5 = customerService.registerUser("sarahJones", "sarah.jones@example.com", "Jones789");
+            System.out.println("Added Customer 5: " + customer5);
+
         } catch (Exception e) {
-            System.out.println("Error adding customers: " + e.getMessage());
+            System.err.println("Error adding customers: " + e.getMessage());
         }
     }
 
-    /**
-     * Seeds a test recipe for testing purposes with a selected food category.
-     */
-    private void addTestRecipe() {
-        System.out.println("\n===== Adding Test Recipe =====");
+    private void addTestRecipes() {
+        System.out.println("\n===== Adding Test Recipes =====");
 
         try {
-            Category category = categoryService.createCategory(FoodCategories.VEGETARIAN);
-            System.out.println("Using Category: " + category);
+            // Adding categories
+            Category vegetarianCategory = categoryService.createCategory(FoodCategories.VEGETARIAN);
 
-            RecipeCreateRequest recipeRequest = RecipeCreateRequest.builder()
-                    .title("Test Recipe")
-                    .description("A simple test recipe.")
-                    .ingredients(List.of("Ingredient 1", "Ingredient 2"))
+            // First test recipe
+            RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
+                    .title("Test Recipe 1")
+                    .description("A simple test recipe 1.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Ingredient 1", "2", "cups"),
+                            new IngredientRequest("Ingredient 2", "1", "tsp")
+                    ))
                     .preparationSteps("Step 1: Do this. Step 2: Do that.")
                     .cookingTime(30)
                     .servings(4)
                     .dietaryInfo("Vegetarian")
+                    .containsGluten(false)
                     .build();
 
-            testRecipe = recipeService.createRecipe(recipeRequest, customer1);
-            System.out.println("Added Test Recipe: " + testRecipe);
+            testRecipe = recipeService.createRecipe(recipeRequest1, customer1);
+            System.out.println("Added Test Recipe 1: " + testRecipe);
 
-
-            Category category1 = categoryService.createCategory(FoodCategories.VEGETARIAN);
-            RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
-                    .title("Hearty Vegetable Stew")
-                    .description("A delicious and filling vegetable stew, perfect for cold evenings.")
-                    .ingredients(List.of("Carrots", "Potatoes", "Onions", "Celery", "Vegetable Stock"))
-                    .preparationSteps("Chop all vegetables. Cook in a pot with stock until tender.")
-                    .cookingTime(60)
-                    .servings(4)
-                    .dietaryInfo("Vegetarian")
-                    .build();
-            Recipe recipe1 = recipeService.createRecipe(recipeRequest1, customer1);
-            System.out.println("Added Recipe: " + recipe1.getTitle());
-
-            Category category2 = categoryService.createCategory(FoodCategories.SEAFOOD);
+            // Second test recipe
             RecipeCreateRequest recipeRequest2 = RecipeCreateRequest.builder()
-                    .title("Garlic Butter Shrimp Pasta")
-                    .description("Quick and easy shrimp pasta with a garlic butter sauce.")
-                    .ingredients(List.of("Shrimp", "Pasta", "Garlic", "Butter", "Parsley"))
-                    .preparationSteps("Cook pasta. Saute shrimp with garlic in butter. Combine and garnish with parsley.")
+                    .title("Test Recipe 2")
+                    .description("A simple test recipe 2.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Ingredient A", "3", "tbsp"),
+                            new IngredientRequest("Ingredient B", "2", "cups")
+                    ))
+                    .preparationSteps("Step 1: Mix ingredients. Step 2: Bake.")
+                    .cookingTime(40)
+                    .servings(6)
+                    .dietaryInfo("Non-Vegetarian")
+                    .containsGluten(true)
+                    .build();
+
+            Recipe testRecipe2 = recipeService.createRecipe(recipeRequest2, customer2);
+            System.out.println("Added Test Recipe 2: " + testRecipe2);
+
+            // Third test recipe
+            RecipeCreateRequest recipeRequest3 = RecipeCreateRequest.builder()
+                    .title("Test Recipe 3")
+                    .description("A simple test recipe 3.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Ingredient X", "5", "g"),
+                            new IngredientRequest("Ingredient Y", "3", "tbsp")
+                    ))
+                    .preparationSteps("Step 1: Heat ingredients. Step 2: Serve hot.")
                     .cookingTime(20)
                     .servings(2)
-                    .dietaryInfo("Seafood")
+                    .dietaryInfo("Vegan")
+                    .containsGluten(false)
                     .build();
-            Recipe recipe2 = recipeService.createRecipe(recipeRequest2, customer1);
-            System.out.println("Added Recipe: " + recipe2.getTitle());
 
-            Category category3 = categoryService.createCategory(FoodCategories.DESSERT);
-            RecipeCreateRequest recipeRequest3 = RecipeCreateRequest.builder()
-                    .title("Classic Chocolate Brownies")
-                    .description("Rich, fudgy chocolate brownies with a crackly top.")
-                    .ingredients(List.of("Butter", "Sugar", "Cocoa powder", "Flour", "Eggs"))
-                    .preparationSteps("Mix all ingredients and bake in a preheated oven at 350°F for 20 minutes.")
-                    .cookingTime(20)
-                    .servings(8)
-                    .dietaryInfo("Dessert")
-                    .build();
-            Recipe recipe3 = recipeService.createRecipe(recipeRequest3, customer1);
-            System.out.println("Added Recipe: " + recipe3.getTitle());
-
+            Recipe testRecipe3 = recipeService.createRecipe(recipeRequest3, customer1);
+            System.out.println("Added Test Recipe 3: " + testRecipe3);
 
         } catch (Exception e) {
-            System.out.println("Error adding test recipe: " + e.getMessage());
+            System.err.println("Error adding recipes: " + e.getMessage());
         }
     }
 
-    /**
-     * Prints all customers in the system.
-     */
+    private void testComments() {
+        System.out.println("\n===== Testing Comments =====");
+
+        try {
+            Comment comment1 = Comment.builder()
+                    .text("Amazing recipe!")
+                    .user(customer1)
+                    .recipe(testRecipe)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            commentService.createComment(comment1);
+            System.out.println("Created Comment: " + comment1);
+
+            Comment comment2 = Comment.builder()
+                    .text("So delicious and easy to make!")
+                    .user(customer2)
+                    .recipe(testRecipe)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            commentService.createComment(comment2);
+            System.out.println("Created Comment: " + comment2);
+
+            Comment comment3 = Comment.builder()
+                    .text("Loved it, will make again!")
+                    .user(customer1)
+                    .recipe(testRecipe)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            commentService.createComment(comment3);
+            System.out.println("Created Comment: " + comment3);
+
+            List<Comment> comments = commentService.getCommentsByRecipeId(testRecipe.getId());
+            System.out.println("Comments for Recipe:");
+            comments.forEach(comment -> System.out.println(" - " + comment.getText() + " | By: " + comment.getUser().getUsername()));
+
+        } catch (Exception e) {
+            System.err.println("Error testing comments: " + e.getMessage());
+        }
+    }
+
+    private void testFavorites() {
+        System.out.println("\n===== Testing Favorites =====");
+
+        try {
+            Favorite favorite1 = favoriteService.addFavorite(customer1, testRecipe);
+            System.out.println("Added Favorite 1: " + favorite1);
+
+            Favorite favorite2 = favoriteService.addFavorite(customer2, testRecipe);
+            System.out.println("Added Favorite 2: " + favorite2);
+
+            Favorite favorite3 = favoriteService.addFavorite(customer1, testRecipe);
+            System.out.println("Added Favorite 3: " + favorite3);
+
+        } catch (Exception e) {
+            System.err.println("Error testing favorites: " + e.getMessage());
+        }
+    }
+
+    private void testRatings() {
+        System.out.println("\n===== Testing Ratings =====");
+
+        try {
+            RatingCreateRequest ratingRequest1 = RatingCreateRequest.builder()
+                    .recipeId(testRecipe.getId())
+                    .userId(customer1.getId())
+                    .score(5)
+                    .comment("Absolutely fantastic!")
+                    .build();
+
+            RatingResponse createdRating1 = ratingService.createRating(ratingRequest1);
+            System.out.println("Created Rating: " + createdRating1);
+
+            RatingCreateRequest ratingRequest2 = RatingCreateRequest.builder()
+                    .recipeId(testRecipe.getId())
+                    .userId(customer2.getId())
+                    .score(4)
+                    .comment("Pretty good!")
+                    .build();
+
+            RatingResponse createdRating2 = ratingService.createRating(ratingRequest2);
+            System.out.println("Created Rating: " + createdRating2);
+
+            RatingCreateRequest ratingRequest3 = RatingCreateRequest.builder()
+                    .recipeId(testRecipe.getId())
+                    .userId(customer1.getId())
+                    .score(3)
+                    .comment("It was okay.")
+                    .build();
+
+            RatingResponse createdRating3 = ratingService.createRating(ratingRequest3);
+            System.out.println("Created Rating: " + createdRating3);
+
+        } catch (Exception e) {
+            System.err.println("Error testing ratings: " + e.getMessage());
+        }
+    }
+
     private void printAllCustomers() {
         System.out.println("\n===== Fetching All Customers =====");
 
@@ -152,86 +246,6 @@ public class CustomerTester implements CommandLineRunner {
             System.out.println("No customers found.");
         } else {
             customers.forEach(customer -> System.out.println("Customer: " + customer));
-        }
-    }
-
-    /**
-     * Tests adding, removing, and retrieving favorites.
-     */
-    private void testFavorites() {
-        System.out.println("\n===== Testing Favorites =====");
-
-        try {
-            // Add a recipe to favorites
-            Favorite favorite = favoriteService.addFavorite(customer1, testRecipe);
-            System.out.println("Added to Favorites: " + favorite);
-
-            // Check if the recipe is favorited
-            boolean isFavorite = favoriteService.isRecipeFavorite(customer1.getId(), testRecipe.getId());
-            System.out.println("Is Recipe Favorited: " + isFavorite);
-
-            // Retrieve all favorites for the user
-            List<Favorite> favorites = favoriteService.getFavoritesByUserId(customer1.getId());
-            System.out.println("Favorites for Customer 1:");
-            favorites.forEach(fav -> System.out.println(" - " + fav));
-
-            // Remove the recipe from favorites
-            favoriteService.removeFavorite(customer1, testRecipe);
-            System.out.println("Removed Recipe from Favorites");
-
-            // Verify the recipe is no longer favorited
-            boolean isStillFavorite = favoriteService.isRecipeFavorite(customer1.getId(), testRecipe.getId());
-            System.out.println("Is Recipe Still Favorited: " + isStillFavorite);
-
-        } catch (Exception e) {
-            System.out.println("Error testing favorites: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Tests adding and retrieving comments for the test recipe.
-     */
-    private void testComments() {
-        System.out.println("\n===== Testing Comments =====");
-
-        try {
-            Comment comment = new Comment();
-            comment.setText("This is a test comment for the recipe.");
-            comment.setUser(customer1);
-            comment.setRecipe(testRecipe);
-            Comment createdComment = commentService.createComment(comment);
-            System.out.println("Created Comment: " + createdComment);
-
-            Comment retrievedComment = commentService.getCommentById(createdComment.getId());
-            System.out.println("Retrieved Comment: " + retrievedComment);
-
-        } catch (Exception e) {
-            System.out.println("Error testing comments: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Tests creating and retrieving ratings for the test recipe.
-     */
-    private void testRatings() {
-        System.out.println("\n===== Testing Ratings =====");
-
-        try {
-            RatingCreateRequest ratingRequest = RatingCreateRequest.builder()
-                    .recipeId(testRecipe.getId())
-                    .userId(customer1.getId())
-                    .score(5)
-                    .comment("This is a test rating.")
-                    .build();
-
-            RatingResponse createdRating = ratingService.createRating(ratingRequest);
-            System.out.println("Created Rating: " + createdRating);
-
-            RatingResponse retrievedRating = ratingService.getRatingById(createdRating.getId());
-            System.out.println("Retrieved Rating: " + retrievedRating);
-
-        } catch (Exception e) {
-            System.out.println("Error testing ratings: " + e.getMessage());
         }
     }
 }
