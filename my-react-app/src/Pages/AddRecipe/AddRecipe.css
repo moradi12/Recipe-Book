@@ -1,0 +1,142 @@
+/* AddRecipe.css */
+
+/* General layout */
+.add-recipe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .add-recipe__title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .add-recipe__message {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #d1e7dd;
+    border: 1px solid #badbcc;
+    color: #0f5132;
+    border-radius: 4px;
+  }
+  
+  .add-recipe__form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-recipe__label {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .add-recipe__input,
+  .add-recipe__textarea,
+  .add-recipe__select {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 5px;
+  }
+  
+  .add-recipe__textarea {
+    resize: vertical;
+  }
+  
+  .add-recipe__fieldset {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+  }
+  
+  .add-recipe__legend {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #444;
+  }
+  
+  .add-recipe__ingredient-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .add-recipe__ingredient-input,
+  .add-recipe__ingredient-select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .add-recipe__remove-button,
+  .add-recipe__add-ingredient-button,
+  .add-recipe__button {
+    padding: 8px 12px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-recipe__remove-button {
+    background-color: #dc3545;
+  }
+  
+  .add-recipe__add-ingredient-button {
+    margin-top: 10px;
+  }
+  
+  .add-recipe__button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .add-recipe__remove-button:hover,
+  .add-recipe__add-ingredient-button:hover,
+  .add-recipe__button:hover {
+    background-color: #0056b3;
+  }
+  
+  .add-recipe__remove-button:hover {
+    background-color: #c82333;
+  }
+  
+  .spinner {
+    margin: 20px 0;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

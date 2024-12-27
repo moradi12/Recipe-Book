@@ -1,8 +1,6 @@
-// Updated AddRecipe.tsx
-
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Category } from "../../Models/Category";
+import { useState } from "react";
+import { FoodCategory } from "../../Models/FoodCategory"; // Import the FoodCategory enum
 import { Ingredient } from "../../Models/Ingredient";
 import "./AddRecipe.css";
 
@@ -19,8 +17,7 @@ const AddRecipe: React.FC = () => {
   const [servings, setServings] = useState<number>(0);
   const [dietaryInfo, setDietaryInfo] = useState<string>("");
   const [containsGluten, setContainsGluten] = useState<boolean>(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [availableCategories, setAvailableCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<FoodCategory | "">("");
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
 
@@ -33,18 +30,7 @@ const AddRecipe: React.FC = () => {
     "pieces",
   ];
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get<Category[]>(`${API_BASE_URL}/api/categories`);
-        setAvailableCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+  const foodCategoryOptions = Object.values(FoodCategory); // Convert enum to array
 
   const addIngredient = () => {
     setIngredients([...ingredients, { id: Date.now(), name: "", quantity: "", unit: "" }]);
@@ -70,43 +56,55 @@ const AddRecipe: React.FC = () => {
     setMessage("");
 
     const recipe = {
-        title,
-        description,
-        ingredients,
-        preparationSteps,
-        cookingTime,
-        servings,
-        dietaryInfo,
-        containsGluten,
-        categories,
+      title,
+      description,
+      ingredients,
+      preparationSteps,
+      cookingTime,
+      servings,
+      dietaryInfo,
+      containsGluten,
+      category: selectedCategory || null,
     };
 
     try {
-        const token = localStorage.getItem("token"); // Fetch the token from local storage
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const response = await axios.post(
-            `${API_BASE_URL}/api/recipes`,
-            recipe,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`, // Add the Authorization header
-                },
-            }
-        );
-        setMessage("Recipe added successfully!");
-        resetForm(); // Reset the form fields
+      const token = localStorage.getItem("token");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await axios.post(
+        `${API_BASE_URL}/api/recipes`,
+        recipe,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessage("Recipe added successfully!");
+      resetForm();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-        console.error("Error:", error);
-        if (error.response) {
-            console.error("Server Response:", error.response.data); // Log server error details
-        }
-        setMessage("Failed to add recipe. Please check your input.");
+      console.error("Error:", error);
+      if (error.response) {
+        console.error("Server Response:", error.response.data);
+      }
+      setMessage("Failed to add recipe. Please check your input.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setIngredients([{ id: Date.now(), name: "", quantity: "", unit: "" }]);
+    setPreparationSteps("");
+    setCookingTime(0);
+    setServings(0);
+    setDietaryInfo("");
+    setContainsGluten(true);
+    setSelectedCategory("");
+  };
 
   return (
     <div className="add-recipe">
@@ -229,22 +227,17 @@ const AddRecipe: React.FC = () => {
           />
         </label>
         <label className="add-recipe__label">
-          Categories:
+          Category:
           <select
             className="add-recipe__select"
-            multiple
-            value={categories.map((cat) => String(cat.id))}
-            onChange={(e) =>
-              setCategories(
-                Array.from(e.target.selectedOptions, (option) =>
-                  availableCategories.find((cat) => cat.id === Number(option.value))!
-                )
-              )
-            }
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value as FoodCategory)}
+            required
           >
-            {availableCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
+            <option value="" disabled>Select Category</option>
+            {foodCategoryOptions.map((category) => (
+              <option key={category} value={category}>
+                {category}
               </option>
             ))}
           </select>
@@ -258,7 +251,3 @@ const AddRecipe: React.FC = () => {
 };
 
 export default AddRecipe;
-function resetForm() {
-  throw new Error("Function not implemented.");
-}
-
