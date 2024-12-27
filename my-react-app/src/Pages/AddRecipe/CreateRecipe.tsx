@@ -1,213 +1,21 @@
 // src/components/CreateRecipe.tsx
 
-import axios from 'axios';
-import React, { useState } from 'react';
-import { FormState } from '../../Models/FormState';
-import { IngredientRequest, RecipeCreateRequest } from '../../Models/RecipeCreateRequest';
-import { notify } from '../../Utiles/notif'; // Ensure this import exists
+import React from 'react';
+import useRecipeForm from '../Redux/Hooks/useRecipeForm';
 import './CreateRecipe.css';
 import IngredientItem from './IngredientItem';
 
 const CreateRecipe: React.FC = () => {
-    // Initialize form state
-    const [form, setForm] = useState<FormState>({
-        title: '',
-        description: '',
-        ingredients: [{ name: '', quantity: '', unit: '' }],
-        preparationSteps: '',
-        cookingTime: 0,
-        servings: 0,
-        dietaryInfo: '',
-        containsGluten: true,
-        // categoryId has been removed
-    });
-
-    // Feedback state
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    // Removed successMessage state if opting for only toast notifications
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-    // Function to log all localStorage items (for debugging)
-    const logLocalStorage = () => {
-        console.log('--- localStorage Contents ---');
-        Object.keys(localStorage).forEach(key => {
-            const value = localStorage.getItem(key);
-            console.log(`${key}: ${value}`);
-        });
-        console.log('--- End of localStorage ---');
-    };
-
-    // Generic handler for input changes
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { id, value, type } = e.target;
-        let newValue: string | boolean | number = value;
-
-        // Handle checkbox
-        if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
-            newValue = e.target.checked;
-        }
-
-        // Handle number inputs
-        if (type === 'number') {
-            newValue = Number(value);
-        }
-
-        setForm(prev => ({
-            ...prev,
-            [id]: newValue,
-        }));
-    };
-
-    // Handler for ingredient changes
-    const handleIngredientChange = (index: number, field: keyof IngredientRequest, value: string) => {
-        const updatedIngredients = form.ingredients.map((ingredient, i) =>
-            i === index ? { ...ingredient, [field]: value } : ingredient
-        );
-        setForm(prev => ({ ...prev, ingredients: updatedIngredients }));
-    };
-
-    // Add a new ingredient
-    const addIngredient = () => {
-        setForm(prev => ({
-            ...prev,
-            ingredients: [...prev.ingredients, { name: '', quantity: '', unit: '' }],
-        }));
-    };
-
-    // Remove an ingredient
-    const removeIngredient = (index: number) => {
-        setForm(prev => ({
-            ...prev,
-            ingredients: prev.ingredients.filter((_, i) => i !== index),
-        }));
-    };
-
-    // Validate form data
-    const validateForm = (): boolean => {
-        const validationErrors: Record<string, string> = {};
-
-        if (!form.title.trim()) {
-            validationErrors.title = 'Title is mandatory.';
-        }
-        if (!form.description.trim()) {
-            validationErrors.description = 'Description is mandatory.';
-        }
-        if (form.ingredients.length === 0) {
-            validationErrors.ingredients = 'At least one ingredient is required.';
-        } else {
-            form.ingredients.forEach((ingredient, index) => {
-                if (!ingredient.name.trim()) {
-                    validationErrors[`ingredient-name-${index}`] = 'Name is required.';
-                }
-                if (!ingredient.quantity.trim()) {
-                    validationErrors[`ingredient-quantity-${index}`] = 'Quantity is required.';
-                }
-                if (!ingredient.unit.trim()) {
-                    validationErrors[`ingredient-unit-${index}`] = 'Unit is required.';
-                }
-            });
-        }
-        if (!form.preparationSteps.trim()) {
-            validationErrors.preparationSteps = 'Preparation steps are mandatory.';
-        }
-        if (form.cookingTime <= 0) {
-            validationErrors.cookingTime = 'Cooking time must be a positive number.';
-        }
-        if (form.servings <= 0) {
-            validationErrors.servings = 'Servings must be a positive number.';
-        }
-
-        setErrors(validationErrors);
-        return Object.keys(validationErrors).length === 0;
-    };
-
-    // Handle form submission
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setErrors({});
-        // Removed setSuccessMessage if opting for only toast notifications
-        setIsSubmitting(true);
-
-        if (!validateForm()) {
-            setIsSubmitting(false);
-            return;
-        }
-
-        const recipeRequest: RecipeCreateRequest = {
-            title: form.title,
-            description: form.description,
-            ingredients: form.ingredients,
-            preparationSteps: form.preparationSteps,
-            cookingTime: form.cookingTime,
-            servings: form.servings,
-            dietaryInfo: form.dietaryInfo || undefined,
-            containsGluten: form.containsGluten,
-            // categoryId has been removed
-        };
-
-        try {
-            logLocalStorage(); // Debugging line
-            const token = localStorage.getItem('authToken'); // Retrieves 'string | null'
-            console.log('Submitting Recipe with Token:', token); // Debugging line
-
-            if (!token) {
-                setErrors({ submit: 'Authentication token is missing. Please log in.' });
-                notify.error('Authentication token is missing. Please log in.');
-                setIsSubmitting(false);
-                return;
-            }
-
-            // Type assertion to assure TypeScript that 'token' is a string
-            const authHeader: string = `Bearer ${token}`;
-            const response = await axios.post('http://localhost:8080/api/recipes', recipeRequest, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': authHeader,
-                },
-            });
-
-            if (response.status === 201) { // Assuming 201 Created
-                // setSuccessMessage('Recipe created successfully.'); // Remove if using only toast
-                notify.success('Recipe created successfully!');
-                // Reset form fields
-                setForm({
-                    title: '',
-                    description: '',
-                    ingredients: [{ name: '', quantity: '', unit: '' }],
-                    preparationSteps: '',
-                    cookingTime: 0,
-                    servings: 0,
-                    dietaryInfo: '',
-                    containsGluten: true,
-                    // categoryId has been removed
-                });
-            } else {
-                setErrors({ submit: response.data.message || 'Failed to create recipe.' });
-                notify.error(response.data.message || 'Failed to create recipe.');
-            }
-        } catch (error: unknown) {
-            console.error('Error creating recipe:', error);
-            if (axios.isAxiosError(error)) {
-                if (error.response) {
-                    setErrors({ submit: error.response.data.message || 'Failed to create recipe.' });
-                    notify.error(error.response.data.message || 'Failed to create recipe.');
-                } else if (error.request) {
-                    setErrors({ submit: 'No response from server. Please try again later.' });
-                    notify.error('No response from server. Please try again later.');
-                } else {
-                    setErrors({ submit: 'An error occurred while setting up the request.' });
-                    notify.error('An error occurred while setting up the request.');
-                }
-            } else {
-                setErrors({ submit: 'An unexpected error occurred while creating the recipe.' });
-                notify.error('An unexpected error occurred while creating the recipe.');
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+    const {
+        form,
+        errors,
+        isSubmitting,
+        handleChange,
+        handleIngredientChange,
+        addIngredient,
+        removeIngredient,
+        handleSubmit,
+    } = useRecipeForm();
 
     return (
         <div className="create-recipe-container">
@@ -221,8 +29,6 @@ const CreateRecipe: React.FC = () => {
                     </ul>
                 </div>
             )}
-            {/* Remove this line if using only toast notifications */}
-            {/* {successMessage && <div className="success-message">{successMessage}</div>} */}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="title">Title*</label>
@@ -260,7 +66,7 @@ const CreateRecipe: React.FC = () => {
                         />
                     ))}
                     {errors.ingredients && <span className="error-text">{errors.ingredients}</span>}
-                    <button type="button" onClick={addIngredient}>
+                    <button type="button" onClick={addIngredient} className="add-ingredient-button">
                         Add Ingredient
                     </button>
                 </div>
@@ -312,7 +118,7 @@ const CreateRecipe: React.FC = () => {
                     />
                 </div>
 
-                <div className="form-group">
+                <div className="form-group checkbox-group">
                     <label htmlFor="containsGluten">Contains Gluten</label>
                     <input
                         type="checkbox"
@@ -322,7 +128,7 @@ const CreateRecipe: React.FC = () => {
                     />
                 </div>
 
-                {errors.submit && <div className="error-text">{errors.submit}</div>}
+                {errors.submit && <div className="error-text submit-error">{errors.submit}</div>}
 
                 <button type="submit" className="submit-button" disabled={isSubmitting}>
                     {isSubmitting ? 'Creating...' : 'Create Recipe'}
@@ -330,7 +136,6 @@ const CreateRecipe: React.FC = () => {
             </form>
         </div>
     );
-
 };
 
 export default CreateRecipe;

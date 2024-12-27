@@ -1,14 +1,17 @@
+// src/Components/Login/LoginForm.tsx
+
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../../Utiles/AuthService"; // <-- your existing service
-import { notify } from "../../Utiles/notif"; // <-- your notify utility
+import { useNavigate } from "react-router-dom"; // <-- for navigation
+import { loginUser } from "../../Utiles/AuthService";
+import { notify } from "../../Utiles/notif";
 import { authState, loginAction } from "../Redux/AuthReducer";
 import { AppDispatch } from "../Redux/store";
-import "./LoginForm.css"; // Import the CSS file
+import "./LoginForm.css"; // (Optional dark style)
 
 const LoginForm: React.FC = () => {
-  // Use typed dispatch from our Redux store
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,10 +20,10 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     try {
-      // 1) Call the backend via AuthService
+      // 1) Perform the backend call
       const response = await loginUser({ usernameOrEmail, password });
 
-      // 2) Build an authState object
+      // 2) Build userState from response
       const userState: authState = {
         email: response.email,
         name: response.username,
@@ -30,16 +33,18 @@ const LoginForm: React.FC = () => {
         isLogged: true,
       };
 
-      // 3) Dispatch loginAction to update Redux
+      // 3) Dispatch to Redux
       dispatch(loginAction(userState));
 
-      // 4) Save the JWT in sessionStorage (optional, if you want persistence)
+      // 4) Save token to sessionStorage for refresh persistence
       sessionStorage.setItem("jwt", response.token);
 
       // 5) Notify success
       notify.success("Login Successful!");
+
+      // 6) Navigate to root (http://localhost:5173/)
+      navigate("/");
     } catch (err: unknown) {
-      // Display error notification
       notify.error("Login Failed");
       console.error(err);
     }

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { IngredientRequest } from '../../Models/RecipeCreateRequest';
-import { UNIT_OPTIONS } from '../../Models/units';
+import './IngredientItem.css';
 
 interface IngredientItemProps {
     index: number;
@@ -13,35 +13,39 @@ interface IngredientItemProps {
 }
 
 const IngredientItem: React.FC<IngredientItemProps> = ({ index, ingredient, onChange, onRemove, canRemove }) => {
+    const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        onChange(index, id as keyof IngredientRequest, value);
+    };
+
     return (
         <div className="ingredient-item">
             <input
                 type="text"
+                id="name"
                 placeholder="Name"
                 value={ingredient.name}
-                onChange={(e) => onChange(index, 'name', e.target.value)}
+                onChange={handleFieldChange}
                 required
             />
             <input
                 type="text"
+                id="quantity"
                 placeholder="Quantity"
                 value={ingredient.quantity}
-                onChange={(e) => onChange(index, 'quantity', e.target.value)}
+                onChange={handleFieldChange}
                 required
             />
-            <select
+            <input
+                type="text"
+                id="unit"
+                placeholder="Unit"
                 value={ingredient.unit}
-                onChange={(e) => onChange(index, 'unit', e.target.value)}
+                onChange={handleFieldChange}
                 required
-            >
-                {UNIT_OPTIONS.map((unit) => (
-                    <option key={unit.value} value={unit.value}>
-                        {unit.label}
-                    </option>
-                ))}
-            </select>
+            />
             {canRemove && (
-                <button type="button" onClick={() => onRemove(index)}>
+                <button type="button" onClick={() => onRemove(index)} className="remove-ingredient-button">
                     Remove
                 </button>
             )}

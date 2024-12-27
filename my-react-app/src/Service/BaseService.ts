@@ -1,7 +1,7 @@
 // Services/BaseService.ts
 
 import axios, { AxiosInstance, AxiosRequestHeaders } from 'axios';
-import { getToken } from '../Utiles/authService';
+import { getToken } from '../Utiles/OldauthService';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 

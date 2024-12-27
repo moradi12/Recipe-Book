@@ -1,35 +1,39 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
-import { isAuthenticated, logout } from "../../Utiles/authService";
+import { logoutAction } from "../../Pages/Redux/AuthReducer"; // <-- Adjust path
+import { AppDispatch, RootState } from "../../Pages/Redux/store"; // <-- Adjust path
 import styles from "./Navbar.module.css";
 
 const Navbar: React.FC = () => {
+  // Redux
+  const dispatch = useDispatch<AppDispatch>();
+  const isLogged = useSelector((state: RootState) => state.auth.isLogged);
+
+  // Local state for hamburger menu
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState<boolean>(isAuthenticated());
+
+  // React Router
   const navigate = useNavigate();
 
+  // Toggle the mobile menu
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuth(isAuthenticated());
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
-
+  // Close the menu and logout the user
   const handleLogout = () => {
-    logout();
-    setIsAuth(false);
+    // 1) Dispatch logout action in Redux
+    dispatch(logoutAction());
+    // 2) Remove token from sessionStorage
+    sessionStorage.removeItem("jwt");
+    // 3) Navigate to login page
     navigate("/login");
+    // 4) Close menu
     setIsOpen(false);
   };
 
+  // Close the menu if user clicks outside the navbar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(`.${styles.navbar}`);
@@ -85,17 +89,11 @@ const Navbar: React.FC = () => {
             Contact
           </NavLink>
         </li>
-
-
-
-
         <li>
           <NavLink to="/add" onClick={() => setIsOpen(false)}>
-            Add 
+            Add
           </NavLink>
         </li>
-
-
 
         {/* New Links */}
         <li>
@@ -114,8 +112,8 @@ const Navbar: React.FC = () => {
           </NavLink>
         </li>
 
-        {/* Authentication Links */}
-        {!isAuth ? (
+        {/* Auth Links (Login / Register vs. Logout) */}
+        {!isLogged ? (
           <>
             <li>
               <NavLink to="/login" onClick={() => setIsOpen(false)}>

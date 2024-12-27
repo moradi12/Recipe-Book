@@ -1,14 +1,14 @@
 package Allrecipes.Recipesdemo.DTOs;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class AuthResponse {
-    private String accessToken;
-    private String tokenType = "Bearer";
-
-    public AuthResponse(String accessToken) {
-        this.accessToken = accessToken;
-    }
+    private Long id;
+    private String username;
+    private String email;
+    private String userType;
+    private String token;
 }
