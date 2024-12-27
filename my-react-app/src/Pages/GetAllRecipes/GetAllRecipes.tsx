@@ -1,10 +1,7 @@
-// src/Pages/GetAllRecipes/GetAllRecipes.tsx
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { RecipeResponse } from '../../Models/Recipe';
 import RecipeService, { PaginatedRecipes } from '../../Service/RecipeService';
 import { notify } from '../../Utiles/notif';
-import { RootState } from '../Redux/RootState';
 import './GetAllRecipes.css'; // Import the CSS file
 
 const GetAllRecipes: React.FC = () => {
@@ -14,25 +11,17 @@ const GetAllRecipes: React.FC = () => {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
-  // If you have JWT-based auth in Redux
-  const token = useSelector((state: RootState) => state.auth.token);
-
   const fetchRecipes = async (pageNumber: number, pageSize: number) => {
     try {
       setError('');
-      if (!token) {
-        setError('Authentication token is missing. Please log in.');
-        return;
-      }
 
-      // NOTE: We call the "paginated" method now:
+      // Call the paginated service to fetch recipes
       const response = await RecipeService.getAllRecipesPaginated(pageNumber, pageSize);
       const data: PaginatedRecipes = response.data;
 
       setRecipes(data.content);
       setTotalPages(data.totalPages);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error fetching paginated recipes:', err);
       setError('An error occurred while retrieving recipes.');
       notify.error('An error occurred while retrieving recipes.');
