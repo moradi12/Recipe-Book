@@ -1,0 +1,110 @@
+/* GetAllRecipes.css */
+
+/* Container Styles */
+.get-all-recipes {
+    margin: 1rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+  
+  /* Heading Styles */
+  .get-all-recipes h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  /* Error Message Styles */
+  .get-all-recipes .error-message {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+  
+  /* Controls (Page Size Selector) Styles */
+  .get-all-recipes .controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .get-all-recipes .controls label {
+    font-weight: bold;
+  }
+  
+  .get-all-recipes .controls select {
+    padding: 0.5rem;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    background-color: #ecf0f1;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .get-all-recipes .controls select:hover {
+    background-color: #dfe6e9;
+  }
+  
+  /* Pagination Controls Styles */
+  .get-all-recipes .pagination {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .get-all-recipes .pagination button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .get-all-recipes .pagination button:hover:not(:disabled) {
+    background-color: #2980b9;
+  }
+  
+  .get-all-recipes .pagination button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  /* Recipe List Styles */
+  .get-all-recipes .recipe-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .get-all-recipes .recipe-item {
+    border: 1px solid #bdc3c7;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    background-color: #fdfdfd;
+  }
+  
+  .get-all-recipes .recipe-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .get-all-recipes .recipe-item h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2980b9;
+  }
+  
+  .get-all-recipes .recipe-item p {
+    margin: 0;
+    color: #7f8c8d;
+  }
+  
+  /* No Recipes Message Styles */
+  .get-all-recipes .no-recipes {
+    font-style: italic;
+    color: #7f8c8d;
+  }
+  

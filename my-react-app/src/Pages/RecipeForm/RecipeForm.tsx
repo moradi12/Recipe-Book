@@ -1,3 +1,5 @@
+// src/components/RecipeForm/RecipeForm.tsx
+
 import React from "react";
 import { Recipe } from "../../Models/Recipe";
 import FormInput from "../FormInput/FormInput";
@@ -13,8 +15,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
   const handleNumberInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { value, name } = e.target;
+    const { value } = e.target;
     const numericValue = Number(value);
 
     // Ensure the value is a positive number or empty string

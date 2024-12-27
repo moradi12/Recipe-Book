@@ -1,17 +1,11 @@
-import axios from 'axios';
+// src/Pages/GetAllRecipes/GetAllRecipes.tsx
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RecipeResponse } from '../../Models/RecipeResponse';
+import { RecipeResponse } from '../../Models/Recipe';
+import RecipeService, { PaginatedRecipes } from '../../Service/RecipeService';
 import { notify } from '../../Utiles/notif';
 import { RootState } from '../Redux/RootState';
-
-interface PaginatedRecipes {
-  content: RecipeResponse[];
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
-}
+import './GetAllRecipes.css'; // Import the CSS file
 
 const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
@@ -19,6 +13,8 @@ const GetAllRecipes: React.FC = () => {
   const [size, setSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [error, setError] = useState<string>('');
+
+  // If you have JWT-based auth in Redux
   const token = useSelector((state: RootState) => state.auth.token);
 
   const fetchRecipes = async (pageNumber: number, pageSize: number) => {
@@ -29,18 +25,15 @@ const GetAllRecipes: React.FC = () => {
         return;
       }
 
-      const response = await axios.get<PaginatedRecipes>(
-        `/api/recipes/all?page=${pageNumber}&size=${pageSize}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      // NOTE: We call the "paginated" method now:
+      const response = await RecipeService.getAllRecipesPaginated(pageNumber, pageSize);
+      const data: PaginatedRecipes = response.data;
 
-      setRecipes(response.data.content);
-      setTotalPages(response.data.totalPages);
+      setRecipes(data.content);
+      setTotalPages(data.totalPages);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Error fetching all recipes:', err);
+      console.error('Error fetching paginated recipes:', err);
       setError('An error occurred while retrieving recipes.');
       notify.error('An error occurred while retrieving recipes.');
     }
@@ -52,42 +45,61 @@ const GetAllRecipes: React.FC = () => {
   }, [page, size]);
 
   return (
-    <div style={{ margin: '1rem' }}>
-      <h2>All Recipes (page {page + 1})</h2>
+    <div className="get-all-recipes">
+      <h2>All Recipes (Page {page + 1} of {totalPages})</h2>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      <div>
-        <label>Page Size: </label>
-        <select value={size} onChange={(e) => setSize(Number(e.target.value))}>
+      {/* Page size select */}
+      <div className="controls">
+        <label htmlFor="page-size">Page Size:</label>
+        <select
+          id="page-size"
+          value={size}
+          onChange={(e) => setSize(Number(e.target.value))}
+        >
           {[5, 10, 20, 50].map((option) => (
-            <option key={option} value={option}>{option}</option>
+            <option key={option} value={option}>
+              {option}
+            </option>
           ))}
         </select>
       </div>
 
-      <button
-        onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-        disabled={page === 0}
-      >
-        Previous
-      </button>
-      <button
-        onClick={() => setPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev))}
-        disabled={page >= totalPages - 1}
-      >
-        Next
-      </button>
+      {/* Pagination controls */}
+      <div className="pagination">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+          disabled={page === 0}
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => {
+            if (page < totalPages - 1) {
+              setPage((prev) => prev + 1);
+            }
+          }}
+          disabled={page >= totalPages - 1}
+        >
+          Next
+        </button>
+      </div>
 
-      <ul style={{ marginTop: '1rem' }}>
-        {recipes.map((recipe) => (
-          <li key={recipe.id} style={{ marginBottom: '1rem' }}>
-            <h3>{recipe.title}</h3>
-            <p>{recipe.description}</p>
-            {/* Display other recipe fields as needed */}
-          </li>
-        ))}
-      </ul>
+      {/* Render the recipe list */}
+      {recipes && recipes.length > 0 ? (
+        <ul className="recipe-list">
+          {recipes.map((recipe) => (
+            <li key={recipe.id} className="recipe-item">
+              <h3>{recipe.title}</h3>
+              <p>{recipe.description}</p>
+              {/* ... display other fields as needed */}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        !error && <p className="no-recipes">No recipes found.</p>
+      )}
     </div>
   );
 };
