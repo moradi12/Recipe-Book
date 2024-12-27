@@ -5,13 +5,18 @@ import CreateRecipe from "../../AddRecipe/CreateRecipe";
 import CategoryDropdown from "../../CategoryDropdown/CategoryDropdown";
 import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
+import DeleteRecipe from "../../DeleteRecipe/DeleteRecipe";
 import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
+import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
+import GetRecipeById from "../../GetRecipeById/GetRecipeById";
 import HomePage from "../../HomePage/OldHomePage";
 import LoginForm from "../../Login/LoginForm";
 import { Page404 } from "../../Page404/Page404";
 import RecipesPage from "../../RecipesPage/RecipesPage";
 import RegisterForm from "../../Register/RegisterForm";
+import SearchRecipes from "../../SearchRecipes/SearchRecipes";
+import UpdateRecipe from "../../UpdateRecipe/UpdateRecipe";
 
 export function MainRoute(): JSX.Element {
   return (
@@ -27,8 +32,19 @@ export function MainRoute(): JSX.Element {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/categories" element={<CategoryDropdown />} />
       <Route path="/add" element={<AddRecipe />} />
-      <Route path="/create" element={<CreateRecipe  />} />
+      <Route path="/create" element={<CreateRecipe />} />
 
+      {/* Existing "All Recipes" route */}
+      <Route path="/all/recipes" element={<GetAllRecipes />} />
+
+      {/*
+        Additional routes for the other controller methods:
+        getRecipeById, updateRecipe, deleteRecipe, and searchRecipes.
+      */}
+      <Route path="/recipes/:id" element={<GetRecipeById />} />
+      <Route path="/recipes/update" element={<UpdateRecipe />} />
+      <Route path="/recipes/delete" element={<DeleteRecipe />} />
+      <Route path="/recipes/search" element={<SearchRecipes />} />
 
       {/* Catch-all for undefined routes */}
       <Route path="*" element={<Page404 />} />

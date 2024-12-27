@@ -1,6 +1,5 @@
-// src/components/CreateRecipe.tsx
-
-import React from 'react';
+import React, { useState } from 'react';
+import { FoodCategory } from '../../Models/FoodCategory';
 import useRecipeForm from '../Redux/Hooks/useRecipeForm';
 import './CreateRecipe.css';
 import IngredientItem from './IngredientItem';
@@ -17,6 +16,14 @@ const CreateRecipe: React.FC = () => {
         handleSubmit,
     } = useRecipeForm();
 
+    const [selectedCategory, setSelectedCategory] = useState<FoodCategory | "">("");
+
+    const foodCategoryOptions = Object.values(FoodCategory);
+
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCategory(e.target.value as FoodCategory);
+    };
+
     return (
         <div className="create-recipe-container">
             <h2>Create a New Recipe</h2>
@@ -29,7 +36,7 @@ const CreateRecipe: React.FC = () => {
                     </ul>
                 </div>
             )}
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => handleSubmit(e, selectedCategory)}>
                 <div className="form-group">
                     <label htmlFor="title">Title*</label>
                     <input
@@ -116,6 +123,27 @@ const CreateRecipe: React.FC = () => {
                         value={form.dietaryInfo}
                         onChange={handleChange}
                     />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="category">Category*</label>
+                    <select
+                        id="category"
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                        required
+                        className="add-recipe__select"
+                    >
+                        <option value="" disabled>
+                            Select Category
+                        </option>
+                        {foodCategoryOptions.map((category) => (
+                            <option key={category} value={category}>
+                                {category.replace(/_/g, ' ')}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.category && <span className="error-text">{errors.category}</span>}
                 </div>
 
                 <div className="form-group checkbox-group">

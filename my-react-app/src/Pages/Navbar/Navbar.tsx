@@ -1,8 +1,9 @@
+// src/Navbar/Navbar.tsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
-import { logoutAction } from "../../Pages/Redux/AuthReducer"; // <-- Adjust path
-import { AppDispatch, RootState } from "../../Pages/Redux/store"; // <-- Adjust path
+import { logoutAction } from "../../Pages/Redux/AuthReducer"; // <-- Adjust path if necessary
+import { AppDispatch, RootState } from "../../Pages/Redux/store"; // <-- Adjust path if necessary
 import styles from "./Navbar.module.css";
 
 const Navbar: React.FC = () => {
@@ -41,7 +42,6 @@ const Navbar: React.FC = () => {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -89,30 +89,49 @@ const Navbar: React.FC = () => {
             Contact
           </NavLink>
         </li>
+
+        {/* Add recipe pages */}
         <li>
           <NavLink to="/add" onClick={() => setIsOpen(false)}>
             Add
           </NavLink>
         </li>
-
-        {/* New Links */}
         <li>
-          <NavLink to="/create-recipe" onClick={() => setIsOpen(false)}>
+          <NavLink to="/create" onClick={() => setIsOpen(false)}>
             Create Recipe
           </NavLink>
         </li>
         <li>
-          <NavLink to="/all-recipes" onClick={() => setIsOpen(false)}>
-            View All Recipes
+          <NavLink to="/all/recipes" onClick={() => setIsOpen(false)}>
+            View All
           </NavLink>
         </li>
+
+        {/* Additional recipe operations */}
+        <li>
+          <NavLink to="/recipes/search" onClick={() => setIsOpen(false)}>
+            Search Recipes
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/recipes/update" onClick={() => setIsOpen(false)}>
+            Update Recipe
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/recipes/delete" onClick={() => setIsOpen(false)}>
+            Delete Recipe
+          </NavLink>
+        </li>
+
+        {/* Category Page */}
         <li>
           <NavLink to="/categories" onClick={() => setIsOpen(false)}>
             Categories
           </NavLink>
         </li>
 
-        {/* Auth Links (Login / Register vs. Logout) */}
+        {/* Auth Links (Login / Register vs Logout) */}
         {!isLogged ? (
           <>
             <li>

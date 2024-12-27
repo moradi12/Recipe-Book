@@ -1,27 +1,38 @@
 /* src/components/CreateRecipe.css */
 
+/* Container Styling */
 .create-recipe-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
+.create-recipe-container:hover {
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading Styling */
 .create-recipe-container h2 {
     text-align: center;
     margin-bottom: 30px;
-    color: #333;
+    color: #4a90e2; /* Soft Blue */
+    font-size: 2em;
 }
 
+/* Error Messages */
 .error-messages {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #ffe6e6; /* Light Red */
+    color: #d8000c; /* Dark Red */
     padding: 15px;
     margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
+    border: 1px solid #d8000c;
     border-radius: 5px;
 }
 
@@ -30,15 +41,17 @@
     padding-left: 20px;
 }
 
+/* Success Message */
 .success-message {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #e6ffed; /* Light Green */
+    color: #2e7d32; /* Dark Green */
     padding: 15px;
     margin-bottom: 20px;
-    border: 1px solid #c3e6cb;
+    border: 1px solid #2e7d32;
     border-radius: 5px;
 }
 
+/* Form Group Styling */
 .form-group {
     margin-bottom: 25px;
 }
@@ -47,12 +60,8 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #333;
-}
-
-.form-group .required {
-    color: red;
-    margin-left: 4px;
+    color: #333333;
+    font-size: 1.1em;
 }
 
 .form-group input[type="text"],
@@ -60,18 +69,20 @@
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px 14px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #ffffff;
 }
 
 .form-group input[type="text"]:focus,
 .form-group input[type="number"]:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-    border-color: #007bff;
+    border-color: #4a90e2; /* Soft Blue */
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
     outline: none;
 }
 
@@ -79,27 +90,41 @@
     resize: vertical;
 }
 
+/* Checkbox Group Styling */
 .checkbox-group {
     display: flex;
     align-items: center;
 }
 
-.checkbox-group input[type="checkbox"] {
-    margin-right: 10px;
-    width: 20px;
-    height: 20px;
+.checkbox-group label {
+    margin-right: 15px;
+    font-weight: 500;
+    color: #555555;
 }
 
+.checkbox-group input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    accent-color: #4a90e2; /* Enhances the checkbox color */
+}
+
+/* Ingredient Items Styling */
 .ingredient-item {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
     align-items: flex-start;
     padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 5px;
+    border: 1px solid #d0e1fd; /* Light Blue Border */
+    border-radius: 8px;
     margin-bottom: 15px;
-    background-color: #fafafa;
+    background-color: #f0f4ff; /* Very Light Blue Background */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.ingredient-item:hover {
+    background-color: #e8edff;
+    border-color: #a6bfff;
 }
 
 .ingredient-field {
@@ -111,72 +136,93 @@
 .ingredient-field label {
     margin-bottom: 5px;
     font-weight: 500;
-    color: #555;
+    color: #555555;
 }
 
-.ingredient-item select {
+.ingredient-item select,
+.ingredient-item input[type="text"] {
     width: 100%;
     padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #fff;
-}
-
-.ingredient-item input[type="text"],
-.ingredient-item select {
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    background-color: #ffffff;
     font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+.ingredient-item select:focus,
+.ingredient-item input[type="text"]:focus {
+    border-color: #4a90e2; /* Soft Blue */
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+    outline: none;
+}
+
+/* Remove Ingredient Button */
 .remove-button {
-    background-color: #dc3545;
+    background-color: #e74c3c; /* Red */
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 8px 12px;
+    border-radius: 6px;
+    padding: 8px 14px;
     cursor: pointer;
-    align-self: flex-end;
-    height: 40px;
-    margin-top: 20px;
+    transition: background-color 0.3s;
+    height: 42px;
 }
 
 .remove-button:hover {
-    background-color: #c82333;
+    background-color: #c0392b; /* Darker Red */
 }
 
-.add-button {
-    background-color: #28a745;
+/* Add Ingredient Button */
+.add-ingredient-button {
+    background-color: #4caf50; /* Green */
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
+    border-radius: 6px;
+    padding: 10px 18px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
+    margin-top: 10px;
 }
 
-.add-button:hover {
-    background-color: #218838;
+.add-ingredient-button:hover {
+    background-color: #43a047; /* Darker Green */
 }
 
+/* Submit Button */
 .submit-button {
-    background-color: #007bff;
+    background-color: #4a90e2; /* Soft Blue */
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 12px 20px;
+    border-radius: 6px;
+    padding: 14px 0;
     cursor: pointer;
     width: 100%;
     font-size: 18px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .submit-button:hover {
-    background-color: #0056b3;
+    background-color: #357ab8; /* Darker Blue */
+    transform: translateY(-2px);
 }
 
 .submit-button:disabled {
-    background-color: #6c757d;
+    background-color: #a0c4e8; /* Light Blue */
     cursor: not-allowed;
+}
+
+/* Error Text Styling */
+.error-text {
+    color: #d8000c; /* Dark Red */
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: block;
+}
+
+.submit-error {
+    margin-bottom: 15px;
 }
 
 /* Responsive Design */

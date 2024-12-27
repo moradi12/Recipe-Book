@@ -12,12 +12,16 @@ import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import Allrecipes.Recipesdemo.Service.RecipeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.security.auth.login.LoginException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -79,22 +83,31 @@ public class RecipeController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllRecipes() {
+    @CrossOrigin(origins = "*") // Allows access from all origins
+    public ResponseEntity<?> getAllRecipes(@RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "10") int size) {
         try {
-            List<RecipeResponse> recipes = recipeService.getAllRecipes();
-            return ResponseEntity.ok(recipes);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<RecipeResponse> resultPage = recipeService.getAllRecipesWithResponse(pageable);
+
+            // Build a custom response map
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("content", resultPage.getContent());
+            responseBody.put("totalPages", resultPage.getTotalPages());
+            responseBody.put("totalElements", resultPage.getTotalElements());
+            responseBody.put("size", resultPage.getSize());
+            responseBody.put("number", resultPage.getNumber());
+
+            return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred while retrieving recipes.");
         }
     }
-
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRecipe(
-            @PathVariable Long id,
-            @Valid @RequestBody RecipeCreateRequest request,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<?> updateRecipe(@PathVariable Long id,
+                                          @Valid @RequestBody RecipeCreateRequest request,
+                                          HttpServletRequest httpRequest) {
         try {
             UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
             User user = userRepository.findById(userDetails.getUserId())
@@ -113,8 +126,11 @@ public class RecipeController {
         }
     }
 
+
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
+                                          HttpServletRequest httpRequest) {
         try {
             UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
             User user = userRepository.findById(userDetails.getUserId())
@@ -133,6 +149,7 @@ public class RecipeController {
         }
     }
 
+
     @GetMapping("/search")
     public ResponseEntity<?> searchRecipes(@RequestParam String title) {
         try {
@@ -146,5 +163,4 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred while searching for recipes.");
         }
-    }
-}
+    }}

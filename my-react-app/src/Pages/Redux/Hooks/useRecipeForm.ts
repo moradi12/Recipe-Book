@@ -106,7 +106,7 @@ const useRecipeForm = () => {
         return Object.keys(validationErrors).length === 0;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent, selectedCategory?: string) => {
         e.preventDefault();
         setErrors({});
         setIsSubmitting(true);
