@@ -1,10 +1,11 @@
 package Allrecipes.Recipesdemo.DTOs;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class IngredientDto {
     private Long id;       // Optional, if you need to reference the ingredient in the database
     private String name;

@@ -1,5 +1,6 @@
 package Allrecipes.Recipesdemo.Controllers;
 
+import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Entities.UserDetails;
 import Allrecipes.Recipesdemo.Exceptions.RecipeNotFoundException;
@@ -9,6 +10,7 @@ import Allrecipes.Recipesdemo.Recipe.RecipeResponse;
 import Allrecipes.Recipesdemo.Repositories.UserRepository;
 import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
+import Allrecipes.Recipesdemo.Service.CategoryService;
 import Allrecipes.Recipesdemo.Service.RecipeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.security.auth.login.LoginException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,18 +33,19 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
     private final JWT jwtUtil;
 
-    public RecipeController(RecipeService recipeService, UserRepository userRepository, JWT jwtUtil) {
+    public RecipeController(RecipeService recipeService, UserRepository userRepository, CategoryService categoryService, JWT jwtUtil) {
         this.recipeService = recipeService;
         this.userRepository = userRepository;
+        this.categoryService = categoryService;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping
-    public ResponseEntity<?> createRecipe(
-             @RequestBody RecipeCreateRequest request,
-            HttpServletRequest httpRequest) {
+    public ResponseEntity<?> createRecipe(@RequestBody RecipeCreateRequest request,
+                                          HttpServletRequest httpRequest) {
         try {
             UserDetails userDetails = getUserDetailsFromRequest(httpRequest);
             User user = userRepository.findById(userDetails.getUserId())
@@ -57,7 +61,6 @@ public class RecipeController {
                     .body("An unexpected error occurred while creating the recipe.");
         }
     }
-
 
     private UserDetails getUserDetailsFromRequest(HttpServletRequest request) throws LoginException {
         String authHeader = request.getHeader("Authorization");
@@ -90,7 +93,6 @@ public class RecipeController {
             Pageable pageable = PageRequest.of(page, size);
             Page<RecipeResponse> resultPage = recipeService.getAllRecipesWithResponse(pageable);
 
-            // Build a custom response map
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("content", resultPage.getContent());
             responseBody.put("totalPages", resultPage.getTotalPages());
@@ -104,6 +106,7 @@ public class RecipeController {
                     .body("An unexpected error occurred while retrieving recipes.");
         }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRecipe(@PathVariable Long id,
                                           @Valid @RequestBody RecipeCreateRequest request,
@@ -126,8 +129,6 @@ public class RecipeController {
         }
     }
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
                                           HttpServletRequest httpRequest) {
@@ -149,7 +150,6 @@ public class RecipeController {
         }
     }
 
-
     @GetMapping("/search")
     public ResponseEntity<?> searchRecipes(@RequestParam String title) {
         try {
@@ -163,4 +163,15 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An unexpected error occurred while searching for recipes.");
         }
-    }}
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = categoryService.getAllCategories();
+        if (categories.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(categories);
+    }
+
+}

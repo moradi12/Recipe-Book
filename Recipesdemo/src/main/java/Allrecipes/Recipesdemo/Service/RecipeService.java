@@ -32,17 +32,11 @@ public class RecipeService {
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * Retrieve all recipes from the database with pagination and mapping to RecipeResponse.
-     */
     public Page<RecipeResponse> getAllRecipesWithResponse(Pageable pageable) {
         Page<Recipe> recipesPage = recipeRepository.findAll(pageable);
         return recipesPage.map(this::toRecipeResponse);
     }
 
-    /**
-     * Retrieve all recipes from the database.
-     */
     public List<RecipeResponse> getAllRecipes() {
         List<Recipe> recipes = recipeRepository.findAll();
         return recipes.stream()
@@ -50,9 +44,6 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Create a new recipe.
-     */
     public Recipe createRecipe(RecipeCreateRequest req, User user) {
         validateRecipeRequest(req);
 
@@ -67,11 +58,14 @@ public class RecipeService {
         }
 
         List<Ingredient> ingredients = req.getIngredients().stream()
-                .map(dto -> Ingredient.builder()
-                        .name(dto.getName())
-                        .quantity(dto.getQuantity())
-                        .unit(dto.getUnit())
-                        .build())
+                .map(dto -> {
+                    Ingredient ingredient = Ingredient.builder()
+                            .name(dto.getName())
+                            .quantity(dto.getQuantity())
+                            .unit(dto.getUnit())
+                            .build();
+                    return ingredient; // Recipe association is set after creation
+                })
                 .collect(Collectors.toList());
 
         Recipe recipe = Recipe.builder()
@@ -90,27 +84,26 @@ public class RecipeService {
                 .categories(categories)
                 .build();
 
+        ingredients.forEach(ingredient -> ingredient.setRecipe(recipe)); // Associate ingredients with recipe
+
         return recipeRepository.save(recipe);
     }
+
     public void deleteRecipe(Long id, User user) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
-        // Check if the user is authorized to delete this recipe
         if (!recipe.getCreatedBy().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You do not have permission to delete this recipe");
         }
 
         recipeRepository.delete(recipe);
     }
-    /**
-     * Update an existing recipe. Only the user who created the recipe can update it.
-     */
+
     public Recipe updateRecipe(Long id, RecipeCreateRequest req, User user) {
         Recipe existing = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
 
-        // Check if the user is authorized to update this recipe
         if (!existing.getCreatedBy().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You do not have permission to update this recipe");
         }
@@ -128,11 +121,15 @@ public class RecipeService {
         }
 
         List<Ingredient> ingredients = req.getIngredients().stream()
-                .map(dto -> Ingredient.builder()
-                        .name(dto.getName())
-                        .quantity(dto.getQuantity())
-                        .unit(dto.getUnit())
-                        .build())
+                .map(dto -> {
+                    Ingredient ingredient = Ingredient.builder()
+                            .name(dto.getName())
+                            .quantity(dto.getQuantity())
+                            .unit(dto.getUnit())
+                            .build();
+                    ingredient.setRecipe(existing); // Associate with existing recipe
+                    return ingredient;
+                })
                 .collect(Collectors.toList());
 
         existing.setTitle(req.getTitle());
@@ -149,9 +146,6 @@ public class RecipeService {
         return recipeRepository.save(existing);
     }
 
-    /**
-     * Validate the fields of the recipe request. Throws an exception if validation fails.
-     */
     private void validateRecipeRequest(RecipeCreateRequest req) {
         if (req.getTitle() == null || req.getTitle().trim().isEmpty()) {
             throw new InvalidRecipeDataException("Recipe title cannot be empty");
@@ -174,9 +168,6 @@ public class RecipeService {
         }
     }
 
-    /**
-     * Convert a Recipe entity to a RecipeResponse DTO.
-     */
     public RecipeResponse toRecipeResponse(Recipe recipe) {
         return RecipeResponse.builder()
                 .id(recipe.getId())
@@ -212,4 +203,5 @@ public class RecipeService {
         return recipes.stream()
                 .map(this::toRecipeResponse)
                 .collect(Collectors.toList());
-    }}
+    }
+}

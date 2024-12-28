@@ -31,8 +31,7 @@ public class Recipe {
     @Lob
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "recipe_id") // Creates a foreign key in the ingredients table
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredient> ingredients = new ArrayList<>();
     @Lob
     private String preparationSteps;

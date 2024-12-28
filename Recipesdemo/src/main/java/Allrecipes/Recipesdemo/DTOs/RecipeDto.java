@@ -1,12 +1,14 @@
 package Allrecipes.Recipesdemo.DTOs;
 
+import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-
+@Data
 public class RecipeDto {
     private Long id;
     private String name;
@@ -23,6 +25,7 @@ public class RecipeDto {
     private LocalDateTime updatedAt;
     private Long createdByUserId;
     private boolean containsGluten;
+    private Set<Category> categories;
     private Set<Long> categoryIds;
 
     public Long getId() { return id; }

@@ -1,5 +1,6 @@
 package Allrecipes.Recipesdemo.Mappers;
 
+import Allrecipes.Recipesdemo.DTOs.IngredientDto;
 import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.RecipeReview;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
@@ -63,4 +64,20 @@ public class RecipeMapper {
     private static String formatIngredient(Ingredient ingredient) {
         return String.format("%s %s of %s", ingredient.getQuantity(), ingredient.getUnit(), ingredient.getName());
     }
+
+    private static List<IngredientDto> mapIngredientsToDtos(List<Ingredient> ingredients) {
+        if (ingredients == null || ingredients.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return ingredients.stream()
+                .map(ingredient -> new IngredientDto(
+                        ingredient.getId(),
+                        ingredient.getName(),
+                        ingredient.getQuantity(),
+                        ingredient.getUnit()
+                ))
+                .toList();
+    }
+
+
 }

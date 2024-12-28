@@ -8,7 +8,7 @@ export interface Recipe {
   title: string;
   description: string;
   ingredients: { id: number; name: string; quantity: string; unit: string }[];
-
+  foodCategory: string; 
   preparationSteps: string;
   cookingTime: number;
   servings: number;

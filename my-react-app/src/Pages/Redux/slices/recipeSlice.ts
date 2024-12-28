@@ -15,13 +15,18 @@ const initialState: RecipeState = {
   error: null,
 };
 
-// Fetch recipes thunk
+/**
+ * Fetch all recipes as an array (NO pagination).
+ * If your backend endpoint currently returns a paginated JSON,
+ * you could adapt this to handle the paginated structure. 
+ */
 export const fetchRecipes = createAsyncThunk<RecipeResponse[], void, { rejectValue: string }>(
   'recipes/fetchRecipes',
   async (_, thunkAPI) => {
     try {
-      const response = await RecipeService.getAllRecipes();
-      return response.data;
+      // Calls a method that returns an array of recipes (unpaginated).
+      const response = await RecipeService.getAllRecipes(); 
+      return response.data; 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
@@ -31,8 +36,14 @@ export const fetchRecipes = createAsyncThunk<RecipeResponse[], void, { rejectVal
   }
 );
 
-// Add recipe thunk
-export const addRecipe = createAsyncThunk<RecipeResponse, { recipe: RecipeResponse; token: string }, { rejectValue: string }>(
+/**
+ * Add a new recipe (create).
+ */
+export const addRecipe = createAsyncThunk<
+  RecipeResponse,
+  { recipe: RecipeResponse; token: string },
+  { rejectValue: string }
+>(
   'recipes/addRecipe',
   async ({ recipe, token }, thunkAPI) => {
     try {
@@ -52,6 +63,7 @@ const recipeSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    // fetchRecipes
     builder
       .addCase(fetchRecipes.pending, (state) => {
         state.loading = true;
@@ -64,14 +76,17 @@ const recipeSlice = createSlice({
       .addCase(fetchRecipes.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch recipes';
-      })
+      });
+
+    // addRecipe
+    builder
       .addCase(addRecipe.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addRecipe.fulfilled, (state, action: PayloadAction<RecipeResponse>) => {
         state.loading = false;
-        state.recipes.push(action.payload);
+        state.recipes.push(action.payload); // Insert newly created recipe
       })
       .addCase(addRecipe.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;

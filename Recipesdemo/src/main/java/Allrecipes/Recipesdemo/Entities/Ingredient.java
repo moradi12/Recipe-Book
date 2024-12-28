@@ -1,5 +1,6 @@
 package Allrecipes.Recipesdemo.Entities;
 
+import Allrecipes.Recipesdemo.Recipe.Recipe;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -25,4 +26,10 @@ public class Ingredient {
 
     @NotBlank(message = "Ingredient unit is mandatory")
     private String unit;
+
+    @ManyToOne
+    @JoinColumn(name = "recipe_id", nullable = false) // Ensures foreign key constraint
+    private Recipe recipe;
+
+
 }

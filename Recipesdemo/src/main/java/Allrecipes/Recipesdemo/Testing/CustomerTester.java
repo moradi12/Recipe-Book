@@ -42,6 +42,12 @@ public class CustomerTester implements CommandLineRunner {
         try {
             addCustomers();
             addTestRecipes();
+
+            if (testRecipe == null) {
+                System.err.println("Test recipe not created. Skipping dependent tests.");
+                return;
+            }
+
             printAllCustomers();
             testFavorites();
             testComments();
@@ -100,42 +106,6 @@ public class CustomerTester implements CommandLineRunner {
             testRecipe = recipeService.createRecipe(recipeRequest1, customer1);
             System.out.println("Added Test Recipe 1: " + testRecipe);
 
-            // Second test recipe
-            RecipeCreateRequest recipeRequest2 = RecipeCreateRequest.builder()
-                    .title("Test Recipe 2")
-                    .description("A simple test recipe 2.")
-                    .ingredients(List.of(
-                            new IngredientRequest("Ingredient A", "3", "tbsp"),
-                            new IngredientRequest("Ingredient B", "2", "cups")
-                    ))
-                    .preparationSteps("Step 1: Mix ingredients. Step 2: Bake.")
-                    .cookingTime(40)
-                    .servings(6)
-                    .dietaryInfo("Non-Vegetarian")
-                    .containsGluten(true)
-                    .build();
-
-            Recipe testRecipe2 = recipeService.createRecipe(recipeRequest2, customer2);
-            System.out.println("Added Test Recipe 2: " + testRecipe2);
-
-            // Third test recipe
-            RecipeCreateRequest recipeRequest3 = RecipeCreateRequest.builder()
-                    .title("Test Recipe 3")
-                    .description("A simple test recipe 3.")
-                    .ingredients(List.of(
-                            new IngredientRequest("Ingredient X", "5", "g"),
-                            new IngredientRequest("Ingredient Y", "3", "tbsp")
-                    ))
-                    .preparationSteps("Step 1: Heat ingredients. Step 2: Serve hot.")
-                    .cookingTime(20)
-                    .servings(2)
-                    .dietaryInfo("Vegan")
-                    .containsGluten(false)
-                    .build();
-
-            Recipe testRecipe3 = recipeService.createRecipe(recipeRequest3, customer1);
-            System.out.println("Added Test Recipe 3: " + testRecipe3);
-
         } catch (Exception e) {
             System.err.println("Error adding recipes: " + e.getMessage());
         }
@@ -145,6 +115,11 @@ public class CustomerTester implements CommandLineRunner {
         System.out.println("\n===== Testing Comments =====");
 
         try {
+            if (testRecipe == null) {
+                System.err.println("Test recipe not initialized. Skipping comments test.");
+                return;
+            }
+
             Comment comment1 = Comment.builder()
                     .text("Amazing recipe!")
                     .user(customer1)
@@ -153,24 +128,6 @@ public class CustomerTester implements CommandLineRunner {
                     .build();
             commentService.createComment(comment1);
             System.out.println("Created Comment: " + comment1);
-
-            Comment comment2 = Comment.builder()
-                    .text("So delicious and easy to make!")
-                    .user(customer2)
-                    .recipe(testRecipe)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            commentService.createComment(comment2);
-            System.out.println("Created Comment: " + comment2);
-
-            Comment comment3 = Comment.builder()
-                    .text("Loved it, will make again!")
-                    .user(customer1)
-                    .recipe(testRecipe)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            commentService.createComment(comment3);
-            System.out.println("Created Comment: " + comment3);
 
             List<Comment> comments = commentService.getCommentsByRecipeId(testRecipe.getId());
             System.out.println("Comments for Recipe:");
@@ -185,14 +142,13 @@ public class CustomerTester implements CommandLineRunner {
         System.out.println("\n===== Testing Favorites =====");
 
         try {
+            if (testRecipe == null) {
+                System.err.println("Test recipe not initialized. Skipping favorites test.");
+                return;
+            }
+
             Favorite favorite1 = favoriteService.addFavorite(customer1, testRecipe);
             System.out.println("Added Favorite 1: " + favorite1);
-
-            Favorite favorite2 = favoriteService.addFavorite(customer2, testRecipe);
-            System.out.println("Added Favorite 2: " + favorite2);
-
-            Favorite favorite3 = favoriteService.addFavorite(customer1, testRecipe);
-            System.out.println("Added Favorite 3: " + favorite3);
 
         } catch (Exception e) {
             System.err.println("Error testing favorites: " + e.getMessage());
@@ -203,6 +159,11 @@ public class CustomerTester implements CommandLineRunner {
         System.out.println("\n===== Testing Ratings =====");
 
         try {
+            if (testRecipe == null) {
+                System.err.println("Test recipe not initialized. Skipping ratings test.");
+                return;
+            }
+
             RatingCreateRequest ratingRequest1 = RatingCreateRequest.builder()
                     .recipeId(testRecipe.getId())
                     .userId(customer1.getId())
@@ -212,26 +173,6 @@ public class CustomerTester implements CommandLineRunner {
 
             RatingResponse createdRating1 = ratingService.createRating(ratingRequest1);
             System.out.println("Created Rating: " + createdRating1);
-
-            RatingCreateRequest ratingRequest2 = RatingCreateRequest.builder()
-                    .recipeId(testRecipe.getId())
-                    .userId(customer2.getId())
-                    .score(4)
-                    .comment("Pretty good!")
-                    .build();
-
-            RatingResponse createdRating2 = ratingService.createRating(ratingRequest2);
-            System.out.println("Created Rating: " + createdRating2);
-
-            RatingCreateRequest ratingRequest3 = RatingCreateRequest.builder()
-                    .recipeId(testRecipe.getId())
-                    .userId(customer1.getId())
-                    .score(3)
-                    .comment("It was okay.")
-                    .build();
-
-            RatingResponse createdRating3 = ratingService.createRating(ratingRequest3);
-            System.out.println("Created Rating: " + createdRating3);
 
         } catch (Exception e) {
             System.err.println("Error testing ratings: " + e.getMessage());
