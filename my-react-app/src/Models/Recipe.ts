@@ -1,5 +1,4 @@
 import { Category } from "./Category";
-import { Ingredient } from "./Ingredient";
 
 // Models/Recipe.ts
 export interface Recipe {
@@ -38,17 +37,18 @@ export interface RecipeResponse {
   name: string;
   title: string;
   description: string;
-  ingredients: Ingredient[];
+  ingredients: string[];
   preparationSteps: string;
   cookingTime: number;
   servings: number;
+  
   dietaryInfo?: string;
   containsGluten: boolean;
   status: string;
   createdAt: string;
   updatedAt: string;
   createdBy: User;
-  categories: Category[];
+  foodCategory: Category[];
 }
 
 

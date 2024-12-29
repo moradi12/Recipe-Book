@@ -15,6 +15,7 @@ import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
@@ -32,11 +34,13 @@ public class RecipeService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Transactional(readOnly = true)
     public Page<RecipeResponse> getAllRecipesWithResponse(Pageable pageable) {
         Page<Recipe> recipesPage = recipeRepository.findAll(pageable);
         return recipesPage.map(this::toRecipeResponse);
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeResponse> getAllRecipes() {
         List<Recipe> recipes = recipeRepository.findAll();
         return recipes.stream()
@@ -86,7 +90,12 @@ public class RecipeService {
 
         ingredients.forEach(ingredient -> ingredient.setRecipe(recipe)); // Associate ingredients with recipe
 
-        return recipeRepository.save(recipe);
+        Recipe savedRecipe = recipeRepository.save(recipe);
+
+        // Maintain bidirectional relationship
+        categories.forEach(category -> category.getRecipes().add(savedRecipe));
+
+        return savedRecipe;
     }
 
     public void deleteRecipe(Long id, User user) {
@@ -143,7 +152,12 @@ public class RecipeService {
         existing.setContainsGluten(req.getContainsGlutenOrDefault());
         existing.setCategories(categories);
 
-        return recipeRepository.save(existing);
+        Recipe updatedRecipe = recipeRepository.save(existing);
+
+        // Maintain bidirectional relationship
+        categories.forEach(category -> category.getRecipes().add(updatedRecipe));
+
+        return updatedRecipe;
     }
 
     private void validateRecipeRequest(RecipeCreateRequest req) {
@@ -186,7 +200,7 @@ public class RecipeService {
     }
 
     public Recipe getRecipeById(Long id) {
-        return recipeRepository.findById(id)
+        return recipeRepository.findByIdWithCategories(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
     }
 

@@ -6,6 +6,8 @@ import Allrecipes.Recipesdemo.Exceptions.UserNotFoundException;
 import Allrecipes.Recipesdemo.Response.UserResponse;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import Allrecipes.Recipesdemo.Service.CustomerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +18,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
+@Slf4j
 public class CustomerController {
     private final CustomerService customerService;
     private final JWT jwtUtil;
-
-    public CustomerController(CustomerService customerService, JWT jwtUtil) {
-        this.customerService = customerService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
@@ -36,12 +36,15 @@ public class CustomerController {
         try {
             User newUser = customerService.registerUser(username, email, password);
             UserResponse response = customerService.toUserResponse(newUser);
+            log.info("User registered successfully: {}", newUser.getUsername());
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             // Handle cases like invalid input parameters
+            log.error("Registration failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Registration failed due to an unexpected error.", e);
             return new ResponseEntity<>("Registration failed due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -70,12 +73,16 @@ public class CustomerController {
             responseBody.put("message", "Login successful");
             responseBody.put("user", userResponse);
 
+            log.info("User logged in successfully: {}", user.getUsername());
+
             return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
         } catch (UserNotFoundException e) {
             // Handle authentication failures
+            log.warn("Login failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Login failed due to an unexpected error.", e);
             return new ResponseEntity<>("Login failed due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -85,20 +92,26 @@ public class CustomerController {
         try {
             // Check if user is Admin
             jwtUtil.checkUser(authHeader, UserType.ADMIN);
+            log.debug("Admin authorized to fetch all users.");
 
             List<UserResponse> users = customerService.getAllUsers().stream()
                     .map(customerService::toUserResponse)
                     .collect(Collectors.toList());
 
+            log.info("Retrieved {} users.", users.size());
+
             return ResponseEntity.ok(users);
         } catch (UserNotFoundException e) {
             // Handle cases where the user performing the action is not found
+            log.warn("Fetching all users failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Fetching all users unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to retrieve users due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to retrieve users due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -109,16 +122,23 @@ public class CustomerController {
             @PathVariable Long id) {
         try {
             jwtUtil.checkUser(authHeader, UserType.ADMIN);
+            log.debug("Admin authorized to delete user with ID: {}", id);
+
             customerService.deleteUser(id);
+            log.info("User with ID {} deleted successfully.", id);
+
             return ResponseEntity.noContent().build();
         } catch (UserNotFoundException e) {
             // Handle cases where the user to be deleted is not found
+            log.warn("Deletion failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Deletion unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to delete user due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to delete user due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -134,6 +154,7 @@ public class CustomerController {
             // Validate token
             String token = authHeader.replace("Bearer ", "");
             jwtUtil.validateToken(token);
+            log.debug("Token validated for update operation.");
 
             // Extract user type and email from token
             String userType = jwtUtil.getUserType(token);
@@ -142,25 +163,32 @@ public class CustomerController {
             User currentUser = currentUserOpt.orElseThrow(() -> new UserNotFoundException("Current user not found."));
 
             if (!UserType.ADMIN.name().equals(userType) && !currentUser.getId().equals(id)) {
+                log.warn("User ID {} is not authorized to update User ID {}", currentUser.getId(), id);
                 throw new LoginException("User not allowed to update another user's data.");
             }
 
             customerService.updateUser(id, username, email, password);
+            log.info("User with ID {} updated successfully.", id);
+
             User updatedUser = customerService.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found after update."));
             UserResponse response = customerService.toUserResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             // Handle cases where the user is not found
+            log.warn("Update failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Update unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
             // Handle invalid input parameters
+            log.warn("Update failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to update user due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to update user due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -173,6 +201,8 @@ public class CustomerController {
         try {
             String token = authHeader.replace("Bearer ", "");
             jwtUtil.validateToken(token);
+            log.debug("Token validated for adding favorite recipe.");
+
             String userType = jwtUtil.getUserType(token);
             String userEmail = jwtUtil.extractEmail(token);
 
@@ -180,25 +210,32 @@ public class CustomerController {
                     .orElseThrow(() -> new UserNotFoundException("Current user not found."));
 
             if (!UserType.ADMIN.name().equals(userType) && !currentUser.getId().equals(id)) {
+                log.warn("User ID {} is not authorized to modify favorites of User ID {}", currentUser.getId(), id);
                 throw new LoginException("User not allowed to modify favorites of another user.");
             }
 
             customerService.addFavoriteRecipe(currentUser, recipeId);
+            log.info("Favorite recipe ID {} added for User ID {}.", recipeId, id);
+
             User updatedUser = customerService.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found after adding favorite."));
             UserResponse response = customerService.toUserResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             // Handle cases where the user is not found
+            log.warn("Adding favorite failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Adding favorite unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
             // Handle invalid input parameters
+            log.warn("Adding favorite failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to add favorite due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to add favorite due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -211,6 +248,8 @@ public class CustomerController {
         try {
             String token = authHeader.replace("Bearer ", "");
             jwtUtil.validateToken(token);
+            log.debug("Token validated for removing favorite recipe.");
+
             String userType = jwtUtil.getUserType(token);
             String userEmail = jwtUtil.extractEmail(token);
 
@@ -218,25 +257,32 @@ public class CustomerController {
                     .orElseThrow(() -> new UserNotFoundException("Current user not found."));
 
             if (!UserType.ADMIN.name().equals(userType) && !currentUser.getId().equals(id)) {
+                log.warn("User ID {} is not authorized to remove favorites of User ID {}", currentUser.getId(), id);
                 throw new LoginException("User not allowed to remove favorites of another user.");
             }
 
             customerService.removeFavoriteRecipe(currentUser, recipeId);
+            log.info("Favorite recipe ID {} removed for User ID {}.", recipeId, id);
+
             User updatedUser = customerService.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found after removing favorite."));
             UserResponse response = customerService.toUserResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             // Handle cases where the user is not found
+            log.warn("Removing favorite failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Removing favorite unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
             // Handle invalid input parameters
+            log.warn("Removing favorite failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to remove favorite due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to remove favorite due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -248,7 +294,10 @@ public class CustomerController {
             @RequestParam UserType userType) {
         try {
             jwtUtil.checkUser(authHeader, UserType.ADMIN);
+            log.debug("Admin authorized to assign user type.");
+
             customerService.assignUserTypeToUser(id, userType);
+            log.info("Assigned user type {} to User ID {}.", userType, id);
 
             User updatedUser = customerService.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found after type assignment."));
@@ -256,16 +305,37 @@ public class CustomerController {
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
             // Handle cases where the user is not found
+            log.warn("Assigning user type failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
             // Handle unauthorized access
+            log.warn("Assigning user type unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
             // Handle invalid input parameters
+            log.warn("Assigning user type failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Handle any other unexpected exceptions
+            log.error("Failed to assign user type due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to assign user type due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * Helper method to retrieve the current user based on the JWT token.
+     *
+     * @param authHeader The Authorization header containing the JWT token.
+     * @return The current User.
+     * @throws LoginException         If the token is invalid.
+     * @throws UserNotFoundException  If the user is not found.
+     */
+    private User getCurrentUser(String authHeader) throws LoginException, UserNotFoundException {
+        String token = authHeader.replace("Bearer ", "");
+        jwtUtil.validateToken(token);
+        String userType = jwtUtil.getUserType(token);
+        String userEmail = jwtUtil.extractEmail(token);
+        return customerService.findByUsernameOrEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("Current user not found."));
     }
 }

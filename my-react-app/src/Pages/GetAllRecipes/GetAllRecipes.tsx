@@ -15,28 +15,11 @@ const GetAllRecipes: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const fetchRecipes = async (pageNumber: number, pageSize: number, category?: string) => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await RecipeService.getAllRecipesPaginated(pageNumber, pageSize, category);
-      const data: PaginatedRecipes = response.data;
-
-      setRecipes(data.content);
-      setTotalPages(data.totalPages);
-    } catch (err) {
-      console.error('Error fetching paginated recipes:', err);
-      setError('An error occurred while retrieving recipes.');
-      notify.error('An error occurred while retrieving recipes.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchCategories = async () => {
     try {
       setLoading(true);
       const response = await RecipeService.getAllCategories();
+      console.log('Fetched Categories:', response.data);
       setCategories(response.data);
     } catch (err) {
       console.error('Error fetching categories:', err);
@@ -47,35 +30,53 @@ const GetAllRecipes: React.FC = () => {
     }
   };
 
+  const fetchRecipes = async (pageNumber: number, pageSize: number, category?: string) => {
+    try {
+      setLoading(true);
+      setError('');
+      const response = await RecipeService.getAllRecipesPaginated(pageNumber, pageSize, category);
+      const data: PaginatedRecipes = response.data;
+      console.log('Fetched Recipes:', data.content);
+      setRecipes(data.content);
+      setTotalPages(data.totalPages);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error('Error fetching paginated recipes:', err);
+      const errorMessage = err.response?.data?.message || 'An error occurred while retrieving recipes.';
+      setError(errorMessage);
+      notify.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategory = e.target.value;
     setFilterCategory(selectedCategory);
     setPage(0);
-    fetchRecipes(0, size, selectedCategory);
   };
 
   useEffect(() => {
     fetchRecipes(page, size, filterCategory);
+  }, [page, size, filterCategory]);
+
+  useEffect(() => {
     fetchCategories();
-  }, [page, size]);
+  }, []);
 
   return (
     <div className="get-all-recipes">
-      <h2>All Recipes (Page {page + 1} of {totalPages})</h2>
+      <h2>All Recipes {totalPages > 0 && `(Page ${page + 1} of ${totalPages})`}</h2>
 
       {loading && <p>Loading...</p>}
       {error && <p className="error-message">{error}</p>}
 
       <div className="filter-container">
         <label htmlFor="category-filter">Filter by Category:</label>
-        <select
-          id="category-filter"
-          value={filterCategory}
-          onChange={handleCategoryFilter}
-        >
+        <select id="category-filter" value={filterCategory} onChange={handleCategoryFilter}>
           <option value="">All Categories</option>
           {categories.map((category) => (
-            <option key={category.id} value={category.name}>
+            <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
@@ -87,7 +88,10 @@ const GetAllRecipes: React.FC = () => {
         <select
           id="page-size"
           value={size}
-          onChange={(e) => setSize(Number(e.target.value))}
+          onChange={(e) => {
+            setSize(Number(e.target.value));
+            setPage(0);
+          }}
         >
           {[5, 10, 20, 50].map((option) => (
             <option key={option} value={option}>
@@ -98,10 +102,7 @@ const GetAllRecipes: React.FC = () => {
       </div>
 
       <div className="pagination">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
-          disabled={page === 0}
-        >
+        <button onClick={() => setPage((prev) => Math.max(prev - 1, 0))} disabled={page === 0}>
           Previous
         </button>
         <span>
@@ -113,46 +114,60 @@ const GetAllRecipes: React.FC = () => {
           max={totalPages || 1}
           value={page + 1}
           onChange={(e) => {
-            const newPage = Math.max(0, Math.min(Number(e.target.value) - 1, totalPages - 1));
-            setPage(newPage);
+            const inputPage = Number(e.target.value);
+            if (!isNaN(inputPage)) {
+              const newPage = Math.max(0, Math.min(inputPage - 1, totalPages - 1));
+              setPage(newPage);
+            }
           }}
         />
-        <button
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          disabled={page >= totalPages - 1}
-        >
+        <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))} disabled={page >= totalPages - 1}>
           Next
         </button>
       </div>
 
-      {recipes && recipes.length > 0 ? (
+      {recipes.length > 0 ? (
         <ul className="recipe-list">
           {recipes.map((recipe) => (
             <li key={recipe.id} className="recipe-item">
-              <h3>{recipe.title}</h3>
-              <p><strong>Name:</strong> {recipe.name}</p>
-              <p><strong>Description:</strong> {recipe.description}</p>
-              <p><strong>Preparation Steps:</strong> {recipe.preparationSteps}</p>
-              <p><strong>Cooking Time:</strong> {recipe.cookingTime} minutes</p>
-              <p><strong>Servings:</strong> {recipe.servings}</p>
-              <p><strong>Dietary Info:</strong> {recipe.dietaryInfo || 'N/A'}</p>
-              <p><strong>Contains Gluten:</strong> {recipe.containsGluten ? 'Yes' : 'No'}</p>
-              <p><strong>Status:</strong> {recipe.status}</p>
-              <p><strong>Created At:</strong> {new Date(recipe.createdAt).toLocaleString()}</p>
-              <p><strong>Updated At:</strong> {new Date(recipe.updatedAt).toLocaleString()}</p>
-
-              {recipe.createdBy ? (
-                <p><strong>Created By:</strong> {recipe.createdBy.username} ({recipe.createdBy.email})</p>
-              ) : (
-                <p><strong>Created By:</strong> Unknown</p>
-              )}
+              <h3>{recipe.title || 'No Title'}</h3>
+              <p>
+                <strong>Name:</strong> {recipe.name || 'No Name'}
+              </p>
+              <p>
+                <strong>Description:</strong> {recipe.description || 'No Description'}
+              </p>
+              <p>
+                <strong>Preparation Steps:</strong> {recipe.preparationSteps || 'No Preparation Steps'}
+              </p>
+              <p>
+                <strong>Cooking Time:</strong> {recipe.cookingTime} minutes
+              </p>
+              <p>
+                <strong>Servings:</strong> {recipe.servings}
+              </p>
+              <p>
+                <strong>Dietary Info:</strong> {recipe.dietaryInfo || 'N/A'}
+              </p>
+              <p>
+                <strong>Contains Gluten:</strong> {recipe.containsGluten ? 'Yes' : 'No'}
+              </p>
+              <p>
+                <strong>Status:</strong> {recipe.status || 'Unknown'}
+              </p>
+              <p>
+                <strong>Created At:</strong> {new Date(recipe.createdAt).toLocaleString()}
+              </p>
+              <p>
+                <strong>Updated At:</strong> {new Date(recipe.updatedAt).toLocaleString()}
+              </p>
 
               <h4>Ingredients:</h4>
               <ul>
                 {recipe.ingredients?.length > 0 ? (
                   recipe.ingredients.map((ingredient) => (
-                    <li key={ingredient.id}>
-                      {ingredient.quantity} {ingredient.unit} of {ingredient.name}
+                    <li>
+                      {ingredient}
                     </li>
                   ))
                 ) : (
@@ -162,8 +177,10 @@ const GetAllRecipes: React.FC = () => {
 
               <h4>Categories:</h4>
               <ul>
-                {recipe.categories?.length > 0 ? (
-                  recipe.categories.map((category) => <li key={category.id}>{category.name}</li>)
+                {categories?.length > 0 ? (
+                  categories.map((category) => (
+                    <li key={category.id}>{category.name || 'Unnamed'}</li>
+                  ))
                 ) : (
                   <p>No categories available</p>
                 )}

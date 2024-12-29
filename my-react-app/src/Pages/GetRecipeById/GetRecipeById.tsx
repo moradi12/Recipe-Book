@@ -1,7 +1,8 @@
+// Pages/GetRecipeById/GetRecipeById.tsx
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RecipeResponse } from '../../Models/RecipeResponse';
+import { RecipeResponse } from '../../Models/RecipeResponse'; // Ensure correct import
 import { notify } from '../../Utiles/notif';
 import { RootState } from '../Redux/RootState';
 
@@ -63,9 +64,19 @@ const GetRecipeById: React.FC = () => {
         <div style={{ border: '1px solid #ccc', marginTop: '1rem', padding: '1rem' }}>
           <h3>{recipe.title}</h3>
           <p>{recipe.description}</p>
-          <p>Cooking time: {recipe.cookingTime}</p>
+          <p>Cooking time: {recipe.cookingTime} minutes</p>
           <p>Servings: {recipe.servings}</p>
           {/* Add more fields as needed */}
+          <h4>Categories:</h4>
+          <ul>
+            {recipe.categories && recipe.categories.length > 0 ? (
+              recipe.categories.map((category) => (
+                <li key={category.id}>{category.name}</li>
+              ))
+            ) : (
+              <li>No categories available</li>
+            )}
+          </ul>
         </div>
       )}
     </div>

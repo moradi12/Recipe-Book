@@ -10,12 +10,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
 @Entity
 @Table(name = "ingredients")
 public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
     private Long id;
 
     @NotBlank(message = "Ingredient name is mandatory")
@@ -27,9 +29,16 @@ public class Ingredient {
     @NotBlank(message = "Ingredient unit is mandatory")
     private String unit;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false) // Ensures foreign key constraint
+    @ToString.Exclude // Exclude recipe from toString to prevent LazyInitializationException
     private Recipe recipe;
 
-
+    // Helper Method to Manage Bidirectional Relationship
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+        if (recipe != null && !recipe.getIngredients().contains(this)) {
+            recipe.getIngredients().add(this);
+        }
+    }
 }

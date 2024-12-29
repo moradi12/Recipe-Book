@@ -7,16 +7,20 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
 @Entity
-@Data
+@Table(name = "users")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
-public class    User {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -41,4 +45,30 @@ public class    User {
     @Builder.Default
     @ToString.Exclude // Exclude favorites from toString to prevent LazyInitializationException
     private Set<Recipe> favorites = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude // Exclude recipeReviews from toString to prevent LazyInitializationException
+    private Set<RecipeReview> recipeReviews = new HashSet<>();
+
+    // Helper Methods to Manage Bidirectional Relationships
+    public void addFavorite(Recipe recipe) {
+        this.favorites.add(recipe);
+        recipe.getFavorites().add(this);
+    }
+
+    public void removeFavorite(Recipe recipe) {
+        this.favorites.remove(recipe);
+        recipe.getFavorites().remove(this);
+    }
+
+    public void addRecipeReview(RecipeReview recipeReview) {
+        this.recipeReviews.add(recipeReview);
+        recipeReview.setUser(this);
+    }
+
+    public void removeRecipeReview(RecipeReview recipeReview) {
+        this.recipeReviews.remove(recipeReview);
+        recipeReview.setUser(null);
+    }
 }
