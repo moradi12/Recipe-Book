@@ -1,7 +1,7 @@
+// Models/Favorite.ts
 export interface Favorite {
-    id: string;
-    userId: string;
-    recipeId: string;
-    addedAt: Date;
-  }
-  
+  id: number;
+  userId: number;
+  recipeId: number;
+  createdAt: string; // ISO date string
+}

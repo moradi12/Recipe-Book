@@ -1,25 +1,28 @@
 import { Category } from "./Category";
+import { FoodCategory } from "./FoodCategory";
+import { Ingredient } from "./Ingredient";
+import { RecipeStatus } from "./RecipeStatus";
 
 // Models/Recipe.ts
 export interface Recipe {
   id: number;
-  name: string; // Added to match the `name` field in the Java class
+  name: string; // Matches backend's Recipe.name
   title: string;
   description: string;
-  ingredients: { id: number; name: string; quantity: string; unit: string }[];
-  foodCategory: string; 
+  ingredients: Ingredient[]; // Consistent with backend's Ingredient entity
+  foodCategory: FoodCategory; // Enum for type safety
   preparationSteps: string;
-  cookingTime: number;
+  cookingTime: number; // In minutes
   servings: number;
   dietaryInfo?: string;
   containsGluten: boolean;
-  status: string; // Matches `RecipeStatus` in Java class, assuming it's a string enum on the client
-  createdAt: string; // LocalDateTime should be represented as ISO string in TypeScript
-  updatedAt: string; // LocalDateTime as ISO string
-  createdBy: User; // Matches `User createdBy` in Java class
-  categories: Category[]; 
-
+  status: RecipeStatus; // Enum to reflect RecipeStatus
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  createdBy: User; // User interface
+  categories: Category[]; // Array of Category interfaces
 }
+
 
 
 // Models/User.ts
@@ -55,20 +58,19 @@ export interface RecipeResponse {
 
 
 
-
 export interface APIRecipeResponse {
   id: number;
   title: string;
   description: string;
-  ingredients: { id: string; name: string; quantity: string }[];
+  ingredients: { id: string; name: string; quantity: string }[]; // Detailed backend format
   preparationSteps: string;
   cookingTime: number;
   servings: number;
   dietaryInfo?: string;
   containsGluten: boolean;
-  status: string;
+  status: string; // Use an enum if consistent
   createdAt: string;
   updatedAt: string;
-  createdByUsername: string;
-  categories: { id: number; name: string }[];
+  createdByUsername: string; // Ensure this matches backend naming
+  categories: { id: number; name: string }[]; // Consistent structure
 }

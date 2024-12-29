@@ -1,8 +1,8 @@
 package Allrecipes.Recipesdemo.Controllers;
 
-import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Entities.UserDetails;
+import Allrecipes.Recipesdemo.Exceptions.ErrorMessages;
 import Allrecipes.Recipesdemo.Exceptions.RecipeNotFoundException;
 import Allrecipes.Recipesdemo.Exceptions.UnauthorizedActionException;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
@@ -12,6 +12,7 @@ import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import Allrecipes.Recipesdemo.Service.CategoryService;
 import Allrecipes.Recipesdemo.Service.RecipeService;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +42,6 @@ public class RecipeController {
     private final CategoryService categoryService;
     private final JWT jwtUtil;
 
-    /**
-     * Creates a new recipe. Accessible only by authenticated users.
-     *
-     * @param request      The RecipeCreateRequest containing recipe details.
-     * @param httpRequest  The HTTP request containing the Authorization header.
-     * @return A ResponseEntity with a success message.
-     */
     @PostMapping
     public ResponseEntity<?> createRecipe(@RequestBody RecipeCreateRequest request,
                                           HttpServletRequest httpRequest) {
@@ -61,31 +55,28 @@ public class RecipeController {
         } catch (IllegalArgumentException e) {
             log.warn("Recipe creation failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid request: " + e.getMessage());
+                    .body(String.format(ErrorMessages.INVALID_REQUEST, e.getMessage()));
         } catch (Exception e) {
             log.error("Error creating recipe.", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred while creating the recipe.");
+                    .body(ErrorMessages.INTERNAL_ERROR);
         }
     }
 
-    /**
-     * Retrieves a recipe by its ID.
-     *
-     * @param id The ID of the recipe.
-     * @return The Recipe object if found.
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
+    public ResponseEntity<?> getRecipeById(@PathVariable String id) {
         try {
-            log.debug("Fetching recipe with ID: {}", id);
-            Recipe recipe = recipeService.getRecipeById(id);
-            log.info("Recipe retrieved successfully: {}", id);
+            Long recipeId = Long.parseLong(id);
+            Recipe recipe = recipeService.getRecipeById(recipeId);
             return ResponseEntity.ok(recipe);
+        } catch (NumberFormatException e) {
+            log.warn("Invalid recipe ID format: {}", id);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Recipe ID must be a numeric value.");
         } catch (RecipeNotFoundException e) {
-            log.warn("Recipe not found: {}", id);
+            log.warn("Recipe not found for ID: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Recipe with ID " + id + " not found.");
+                    .body(String.format("Recipe with ID %s not found.", id));
         } catch (Exception e) {
             log.error("Error retrieving recipe with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -93,13 +84,6 @@ public class RecipeController {
         }
     }
 
-    /**
-     * Retrieves all recipes with pagination.
-     *
-     * @param page The page number.
-     * @param size The page size.
-     * @return A paginated list of RecipeResponse.
-     */
     @GetMapping
     public ResponseEntity<?> getAllRecipes(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int size) {
@@ -120,23 +104,15 @@ public class RecipeController {
         } catch (Exception e) {
             log.error("Error retrieving all recipes.", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred while retrieving recipes.");
+                    .body(ErrorMessages.INTERNAL_ERROR);
         }
     }
 
-    /**
-     * Updates an existing recipe. Accessible only by the recipe owner or an admin.
-     *
-     * @param id           The ID of the recipe to update.
-     * @param request      The RecipeCreateRequest containing updated details.
-     * @param httpRequest  The HTTP request containing the Authorization header.
-     * @return A ResponseEntity with a success message.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRecipe(@PathVariable Long id,
                                           @Valid @RequestBody RecipeCreateRequest request,
                                           HttpServletRequest httpRequest) {
-        User user = null; // Declare user outside the try block
+        User user = null;
         try {
             log.debug("Attempting to update recipe with ID: {}", id);
             user = getCurrentUser(httpRequest);
@@ -146,132 +122,67 @@ public class RecipeController {
         } catch (RecipeNotFoundException e) {
             log.warn("Recipe not found for update: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Recipe with ID " + id + " not found.");
+                    .body(String.format(ErrorMessages.RECIPE_NOT_FOUND, id));
         } catch (UnauthorizedActionException e) {
-            if (user != null) {
-                log.warn("Unauthorized update attempt by User ID {} on Recipe ID {}",
-                        user.getId(), id);
-            } else {
-                log.warn("Unauthorized update attempt on Recipe ID {} without user information.", id);
-            }
+            log.warn("Unauthorized update attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to update this recipe.");
+                    .body(ErrorMessages.UNAUTHORIZED_ACTION);
         } catch (Exception e) {
             log.error("Error updating recipe with ID: {}", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred while updating the recipe.");
+                    .body(ErrorMessages.INTERNAL_ERROR);
         }
     }
 
-    /**
-     * Deletes a recipe by its ID. Accessible only by the recipe owner or an admin.
-     *
-     * @param id           The ID of the recipe to delete.
-     * @param httpRequest  The HTTP request containing the Authorization header.
-     * @return No Content if deletion is successful.
-     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
-                                          HttpServletRequest httpRequest) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest request) {
         User user = null; // Declare user outside the try block
         try {
             log.debug("Attempting to delete recipe with ID: {}", id);
-            user = getCurrentUser(httpRequest);
+            user = getCurrentUser(request);
             recipeService.deleteRecipe(id, user);
             log.info("Recipe with ID {} deleted successfully by User ID {}", id, user.getId());
             return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (RecipeNotFoundException e) {
             log.warn("Recipe not found for deletion: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Recipe with ID " + id + " not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipe with ID " + id + " not found.");
         } catch (UnauthorizedActionException e) {
-            if (user != null) {
-                log.warn("Unauthorized deletion attempt by User ID {} on Recipe ID {}",
-                        user.getId(), id);
-            } else {
-                log.warn("Unauthorized deletion attempt on Recipe ID {} without user information.", id);
-            }
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("You are not authorized to delete this recipe.");
+            log.warn("Unauthorized deletion attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this recipe.");
         } catch (Exception e) {
             log.error("Error deleting recipe with ID: {}", id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred while deleting the recipe.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred while deleting the recipe.");
         }
     }
 
-    /**
-     * Searches for recipes by title.
-     *
-     * @param title The title keyword to search for.
-     * @return A list of RecipeResponse matching the search criteria.
-     */
-    @GetMapping("/search")
-    public ResponseEntity<?> searchRecipes(@RequestParam String title) {
-        try {
-            log.debug("Searching for recipes with title containing: {}", title);
-            List<RecipeResponse> recipes = recipeService.searchRecipesByTitle(title);
-            if (recipes.isEmpty()) {
-                log.info("No recipes found containing title: {}", title);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("No recipes found with the title containing: " + title);
-            }
-            log.info("Found {} recipes containing title: {}", recipes.size(), title);
-            return ResponseEntity.ok(recipes);
-        } catch (Exception e) {
-            log.error("Error searching for recipes with title: {}", title, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred while searching for recipes.");
-        }
-    }
-
-    /**
-     * Retrieves all categories.
-     *
-     * @return A list of Category objects.
-     */
-    @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        try {
-            log.debug("Fetching all categories.");
-            List<Category> categories = categoryService.getAllCategories();
-            if (categories.isEmpty()) {
-                log.info("No categories found.");
-                return ResponseEntity.noContent().build();
-            }
-            log.info("Retrieved {} categories.", categories.size());
-            return ResponseEntity.ok(categories);
-        } catch (Exception e) {
-            log.error("Error retrieving all categories.", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
-    }
-
-    /**
-     * Extracts and validates the current user from the HTTP request.
-     *
-     * @param request The HTTP request containing the Authorization header.
-     * @return The authenticated User.
-     * @throws LoginException             If the token is invalid or expired.
-     * @throws IllegalArgumentException   If user details are missing or invalid.
-     */
-    private User getCurrentUser(HttpServletRequest request) throws LoginException, IllegalArgumentException {
+    private User getCurrentUser(HttpServletRequest request) throws IllegalArgumentException {
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Missing or invalid Authorization header.");
-            throw new IllegalArgumentException("Missing or invalid Authorization header");
+            throw new IllegalArgumentException("Authorization header is missing or invalid.");
         }
+
         String token = authHeader.substring(7); // Remove "Bearer " prefix
-        log.debug("Extracting user details from token.");
-        UserDetails userDetails = jwtUtil.getUserDetails(authHeader);
 
-        String username = userDetails.getUserName();
-        String email = userDetails.getEmail();
+        try {
+            log.debug("Validating JWT token.");
+            UserDetails userDetails = jwtUtil.getUserDetails(token);
+            String username = userDetails.getUserName();
+            String email = userDetails.getEmail();
 
-        User user = userRepository.findByUsernameOrEmail(username, email)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
-
-        return user;
+            return userRepository.findByUsernameOrEmail(username, email)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid user associated with token."));
+        } catch (MalformedJwtException e) {
+            log.error("Malformed JWT token.", e);
+            throw new IllegalArgumentException("JWT token is malformed.");
+        } catch (Exception e) {
+            log.error("Error validating JWT token.", e);
+            throw new IllegalArgumentException("Error occurred while validating token.");
+        }
     }
+
 }

@@ -2,8 +2,8 @@
 
 export interface IngredientRequest {
     name: string;
-    quantity: string;
-    unit: string;
+    quantity: string; // e.g., "2 cups", "500g"
+    unit: string; // e.g., "grams", "cups", "tablespoons"
 }
 
 export interface RecipeCreateRequest {
@@ -11,9 +11,10 @@ export interface RecipeCreateRequest {
     description: string;
     ingredients: IngredientRequest[];
     preparationSteps: string;
-    cookingTime: number;
+    cookingTime: number; // In minutes
     servings: number;
     dietaryInfo?: string;
     containsGluten: boolean;
-    // categoryId has been removed
+    categories: number[]; // Array of category IDs if backend requires
+    // Alternatively, use categories: Category[]; if backend expects full objects
 }

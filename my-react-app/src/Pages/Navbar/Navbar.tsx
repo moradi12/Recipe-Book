@@ -124,12 +124,7 @@ const Navbar: React.FC = () => {
           </NavLink>
         </li>
 
-        {/* Category Page */}
-        <li>
-          <NavLink to="/categories" onClick={() => setIsOpen(false)}>
-            Categories
-          </NavLink>
-        </li>
+      
 
         {/* Auth Links (Login / Register vs Logout) */}
         {!isLogged ? (

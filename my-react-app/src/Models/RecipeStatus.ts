@@ -1,6 +1,7 @@
+// Models/RecipeStatus.ts
 export enum RecipeStatus {
-  DRAFT,
-  PENDING_APPROVAL,
-  APPROVED,
-  REJECTED,
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  ARCHIVED = "ARCHIVED",
+  // Add other statuses as defined in the backend
 }

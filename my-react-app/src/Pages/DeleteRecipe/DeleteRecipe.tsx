@@ -7,6 +7,7 @@ import { RootState } from '../Redux/RootState';
 const DeleteRecipe: React.FC = () => {
   const [recipeId, setRecipeId] = useState<number>(0);
   const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const token = useSelector((state: RootState) => state.auth.token);
 
   const handleDelete = async () => {
@@ -16,10 +17,12 @@ const DeleteRecipe: React.FC = () => {
         setError('Authentication token is missing. Please log in.');
         return;
       }
-      if (!recipeId) {
-        setError('Please enter a valid recipe ID.');
+      if (!recipeId || recipeId <= 0) {
+        setError('Please enter a valid recipe ID greater than 0.');
         return;
       }
+
+      setLoading(true);
 
       await axios.delete(`/api/recipes/${recipeId}`, {
         headers: {
@@ -42,21 +45,45 @@ const DeleteRecipe: React.FC = () => {
         setError(err?.response?.data || 'An unexpected error occurred while deleting the recipe.');
         notify.error('An unexpected error occurred while deleting the recipe.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ margin: '1rem' }}>
+    <div style={{ margin: '1rem', fontFamily: 'Arial, sans-serif' }}>
       <h2>Delete Recipe</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <div>
-        <label>Recipe ID: </label>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxWidth: '300px' }}>
+        <label htmlFor="recipeId" style={{ fontWeight: 'bold' }}>Recipe ID:</label>
         <input
+          id="recipeId"
           type="number"
           value={recipeId}
           onChange={(e) => setRecipeId(Number(e.target.value))}
+          style={{
+            padding: '0.5rem',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+            fontSize: '1rem'
+          }}
+          min="1"
         />
-        <button onClick={handleDelete}>Delete</button>
+        <button
+          onClick={handleDelete}
+          style={{
+            padding: '0.5rem',
+            backgroundColor: loading ? '#ccc' : '#007BFF',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '1rem'
+          }}
+          disabled={loading}
+        >
+          {loading ? 'Deleting...' : 'Delete'}
+        </button>
       </div>
     </div>
   );

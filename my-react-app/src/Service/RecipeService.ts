@@ -1,4 +1,5 @@
-// src/Services/RecipeService.ts
+// src/Service/RecipeService.ts
+
 import axios, { AxiosResponse } from 'axios';
 import { Category } from '../Models/Category';
 import { RecipeResponse } from '../Models/Recipe';
@@ -25,99 +26,73 @@ class RecipeService {
     return RecipeService.instance;
   }
 
-  /**
-   * Creates a new recipe.
-   * @param recipe - Recipe object to create.
-   * @param token - Authorization token.
-   */
+  // ===========================
+  // CREATE
+  // ===========================
   public async createRecipe(
     recipe: RecipeResponse,
     token: string
   ): Promise<AxiosResponse<RecipeResponse>> {
-    const authHeader = `Bearer ${token}`;
     return axios.post<RecipeResponse>(this.baseUrl, recipe, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${token}`,
       },
     });
   }
 
-  /**
-   * Fetches all recipes without pagination.
-   */
-  public async getAllRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
-    return axios.get<RecipeResponse[]>(`${this.baseUrl}/all`);
-  }
-
-  /**
-   * Fetches paginated recipes with optional category filter.
-   * @param pageNumber - Page number to fetch.
-   * @param pageSize - Number of items per page.
-   * @param category - (Optional) Category filter.
-   */
+  // ===========================
+  // GET PAGINATED
+  // ===========================
   public async getAllRecipesPaginated(
     pageNumber: number,
     pageSize: number,
     category?: string
   ): Promise<AxiosResponse<PaginatedRecipes>> {
-    const url = `${this.baseUrl}/all?page=${pageNumber}&size=${pageSize}`;
-    const finalUrl = category ? `${url}&category=${encodeURIComponent(category)}` : url;
+    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
 
-    return axios.get<PaginatedRecipes>(finalUrl);
-  }
-
-  /**
-   * Fetches all categories.
-   */
-  public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
-    try {
-      const response = await axios.get<Category[]>(`${this.baseUrl}/categories`);
-      return response;
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      throw error;
+    if (category) {
+      // This works if your backend supports filtering by category
+      url += `&category=${encodeURIComponent(category)}`;
     }
+    return axios.get<PaginatedRecipes>(url);
   }
-  
-  /**
-   * Deletes a recipe by ID.
-   * @param id - Recipe ID to delete.
-   * @param token - Authorization token.
-   */
+
+  // ===========================
+  // GET CATEGORIES (Public Endpoint)
+  // ===========================
+  public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
+    return axios.get<Category[]>(`${this.baseUrl}/categories`); // Public endpoint
+  }
+
+  // ===========================
+  // DELETE
+  // ===========================
   public async deleteRecipe(id: number, token: string): Promise<AxiosResponse<void>> {
-    const authHeader = `Bearer ${token}`;
     return axios.delete(`${this.baseUrl}/${id}`, {
-      headers: {
-        Authorization: authHeader,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
   }
 
-  /**
-   * Updates a recipe by ID.
-   * @param id - Recipe ID to update.
-   * @param recipe - Updated recipe data.
-   * @param token - Authorization token.
-   */
+  // ===========================
+  // UPDATE
+  // ===========================
   public async updateRecipe(
     id: number,
     recipe: RecipeResponse,
     token: string
   ): Promise<AxiosResponse<RecipeResponse>> {
-    const authHeader = `Bearer ${token}`;
     return axios.put<RecipeResponse>(`${this.baseUrl}/${id}`, recipe, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader,
+        Authorization: `Bearer ${token}`,
       },
     });
   }
 
-  /**
-   * Searches for recipes by title.
-   * @param title - Recipe title to search.
-   */
+  // ===========================
+  // SEARCH
+  // ===========================
   public async searchRecipesByTitle(title: string): Promise<AxiosResponse<RecipeResponse[]>> {
     const url = `${this.baseUrl}/search?title=${encodeURIComponent(title)}`;
     return axios.get<RecipeResponse[]>(url);

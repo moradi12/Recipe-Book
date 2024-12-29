@@ -99,6 +99,10 @@ public class RecipeService {
     }
 
     public void deleteRecipe(Long id, User user) {
+        if (id == null || user == null) {
+            throw new IllegalArgumentException("Invalid input: Recipe ID and user cannot be null.");
+        }
+
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 

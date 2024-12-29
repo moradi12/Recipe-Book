@@ -16,12 +16,12 @@ const CreateRecipe: React.FC = () => {
         handleSubmit,
     } = useRecipeForm();
 
-    const [selectedCategory, setSelectedCategory] = useState<FoodCategory | "">("");
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
 
     const foodCategoryOptions = Object.values(FoodCategory);
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(e.target.value as FoodCategory);
+        setSelectedCategory(e.target.value);
     };
 
     return (
