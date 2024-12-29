@@ -1,10 +1,10 @@
 import { combineReducers } from '@reduxjs/toolkit';
+import recipeReducer from '../../../src/Pages/Redux/slices/RecipeReducer'; // Import the recipe reducer
 import { AuthReducer } from './AuthReducer';
 
 const rootReducer = combineReducers({
     auth: AuthReducer,
-    
-    // add other reducers here
+    recipes: recipeReducer, 
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

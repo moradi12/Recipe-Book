@@ -1,11 +1,11 @@
-// src/Pages/Redux/store.ts
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import recipeReducer from '../../Pages/Redux/slices/RecipeReducer'; // Import the recipe reducer
 import { AuthReducer } from './AuthReducer';
 
 // Combine all reducers
 const rootReducer = combineReducers({
   auth: AuthReducer,
-  // Add other reducers here (e.g., recipesReducer)
+  recipes: recipeReducer, // Add the recipe reducer here
 });
 
 // Configure the store

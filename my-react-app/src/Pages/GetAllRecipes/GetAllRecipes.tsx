@@ -59,9 +59,9 @@ const GetAllRecipes: React.FC = () => {
   const handleCategoryFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCategory = e.target.value;
     setFilterCategory(selectedCategory);
-    setPage(0); // Reset to first page when filter changes
+    setPage(0);
   };
-
+  
   // Handle page size change
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newSize = Number(e.target.value);
@@ -91,7 +91,13 @@ const GetAllRecipes: React.FC = () => {
   // Handle delete functionality
   const handleDelete = async (id: number) => {
     try {
-      await RecipeService.deleteRecipe(id, '<YOUR_AUTH_TOKEN>'); // Replace with a valid token
+      const token = localStorage.getItem('authToken'); // Example for token retrieval
+      if (!token) {
+        notify.error('Authentication token is missing.');
+        return;
+      }
+  
+      await RecipeService.deleteRecipe(id, token);
       setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
       notify.success('Recipe deleted successfully.');
     } catch (err) {
@@ -99,7 +105,7 @@ const GetAllRecipes: React.FC = () => {
       notify.error('Failed to delete the recipe.');
     }
   };
-
+  
   // Handle edit functionality
   const handleEdit = (id: number) => {
     navigate(`/edit-recipe/${id}`); // Redirect to edit form
