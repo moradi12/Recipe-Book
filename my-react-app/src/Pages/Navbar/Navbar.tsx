@@ -107,22 +107,6 @@ const Navbar: React.FC = () => {
           </NavLink>
         </li>
 
-        {/* Additional recipe operations */}
-        <li>
-          <NavLink to="/recipes/search" onClick={() => setIsOpen(false)}>
-            Search Recipes
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/recipes/update" onClick={() => setIsOpen(false)}>
-            Update Recipe
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/recipes/delete" onClick={() => setIsOpen(false)}>
-            Delete Recipe
-          </NavLink>
-        </li>
 
       
 

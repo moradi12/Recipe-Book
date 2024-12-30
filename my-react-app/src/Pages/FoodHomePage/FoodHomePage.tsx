@@ -1,9 +1,14 @@
 // src/components/FoodHomePage/FoodHomePage.tsx
 import { motion } from 'framer-motion';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './FoodHomePage.module.css';
 
 const FoodHomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const handleBrowseRecipes = () => {
+    navigate('/all/recipes');
+  };
   return (
     <div className={styles.container}>
       {/* Hero Section */}
@@ -18,11 +23,12 @@ const FoodHomePage: React.FC = () => {
           <p className={styles.subtitle}>
             Discover, cook, and enjoy delicious recipes from around the world.
           </p>
-          <button className={styles.ctaButton}>Browse Recipes</button>
+          <button className={styles.ctaButton} onClick={handleBrowseRecipes}>
+            Browse Recipes
+          </button>
         </motion.div>
         <div className={styles.animatedBackground}></div>
       </section>
-
       {/* Features Section */}
       <section className={styles.features}>
         <h2>Our Platform Highlights</h2>

@@ -1,110 +1,166 @@
 /* GetAllRecipes.css */
 
-/* Container Styles */
 .get-all-recipes {
-    margin: 1rem;
-    font-family: Arial, sans-serif;
-    color: #333;
-  }
-  
-  /* Heading Styles */
-  .get-all-recipes h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #2c3e50;
-  }
-  
-  /* Error Message Styles */
-  .get-all-recipes .error-message {
-    color: #e74c3c;
-    margin-bottom: 1rem;
-    font-weight: bold;
-  }
-  
-  /* Controls (Page Size Selector) Styles */
-  .get-all-recipes .controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .get-all-recipes .controls label {
-    font-weight: bold;
-  }
-  
-  .get-all-recipes .controls select {
-    padding: 0.5rem;
-    border: 1px solid #bdc3c7;
-    border-radius: 4px;
-    background-color: #ecf0f1;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .get-all-recipes .controls select:hover {
-    background-color: #dfe6e9;
-  }
-  
-  /* Pagination Controls Styles */
-  .get-all-recipes .pagination {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .get-all-recipes .pagination button {
-    padding: 0.5rem 1rem;
-    border: none;
-    background-color: #3498db;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .get-all-recipes .pagination button:hover:not(:disabled) {
-    background-color: #2980b9;
-  }
-  
-  .get-all-recipes .pagination button:disabled {
-    background-color: #95a5a6;
-    cursor: not-allowed;
-  }
-  
-  /* Recipe List Styles */
-  .get-all-recipes .recipe-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .get-all-recipes .recipe-item {
-    border: 1px solid #bdc3c7;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    background-color: #fdfdfd;
-  }
-  
-  .get-all-recipes .recipe-item:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-  
-  .get-all-recipes .recipe-item h3 {
-    margin: 0 0 0.5rem 0;
-    color: #2980b9;
-  }
-  
-  .get-all-recipes .recipe-item p {
-    margin: 0;
-    color: #7f8c8d;
-  }
-  
-  /* No Recipes Message Styles */
-  .get-all-recipes .no-recipes {
-    font-style: italic;
-    color: #7f8c8d;
-  }
-  
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.get-all-recipes h2 {
+  text-align: center;
+  margin-bottom: 30px; /* Increased spacing below the heading */
+  color: #0056b3;
+}
+
+.filter-container,
+.controls {
+  margin-bottom: 30px; /* More space between filters/controls and other elements */
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Increased gap between items in the same section */
+  justify-content: center;
+}
+
+label {
+  font-weight: bold;
+}
+
+select,
+input {
+  padding: 8px; /* Slightly larger padding for better usability */
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px; /* More space between pagination buttons */
+  margin-bottom: 40px; /* Extra space after pagination */
+}
+
+.pagination button {
+  padding: 8px 15px; /* Slightly larger buttons for better clickability */
+  border: none;
+  background-color: #0056b3;
+  color: white;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #004080;
+  transform: scale(1.05); /* Added slight zoom effect on hover */
+}
+
+.pagination .page-input {
+  width: 60px; /* Increased input width for better usability */
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.recipe-list {
+  list-style-type: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px; /* Increased gap between recipe cards */
+}
+
+.recipe-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px; /* More padding inside recipe cards */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.recipe-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-item h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px; /* Increased spacing below the title */
+}
+
+.recipe-item p {
+  margin: 8px 0; /* More spacing between paragraphs */
+  font-size: 14px;
+}
+
+.recipe-item ul {
+  list-style-type: disc;
+  padding-left: 25px; /* Slightly more padding for indentation */
+  margin: 15px 0; /* Increased spacing above and below the list */
+}
+
+.recipe-item ul li {
+  margin: 5px 0;
+}
+
+.edit-button,
+.delete-button {
+  padding: 10px 15px; /* Larger buttons for better usability */
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.edit-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin-bottom: 25px; /* More space after error messages */
+}
+
+.no-recipes {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  margin-top: 20px; /* Space before the no-recipes message */
+}
+
+.loading {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px; /* Space after the loading message */
+}

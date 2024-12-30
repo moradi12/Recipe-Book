@@ -16,18 +16,19 @@ const initialState: RecipeState = {
 };
 
 /**
- * Fetch all recipes as an array (NO pagination).
- * If your backend endpoint currently returns a paginated JSON,
- * you could adapt this to handle the paginated structure. 
+ * Fetch all recipes (unpaginated).
+ * Adapts to backend responses by assuming the endpoint returns an array of recipes.
  */
-export const fetchRecipes = createAsyncThunk<RecipeResponse[], void, { rejectValue: string }>(
+export const fetchRecipes = createAsyncThunk<
+  RecipeResponse[],
+  void,
+  { rejectValue: string }
+>(
   'recipes/fetchRecipes',
   async (_, thunkAPI) => {
     try {
-      // Calls a method that returns an array of recipes (unpaginated).
-      const response = await RecipeService.getAllRecipes(); 
-      return response.data; 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response = await RecipeService.getAllRecipes(); // Adjust this if pagination is required
+      return response.data; // Assumes response data contains the array of recipes
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || 'Failed to fetch recipes'
@@ -37,7 +38,8 @@ export const fetchRecipes = createAsyncThunk<RecipeResponse[], void, { rejectVal
 );
 
 /**
- * Add a new recipe (create).
+ * Add a new recipe.
+ * Includes token-based authentication for secure API interaction.
  */
 export const addRecipe = createAsyncThunk<
   RecipeResponse,
@@ -48,7 +50,7 @@ export const addRecipe = createAsyncThunk<
   async ({ recipe, token }, thunkAPI) => {
     try {
       const response = await RecipeService.createRecipe(recipe, token);
-      return response.data;
+      return response.data; // Assumes the backend returns the created recipe
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
@@ -63,8 +65,8 @@ const recipeSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // fetchRecipes
     builder
+      // fetchRecipes actions
       .addCase(fetchRecipes.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -73,22 +75,21 @@ const recipeSlice = createSlice({
         state.loading = false;
         state.recipes = action.payload;
       })
-      .addCase(fetchRecipes.rejected, (state, action: PayloadAction<string | undefined>) => {
+      .addCase(fetchRecipes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch recipes';
-      });
+      })
 
-    // addRecipe
-    builder
+      // addRecipe actions
       .addCase(addRecipe.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addRecipe.fulfilled, (state, action: PayloadAction<RecipeResponse>) => {
         state.loading = false;
-        state.recipes.push(action.payload); // Insert newly created recipe
+        state.recipes.push(action.payload);
       })
-      .addCase(addRecipe.rejected, (state, action: PayloadAction<string | undefined>) => {
+      .addCase(addRecipe.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to add recipe';
       });

@@ -1,6 +1,7 @@
 package Allrecipes.Recipesdemo.Controllers;
 
 import Allrecipes.Recipesdemo.Entities.Category;
+import Allrecipes.Recipesdemo.Entities.Enums.FoodCategories;
 import Allrecipes.Recipesdemo.Entities.Enums.UserType;
 import Allrecipes.Recipesdemo.Entities.UserDetails;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
@@ -24,22 +25,40 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final JWT jwtUtil;
 
-    /**
-     * Retrieves all categories. Accessible only by Admin users.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @return A ResponseEntity containing the list of categories.
-     * @throws LoginException If the user is not authorized.
-     */
+
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories(@RequestHeader("Authorization") String authHeader) throws LoginException {
-        log.debug("Fetching all categories with admin authorization.");
-        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
+    public ResponseEntity<List<Category>> getAllCategories() {
+        log.debug("Fetching all categories.");
         List<Category> categories = categoryService.getAllCategories();
         log.info("Retrieved {} categories.", categories.size());
         return ResponseEntity.ok(categories);
     }
 
+    @GetMapping("/food-categories")
+    public ResponseEntity<List<Map<String, String>>> getFoodCategories() {
+        log.debug("Fetching all predefined food categories.");
+
+        // Convert enum values to a list of maps for better readability (name and description)
+        List<Map<String, String>> foodCategories = List.of(FoodCategories.values()).stream()
+                .map(foodCategory -> Map.of(
+                        "name", foodCategory.name(),
+                        "description", foodCategory.getDescription()
+                ))
+                .toList();
+
+        log.info("Retrieved {} food categories.", foodCategories.size());
+        return ResponseEntity.ok(foodCategories);
+    }
+
+//    @GetMapping
+//    public ResponseEntity<List<Category>> getAllCategories(@RequestHeader("Authorization") String authHeader) throws LoginException {
+//        log.debug("Fetching all categories with admin authorization.");
+//        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
+//        List<Category> categories = categoryService.getAllCategories();
+//        log.info("Retrieved {} categories.", categories.size());
+//        return ResponseEntity.ok(categories);
+//    }
+//
     /**
      * Retrieves a specific category by its name. Accessible only by Admin users.
      *

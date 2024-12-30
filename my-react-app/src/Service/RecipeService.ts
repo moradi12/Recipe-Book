@@ -16,7 +16,7 @@ export interface PaginatedRecipes {
 class RecipeService {
   private static instance: RecipeService;
   private baseUrl: string = 'http://localhost:8080/api/recipes';
-
+  private categoriesUrl: string = 'http://localhost:8080/api/categories';
   private constructor() {}
 
   public static getInstance(): RecipeService {
@@ -24,6 +24,21 @@ class RecipeService {
       RecipeService.instance = new RecipeService();
     }
     return RecipeService.instance;
+  }
+
+
+   // ===========================
+  // GET FOOD CATEGORIES
+  // ===========================
+  public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
+    return axios.get<{ name: string; description: string }[]>(`${this.categoriesUrl}/food-categories`);
+  }
+
+  // ===========================
+  // GET ALL RECIPES
+  // ===========================
+  public async getAllRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
+    return axios.get<RecipeResponse[]>(`${this.baseUrl}/all`);
   }
 
   // ===========================
@@ -98,5 +113,6 @@ class RecipeService {
     return axios.get<RecipeResponse[]>(url);
   }
 }
+
 
 export default RecipeService.getInstance();

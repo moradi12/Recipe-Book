@@ -185,6 +185,7 @@ const useRecipeForm = () => {
       servings: form.servings,
       dietaryInfo: form.dietaryInfo || undefined,
       containsGluten: form.containsGluten,
+      categories: selectedCategory ? [Number(selectedCategory)] : [],
     };
 
     // Call createRecipe
