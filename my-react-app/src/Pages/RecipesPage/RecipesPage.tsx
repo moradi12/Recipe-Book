@@ -77,7 +77,6 @@ const RecipesPage: React.FC = () => {
       image: 'https://via.placeholder.com/300?text=Chocolate+Lava+Cake',
       category: 'Desserts',
     },
-    // Add more recipes as needed
   ]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');

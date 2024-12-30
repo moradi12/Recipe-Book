@@ -22,10 +22,6 @@ const DEFAULT_FORM_STATE: FormState = {
   containsGluten: true,
 };
 
-/**
- * Validate the form fields. Returns an object where
- * the keys are field identifiers and the values are error messages.
- */
 function validateRecipeForm(form: FormState): Record<string, string> {
   const validationErrors: Record<string, string> = {};
 
@@ -63,9 +59,6 @@ function validateRecipeForm(form: FormState): Record<string, string> {
   return validationErrors;
 }
 
-/**
- * Attempt to create a recipe via RecipeService and handle various Axios error scenarios.
- */
 async function createRecipe(
   recipeRequest: RecipeCreateRequest,
   token: string

@@ -49,7 +49,7 @@
   border: 1px solid #2a9d8f; /* Teal border */
   border-radius: 4px;
   background-color: #f4f4f4; /* Soft gray background */
-  color: #264653; /* Teal text */
+  color: #108a47; /* Teal text */
 }
 
 /* Recipe list */
@@ -105,7 +105,7 @@
 .recipe-item ul li {
   margin: 5px 0; /* Space between items */
   font-size: 14px;
-  color: #264653; /* Deep blue for ingredients */
+  color: #2c394b; /* Deep blue for ingredients */
   font-weight: bold;
 }
 
@@ -115,11 +115,28 @@
   padding: 8px 12px;
   font-size: 14px;
   color: #ffffff; /* White text */
-  background-color: #457b9d; /* Navy blue */
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+/* Edit button in blue */
+.recipe-item button.edit-button {
+  background-color: #3bb2e4; /* Indigo blue */
+}
+
+.recipe-item button.edit-button:hover {
+  background-color: #113886; /* Darker indigo */
+}
+
+/* Delete button in red */
+.recipe-item button.delete-button {
+  background-color: #e63946; /* Bright red */
+}
+
+.recipe-item button.delete-button:hover {
+  background-color: #9d0208; /* Darker red */
 }
 
 .recipe-item button:hover {
@@ -127,11 +144,11 @@
 }
 
 .recipe-item button.delete-button {
-  background-color: #e63946; /* Bright red */
+  background-color: #e31111; /* Bright red */
 }
 
 .recipe-item button.delete-button:hover {
-  background-color: #9d0208; /* Deep red */
+  background-color: #831418; /* Deep red */
 }
 
 /* Pagination */

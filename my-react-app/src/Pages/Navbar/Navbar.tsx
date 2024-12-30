@@ -22,19 +22,13 @@ const Navbar: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  // Close the menu and logout the user
   const handleLogout = () => {
-    // 1) Dispatch logout action in Redux
     dispatch(logoutAction());
-    // 2) Remove token from sessionStorage
     sessionStorage.removeItem("jwt");
-    // 3) Navigate to login page
     navigate("/login");
-    // 4) Close menu
     setIsOpen(false);
   };
 
-  // Close the menu if user clicks outside the navbar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(`.${styles.navbar}`);
@@ -92,18 +86,13 @@ const Navbar: React.FC = () => {
 
         {/* Add recipe pages */}
         <li>
-          <NavLink to="/add" onClick={() => setIsOpen(false)}>
-            Add
-          </NavLink>
-        </li>
-        <li>
           <NavLink to="/create" onClick={() => setIsOpen(false)}>
             Create Recipe
           </NavLink>
         </li>
         <li>
           <NavLink to="/all/recipes" onClick={() => setIsOpen(false)}>
-            View All
+            All Recipes
           </NavLink>
         </li>
 

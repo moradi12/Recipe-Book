@@ -18,7 +18,6 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ recipe, onInputChange }) => {
     const { value } = e.target;
     const numericValue = Number(value);
 
-    // Ensure the value is a positive number or empty string
     if ((!isNaN(numericValue) && numericValue >= 0) || value === "") {
       onInputChange(e);
     }

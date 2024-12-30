@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Category } from "../../Models/Category";
 import { fetchCategories } from "../../Utiles/recipesApi";
+import './CategoryDropdown.css';
 
 const CategoryDropdown: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);

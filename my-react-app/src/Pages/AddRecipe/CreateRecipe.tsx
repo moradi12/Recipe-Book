@@ -121,6 +121,8 @@ const CreateRecipe: React.FC = () => {
                         type="text"
                         id="dietaryInfo"
                         value={form.dietaryInfo}
+                        placeholder="Enter details such as vegan, vegetarian, etc."
+
                         onChange={handleChange}
                     />
                 </div>
