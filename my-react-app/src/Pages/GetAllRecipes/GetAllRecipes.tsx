@@ -8,6 +8,7 @@ import './GetAllRecipes.css';
 
 const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [categories, setCategories] = useState<Category[]>([]);
   const [pagination, setPagination] = useState({
     page: 0,
@@ -31,6 +32,7 @@ const GetAllRecipes: React.FC = () => {
       const data: PaginatedRecipes = response.data;
       setRecipes(data.content);
       setPagination((prev) => ({ ...prev, totalPages: data.totalPages }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to load recipes.';
       setError(errorMessage);
@@ -79,6 +81,7 @@ const GetAllRecipes: React.FC = () => {
             <p><strong>Servings:</strong> {recipe.servings}</p>
             <p><strong>Dietary Info:</strong> {recipe.dietaryInfo || 'N/A'}</p>
             <p><strong>Contains Gluten:</strong> {recipe.containsGluten ? 'Yes' : 'No'}</p>
+
             <p><strong>Status:</strong> {recipe.status || 'Unknown'}</p>
             <h4>Ingredients:</h4>
             {recipe.ingredients?.length ? (
