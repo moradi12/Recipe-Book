@@ -5,11 +5,13 @@ import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.RecipeReview;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,6 +34,11 @@ public class Recipe {
 
     @Column(nullable = false)
     private String title;
+
+    @Lob
+    @JsonIgnore
+    private Blob photo;
+
 
     @Lob
     private String description;

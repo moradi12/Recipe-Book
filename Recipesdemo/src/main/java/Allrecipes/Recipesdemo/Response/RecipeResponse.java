@@ -14,6 +14,6 @@ public class RecipeResponse {
     private String dietaryInfo;
     private String status;
     private String createdByUsername;
-
+    private String photo;
     // Getters and Setters
 }

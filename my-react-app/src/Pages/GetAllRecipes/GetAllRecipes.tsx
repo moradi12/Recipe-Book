@@ -1,14 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Category } from "../../Models/Category";
 import { RecipeResponse } from "../../Models/Recipe";
 import RecipeService, { PaginatedRecipes } from "../../Service/RecipeService";
+import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
+import { recipeSystem } from "../Redux/store";
 import "./GetAllRecipes.css";
 
 const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [categories, setCategories] = useState<Category[]>([]);
   const [pagination, setPagination] = useState({
     page: 0,
@@ -19,6 +21,11 @@ const GetAllRecipes: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+
+  // Ensure JWT token is valid at the top
+  useEffect(() => {
+    checkData();
+  }, []);
 
   const fetchRecipes = async () => {
     try {
@@ -43,6 +50,32 @@ const GetAllRecipes: React.FC = () => {
     }
   };
 
+  const handleDeleteRecipe = async (id: number) => {
+    const state = recipeSystem.getState();
+    const token = state.auth.token;
+
+    if (!token || token.length < 10) {
+      notify.error("Missing authorization token. Please log in again.");
+      return;
+    }
+
+    if (window.confirm("Are you sure you want to delete this recipe?")) {
+      try {
+        await RecipeService.deleteRecipe(id, token);
+        notify.success("Recipe deleted successfully!");
+        fetchRecipes();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+          notify.error(`Failed to delete recipe: ${error.response.data.message}`);
+        } else {
+          console.error("Error deleting recipe:", error.message);
+          notify.error("An unexpected error occurred.");
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     fetchRecipes();
@@ -114,15 +147,14 @@ const GetAllRecipes: React.FC = () => {
               <p>No ingredients listed</p>
             )}
             <button
-              className="edit-button" 
-               onClick={() => navigate(`/edit-recipe/${recipe.id}`)}>
+              className="edit-button"
+              onClick={() => navigate(`/edit-recipe/${recipe.id}`)}
+            >
               Edit
             </button>
             <button
-              className="delete-button" 
-              onClick={() =>
-                notify.success(`Deleted recipe ${recipe.title || recipe.id}`)
-              }
+              className="delete-button"
+              onClick={() => handleDeleteRecipe(recipe.id)}
             >
               Delete
             </button>
