@@ -17,7 +17,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.rowset.serial.SerialException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,9 +72,20 @@ public class RecipeService {
                             .quantity(dto.getQuantity())
                             .unit(dto.getUnit())
                             .build();
-                    return ingredient; // Recipe association is set after creation
+                    return ingredient;
                 })
                 .collect(Collectors.toList());
+
+
+        Blob photoBlob = null; // New line
+        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) { // New line
+            try { // New line
+                photoBlob = new javax.sql.rowset.serial.SerialBlob(Base64.getDecoder().decode(req.getPhoto())); // New line
+            } catch (SQLException e) { // New line
+                throw new InvalidRecipeDataException("Error decoding photo", e); // New line
+            }
+
+        }
 
         Recipe recipe = Recipe.builder()
                 .title(req.getTitle())
@@ -86,6 +101,7 @@ public class RecipeService {
                 .updatedAt(LocalDateTime.now())
                 .containsGluten(req.getContainsGlutenOrDefault())
                 .categories(categories)
+                .photo(photoBlob)
                 .build();
 
         ingredients.forEach(ingredient -> ingredient.setRecipe(recipe)); // Associate ingredients with recipe
@@ -145,6 +161,17 @@ public class RecipeService {
                 })
                 .collect(Collectors.toList());
 
+
+        Blob photoBlob = null; // New line
+        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) { // New line
+            try { // New line
+                photoBlob = new javax.sql.rowset.serial.SerialBlob(Base64.getDecoder().decode(req.getPhoto())); // New line
+            } catch (SQLException e) { // New line
+                throw new InvalidRecipeDataException("Error decoding photo", e); // New line
+            }
+        }
+
+
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
         existing.setIngredients(ingredients);
@@ -200,6 +227,7 @@ public class RecipeService {
                 .dietaryInfo(recipe.getDietaryInfo())
                 .status(recipe.getStatus().name())
                 .createdByUsername(recipe.getCreatedBy().getUsername())
+                .photo(recipe.getPhotoAsBase64()) // New line
                 .build();
     }
 
