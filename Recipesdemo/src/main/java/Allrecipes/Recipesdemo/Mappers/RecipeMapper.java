@@ -33,6 +33,7 @@ public class RecipeMapper {
                 .dietaryInfo(recipe.getDietaryInfo())
                 .status(recipe.getStatus() != null ? recipe.getStatus().name() : "Unknown")
                 .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "Unknown")
+                .photo(recipe.getPhotoAsBase64())
                 .build();
     }
 

@@ -23,7 +23,7 @@ public class RecipeDto {
 
     @Positive(message = "Servings must be positive")
     private int servings;
-
+    private String photo;
     private String dietaryInfo;
     private RecipeStatus status;
     private LocalDateTime createdAt;

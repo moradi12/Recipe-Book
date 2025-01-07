@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -93,6 +94,28 @@ public class Recipe {
     @Builder.Default
     @ToString.Exclude // Exclude recipeReviews from toString to prevent LazyInitializationException
     private Set<RecipeReview> recipeReviews = new HashSet<>();
+
+    public String getPhotoAsBase64() {
+        if (photo == null) {
+            return null;
+        }
+        try {
+            int blobLength = (int) photo.length();
+            byte[] blobAsBytes = photo.getBytes(1, blobLength);
+            return Base64.getEncoder().encodeToString(blobAsBytes);
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading photo Blob", e);
+        }
+    }
+
+    public void setPhotoFromBase64(String photoBase64) throws SQLException {
+        if (photoBase64 != null) {
+            this.photo = new javax.sql.rowset.serial.SerialBlob(Base64.getDecoder().decode(photoBase64));
+        } else {
+            this.photo = null;
+        }
+    }
+
 
     // Helper Methods to Manage Bidirectional Relationships
     public void addFavorite(User user) {

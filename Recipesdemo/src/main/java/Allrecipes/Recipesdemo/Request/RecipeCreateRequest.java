@@ -36,6 +36,7 @@ public class RecipeCreateRequest {
     private Boolean containsGluten;
 
     private Set<Long> categoryIds;
+    private String photo;
 
     // Default value handling
     public boolean getContainsGlutenOrDefault() {
