@@ -19,4 +19,5 @@ export interface RecipeResponse {
     updatedAt: string; // ISO date string
     createdByUsername: string; // Assuming backend provides username instead of full User object
     category: FoodCategory; // Added this field}
+    photo?: string; 
 }

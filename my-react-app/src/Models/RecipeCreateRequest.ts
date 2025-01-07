@@ -13,6 +13,7 @@ export interface RecipeCreateRequest {
     preparationSteps: string;
     cookingTime: number; // In minutes
     servings: number;
+    photo?: string; 
     dietaryInfo?: string;
     containsGluten: boolean;
     categories: number[]; // Array of category IDs if backend requires

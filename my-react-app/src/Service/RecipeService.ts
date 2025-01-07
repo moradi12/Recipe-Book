@@ -3,6 +3,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { Category } from '../Models/Category';
 import { RecipeResponse } from '../Models/Recipe';
+import { RecipeCreateRequest } from '../Models/RecipeCreateRequest';
 
 export interface PaginatedRecipes {
   content: RecipeResponse[];
@@ -17,6 +18,7 @@ class RecipeService {
   private static instance: RecipeService;
   private baseUrl: string = 'http://localhost:8080/api/recipes';
   private categoriesUrl: string = 'http://localhost:8080/api/categories';
+
   private constructor() {}
 
   public static getInstance(): RecipeService {
@@ -26,26 +28,58 @@ class RecipeService {
     return RecipeService.instance;
   }
 
-
-   // ===========================
-  // GET FOOD CATEGORIES
   // ===========================
-  public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
-    return axios.get<{ name: string; description: string }[]>(`${this.categoriesUrl}/food-categories`);
+  // GET ALL CATEGORIES (Recipe-based endpoint)
+  // ===========================
+  // Calls: GET http://localhost:8080/api/recipes/categories
+  // Make sure your backend has @GetMapping("/categories") in RecipeController
+  public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
+    return axios.get<Category[]>(`${this.baseUrl}/categories`);
   }
 
   // ===========================
-  // GET ALL RECIPES
+  // GET FOOD CATEGORIES (Separate Categories URL)
   // ===========================
+  // Calls: GET http://localhost:8080/api/categories/food-categories
+  // Make sure your backend has @GetMapping("/food-categories") in CategoryController
+  public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
+    return axios.get<{ name: string; description: string }[]>(
+      `${this.categoriesUrl}/food-categories`
+    );
+  }
+
+  // ===========================
+  // GET ALL RECIPES (Non-paginated)
+  // ===========================
+  // Calls: GET http://localhost:8080/api/recipes/all
   public async getAllRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
     return axios.get<RecipeResponse[]>(`${this.baseUrl}/all`);
   }
 
   // ===========================
-  // CREATE
+  // GET ALL RECIPES (Paginated + optional category)
   // ===========================
+  // Calls: GET http://localhost:8080/api/recipes?page=X&size=Y&category=Z
+  public async getAllRecipesPaginated(
+    pageNumber: number,
+    pageSize: number,
+    category?: string
+  ): Promise<AxiosResponse<PaginatedRecipes>> {
+    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
+
+    if (category) {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
+
+    return axios.get<PaginatedRecipes>(url);
+  }
+
+  // ===========================
+  // CREATE RECIPE
+  // ===========================
+  // Calls: POST http://localhost:8080/api/recipes
   public async createRecipe(
-    recipe: RecipeResponse,
+    recipe: RecipeCreateRequest,
     token: string
   ): Promise<AxiosResponse<RecipeResponse>> {
     return axios.post<RecipeResponse>(this.baseUrl, recipe, {
@@ -57,41 +91,24 @@ class RecipeService {
   }
 
   // ===========================
-  // GET PAGINATED
+  // DELETE RECIPE
   // ===========================
-  public async getAllRecipesPaginated(
-    pageNumber: number,
-    pageSize: number,
-    category?: string
-  ): Promise<AxiosResponse<PaginatedRecipes>> {
-    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
-
-    if (category) {
-      // This works if your backend supports filtering by category
-      url += `&category=${encodeURIComponent(category)}`;
-    }
-    return axios.get<PaginatedRecipes>(url);
-  }
-
-  // ===========================
-  // GET CATEGORIES (Public Endpoint)
-  // ===========================
-  public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
-    return axios.get<Category[]>(`${this.baseUrl}/categories`); // Public endpoint
-  }
-
-  // ===========================
-  // DELETE
-  // ===========================
-  public async deleteRecipe(id: number, token: string): Promise<AxiosResponse<void>> {
+  // Calls: DELETE http://localhost:8080/api/recipes/{id}
+  public async deleteRecipe(
+    id: number,
+    token: string
+  ): Promise<AxiosResponse<void>> {
     return axios.delete(`${this.baseUrl}/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   }
 
   // ===========================
-  // UPDATE
+  // UPDATE RECIPE
   // ===========================
+  // Calls: PUT http://localhost:8080/api/recipes/{id}
   public async updateRecipe(
     id: number,
     recipe: RecipeResponse,
@@ -106,13 +123,15 @@ class RecipeService {
   }
 
   // ===========================
-  // SEARCH
+  // SEARCH RECIPES BY TITLE
   // ===========================
-  public async searchRecipesByTitle(title: string): Promise<AxiosResponse<RecipeResponse[]>> {
+  // Calls: GET http://localhost:8080/api/recipes/search?title=...
+  public async searchRecipesByTitle(
+    title: string
+  ): Promise<AxiosResponse<RecipeResponse[]>> {
     const url = `${this.baseUrl}/search?title=${encodeURIComponent(title)}`;
     return axios.get<RecipeResponse[]>(url);
   }
 }
-
 
 export default RecipeService.getInstance();

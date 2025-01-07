@@ -5,6 +5,7 @@ import { RecipeStatus } from "./RecipeStatus";
 
 // Models/Recipe.ts
 export interface Recipe {
+  photo?: string;
   id: number;
   name: string; // Matches backend's Recipe.name
   title: string;
@@ -36,6 +37,7 @@ export interface User {
 // Models/Category.ts
 
 export interface RecipeResponse {
+  message: string;
   id: number;
   name: string;
   title: string;
@@ -44,7 +46,7 @@ export interface RecipeResponse {
   preparationSteps: string;
   cookingTime: number;
   servings: number;
-  
+  photo?: string;
   dietaryInfo?: string;
   containsGluten: boolean;
   status: string;

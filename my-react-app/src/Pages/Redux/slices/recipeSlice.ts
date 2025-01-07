@@ -29,6 +29,7 @@ export const fetchRecipes = createAsyncThunk<
     try {
       const response = await RecipeService.getAllRecipes(); // Adjust this if pagination is required
       return response.data; // Assumes response data contains the array of recipes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || 'Failed to fetch recipes'

@@ -11,4 +11,5 @@ export interface FormState {
     dietaryInfo?: string;
     containsGluten: boolean;
     categoryId?: number;
+    photo? : string
 }
