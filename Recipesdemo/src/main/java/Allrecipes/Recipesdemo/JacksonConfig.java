@@ -17,7 +17,7 @@ public class JacksonConfig {
                 super.configure(objectMapper);
                 // link Category to CategoryMixin
                 objectMapper.addMixIn(Category.class, CategoryMixin.class);
-            }   
+            }
         };
     }
 }

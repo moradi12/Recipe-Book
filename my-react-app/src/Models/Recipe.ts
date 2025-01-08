@@ -21,7 +21,7 @@ export interface Recipe {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   createdBy: User; // User interface
-  categories: Category[]; // Array of Category interfaces
+  categories?: string[];  // Array of Category interfaces
 }
 
 
@@ -42,7 +42,9 @@ export interface RecipeResponse {
   name: string;
   title: string;
   description: string;
+  categories?: string[];  
   ingredients: string[];
+  
   preparationSteps: string;
   cookingTime: number;
   servings: number;

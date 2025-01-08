@@ -29,5 +29,4 @@ public enum FoodCategories {
     FoodCategories(String description) {
         this.description = description;
     }
-
 }

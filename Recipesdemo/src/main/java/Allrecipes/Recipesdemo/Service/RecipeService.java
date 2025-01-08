@@ -21,10 +21,7 @@ import javax.sql.rowset.serial.SerialException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,12 +35,18 @@ public class RecipeService {
         this.categoryRepository = categoryRepository;
     }
 
+    // ================================
+    //  GET ALL (Paginated)
+    // ================================
     @Transactional(readOnly = true)
     public Page<RecipeResponse> getAllRecipesWithResponse(Pageable pageable) {
         Page<Recipe> recipesPage = recipeRepository.findAll(pageable);
         return recipesPage.map(this::toRecipeResponse);
     }
 
+    // ================================
+    //  GET ALL (Non-paginated)
+    // ================================
     @Transactional(readOnly = true)
     public List<RecipeResponse> getAllRecipes() {
         List<Recipe> recipes = recipeRepository.findAll();
@@ -52,41 +55,48 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
+    // ================================
+    //  CREATE RECIPE
+    // ================================
     public Recipe createRecipe(RecipeCreateRequest req, User user) {
         validateRecipeRequest(req);
 
+        // 1) Load categories from DB
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(req.getCategoryIds())
-                    .stream().collect(Collectors.toSet());
+                    .stream()
+                    .collect(Collectors.toSet());
 
             if (categories.size() != req.getCategoryIds().size()) {
                 throw new InvalidRecipeDataException("One or more categories not found");
             }
+            // Removed: recipe.setCategories(categories);  <-- 'recipe' isn't defined yet
         }
 
+        // 2) Build list of Ingredient entities
         List<Ingredient> ingredients = req.getIngredients().stream()
-                .map(dto -> {
-                    Ingredient ingredient = Ingredient.builder()
-                            .name(dto.getName())
-                            .quantity(dto.getQuantity())
-                            .unit(dto.getUnit())
-                            .build();
-                    return ingredient;
-                })
+                .map(dto -> Ingredient.builder()
+                        .name(dto.getName())
+                        .quantity(dto.getQuantity())
+                        .unit(dto.getUnit())
+                        .build()
+                )
                 .collect(Collectors.toList());
 
-
-        Blob photoBlob = null; // New line
-        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) { // New line
-            try { // New line
-                photoBlob = new javax.sql.rowset.serial.SerialBlob(Base64.getDecoder().decode(req.getPhoto())); // New line
-            } catch (SQLException e) { // New line
-                throw new InvalidRecipeDataException("Error decoding photo", e); // New line
+        // 3) Convert Base64 photo to Blob (if present)
+        Blob photoBlob = null;
+        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) {
+            try {
+                photoBlob = new javax.sql.rowset.serial.SerialBlob(
+                        Base64.getDecoder().decode(req.getPhoto())
+                );
+            } catch (SQLException e) {
+                throw new InvalidRecipeDataException("Error decoding photo", e);
             }
-
         }
 
+        // 4) Build & save the Recipe entity
         Recipe recipe = Recipe.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
@@ -100,11 +110,12 @@ public class RecipeService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .containsGluten(req.getContainsGlutenOrDefault())
-                .categories(categories)
+                .categories(categories)           // <-- Attach categories here
                 .photo(photoBlob)
                 .build();
 
-        ingredients.forEach(ingredient -> ingredient.setRecipe(recipe)); // Associate ingredients with recipe
+        // Associate each Ingredient with the new Recipe
+        ingredients.forEach(ingredient -> ingredient.setRecipe(recipe));
 
         Recipe savedRecipe = recipeRepository.save(recipe);
 
@@ -114,6 +125,10 @@ public class RecipeService {
         return savedRecipe;
     }
 
+
+    // ================================
+    //  DELETE RECIPE
+    // ================================
     public void deleteRecipe(Long id, User user) {
         if (id == null || user == null) {
             throw new IllegalArgumentException("Invalid input: Recipe ID and user cannot be null.");
@@ -122,6 +137,7 @@ public class RecipeService {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
+        // Only the user who created the recipe can delete
         if (!recipe.getCreatedBy().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You do not have permission to delete this recipe");
         }
@@ -129,16 +145,21 @@ public class RecipeService {
         recipeRepository.delete(recipe);
     }
 
+    // ================================
+    //  UPDATE RECIPE
+    // ================================
     public Recipe updateRecipe(Long id, RecipeCreateRequest req, User user) {
         Recipe existing = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
 
+        // Only the user who created it can update
         if (!existing.getCreatedBy().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You do not have permission to update this recipe");
         }
 
         validateRecipeRequest(req);
 
+        // 1) Load categories from DB
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(req.getCategoryIds())
@@ -149,6 +170,7 @@ public class RecipeService {
             }
         }
 
+        // 2) Build new Ingredient list
         List<Ingredient> ingredients = req.getIngredients().stream()
                 .map(dto -> {
                     Ingredient ingredient = Ingredient.builder()
@@ -161,17 +183,19 @@ public class RecipeService {
                 })
                 .collect(Collectors.toList());
 
-
-        Blob photoBlob = null; // New line
-        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) { // New line
-            try { // New line
-                photoBlob = new javax.sql.rowset.serial.SerialBlob(Base64.getDecoder().decode(req.getPhoto())); // New line
-            } catch (SQLException e) { // New line
-                throw new InvalidRecipeDataException("Error decoding photo", e); // New line
+        // 3) Convert Base64 photo to Blob if present
+        Blob photoBlob = null;
+        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) {
+            try {
+                photoBlob = new javax.sql.rowset.serial.SerialBlob(
+                        Base64.getDecoder().decode(req.getPhoto())
+                );
+            } catch (SQLException e) {
+                throw new InvalidRecipeDataException("Error decoding photo", e);
             }
         }
 
-
+        // 4) Update fields
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
         existing.setIngredients(ingredients);
@@ -183,6 +207,10 @@ public class RecipeService {
         existing.setContainsGluten(req.getContainsGlutenOrDefault());
         existing.setCategories(categories);
 
+        // If you want to keep old photo if new not set, you can conditionally set existing.setPhoto(...).
+        // else just overwrite:
+        existing.setPhoto(photoBlob);
+
         Recipe updatedRecipe = recipeRepository.save(existing);
 
         // Maintain bidirectional relationship
@@ -191,6 +219,9 @@ public class RecipeService {
         return updatedRecipe;
     }
 
+    // ================================
+    //  VALIDATE RECIPE
+    // ================================
     private void validateRecipeRequest(RecipeCreateRequest req) {
         if (req.getTitle() == null || req.getTitle().trim().isEmpty()) {
             throw new InvalidRecipeDataException("Recipe title cannot be empty");
@@ -213,29 +244,90 @@ public class RecipeService {
         }
     }
 
+    // ================================
+    //  MAP RECIPE -> RECIPE RESPONSE
+    // ================================
+//    public RecipeResponse toRecipeResponse(Recipe recipe) {
+//        return RecipeResponse.builder()
+//                .id(recipe.getId())
+//                .title(recipe.getTitle())
+//                .description(recipe.getDescription())
+//                .ingredients(recipe.getIngredients().stream()
+//                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
+//                        .collect(Collectors.toList()))
+//                .preparationSteps(recipe.getPreparationSteps())
+//                .cookingTime(recipe.getCookingTime())
+//                .servings(recipe.getServings())
+//                .dietaryInfo(recipe.getDietaryInfo())
+//                .status(recipe.getStatus().name())
+//                .createdByUsername(recipe.getCreatedBy().getUsername())
+//                .photo(recipe.getPhotoAsBase64())
+//
+//                // =============================
+//                // NEW: Include categories here
+//                // =============================
+//                .categories(
+//                        recipe.getCategories() == null
+//                                ? List.of()
+//                                : recipe.getCategories().stream()
+//                                // Option A: just the category name
+//                                .map(cat -> cat.getName())
+//                                .collect(Collectors.toList())
+//                )
+//
+//                .build();
+//    }
     public RecipeResponse toRecipeResponse(Recipe recipe) {
+        if (recipe == null) {
+            // handle null or throw exception
+        }
+
+        List<String> categoryNames = recipe.getCategories() == null
+                ? Collections.emptyList()
+                : recipe.getCategories().stream()
+                .map(Category::getName) // or cat -> cat.getName()
+                .collect(Collectors.toList());
+
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
-                .ingredients(recipe.getIngredients().stream()
-                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
-                        .collect(Collectors.toList()))
+                .ingredients(
+                        recipe.getIngredients().stream()
+                                .map(ingredient -> ingredient.getQuantity()
+                                        + " " + ingredient.getUnit()
+                                        + " of " + ingredient.getName())
+                                .collect(Collectors.toList())
+                )
                 .preparationSteps(recipe.getPreparationSteps())
                 .cookingTime(recipe.getCookingTime())
                 .servings(recipe.getServings())
                 .dietaryInfo(recipe.getDietaryInfo())
-                .status(recipe.getStatus().name())
-                .createdByUsername(recipe.getCreatedBy().getUsername())
-                .photo(recipe.getPhotoAsBase64()) // New line
+                .status(recipe.getStatus() != null
+                        ? recipe.getStatus().name()
+                        : "UNKNOWN")
+                .createdByUsername(recipe.getCreatedBy() != null
+                        ? recipe.getCreatedBy().getUsername()
+                        : "UNKNOWN")
+                .photo(recipe.getPhotoAsBase64())
+
+                // ========== ADD THIS ==========
+                .categories(categoryNames)
+
                 .build();
     }
 
+    // ================================
+    //  GET RECIPE BY ID
+    // ================================
     public Recipe getRecipeById(Long id) {
         return recipeRepository.findByIdWithCategories(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
     }
 
+    // ================================
+    //  SEARCH BY TITLE
+    // ================================
     public List<RecipeResponse> searchRecipesByTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new InvalidRecipeDataException("Search title cannot be null or empty");

@@ -16,21 +16,17 @@ const GetAllRecipes: React.FC = () => {
     size: 10,
     totalPages: 0,
   });
-  const [filterCategory, setFilterCategory] = useState<string>(""); // If categories are numeric IDs, keep it string and parse later
+  const [filterCategory, setFilterCategory] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
-  /**
-   * Ensure JWT token is valid at the top (same as your original code).
-   */
+  // 1) Ensure JWT token is valid
   useEffect(() => {
     checkData();
   }, []);
 
-  /**
-   * Fetch categories once, so we can populate the <select> dropdown.
-   */
+  // 2) Fetch categories (for <select>).
   const fetchCategories = useCallback(async () => {
     try {
       const response = await RecipeService.getAllCategories();
@@ -41,15 +37,12 @@ const GetAllRecipes: React.FC = () => {
     }
   }, []);
 
-  /**
-   * Fetch recipes with pagination and optional category filter.
-   */
+  // 3) Fetch recipes with pagination (and optional category filter).
   const fetchRecipes = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
 
-      // If filterCategory is non-empty, pass it. Otherwise pass undefined or empty
       const categoryParam = filterCategory || undefined;
 
       const response = await RecipeService.getAllRecipesPaginated(
@@ -65,12 +58,8 @@ const GetAllRecipes: React.FC = () => {
         totalPages: data.totalPages,
       }));
     } catch (err: unknown) {
-      // TypeScript-friendly error handling
       let errorMessage = "Failed to load recipes.";
       if (err instanceof Error) {
-        // If the error is an Axios error, it might have 'response'
-        // Cast to any if you need to read err.response
-        // But we keep it minimal here:
         errorMessage = err.message || errorMessage;
       }
       setError(errorMessage);
@@ -80,9 +69,7 @@ const GetAllRecipes: React.FC = () => {
     }
   }, [pagination.page, pagination.size, filterCategory]);
 
-  /**
-   * Delete a recipe by ID.
-   */
+  // 4) Delete a recipe by ID
   const handleDeleteRecipe = useCallback(
     async (id: number) => {
       const state = recipeSystem.getState();
@@ -97,7 +84,7 @@ const GetAllRecipes: React.FC = () => {
         try {
           await RecipeService.deleteRecipe(id, token);
           notify.success("Recipe deleted successfully!");
-          fetchRecipes(); // Refresh list
+          fetchRecipes();
         } catch (err: unknown) {
           let errorMessage = "An unexpected error occurred.";
           if (err instanceof Error) {
@@ -111,24 +98,22 @@ const GetAllRecipes: React.FC = () => {
     [fetchRecipes]
   );
 
-  /**
-   * On mount, fetch categories once.
-   */
+  // On mount, fetch categories once
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  /**
-   * When page/size/filterCategory changes, fetch recipes.
-   */
+  // Whenever pagination or filter changes, refetch recipes
   useEffect(() => {
     fetchRecipes();
   }, [fetchRecipes]);
 
   /**
-   * Render function for the list of recipes.
+   * Render the list of recipes.
    */
-  const renderRecipeList = () => {
+  const renderRecipeList = () => 
+    
+    {
     if (!recipes.length && !loading) {
       return <p>No recipes found.</p>;
     }
@@ -142,7 +127,8 @@ const GetAllRecipes: React.FC = () => {
               <strong>Description:</strong> {recipe.description || "No Description"}
             </p>
             <p>
-              <strong>Preparation Steps:</strong> {recipe.preparationSteps || "None"}
+              <strong>Preparation Steps:</strong>{" "}
+              {recipe.preparationSteps || "None"}
             </p>
             <p>
               <strong>Cooking Time:</strong> {recipe.cookingTime} minutes
@@ -154,11 +140,37 @@ const GetAllRecipes: React.FC = () => {
               <strong>Dietary Info:</strong> {recipe.dietaryInfo || "N/A"}
             </p>
             <p>
-              <strong>Contains Gluten:</strong> {recipe.containsGluten ? "Yes" : "No"}
+              <strong>Contains Gluten:</strong>{" "}
+              {recipe.containsGluten ? "Yes" : "No"}
             </p>
             <p>
               <strong>Status:</strong> {recipe.status || "Unknown"}
             </p>
+
+            {/* ===== Display categories if present ===== */}
+            {recipe.categories && recipe.categories.length > 0 && (
+              <p>
+                <strong>Categories:</strong>{" "}
+                {recipe.categories
+                  .map((cat) =>
+                    typeof cat === "string" ? cat : cat.name
+                  )
+                  .join(", ")}
+              </p>
+            )}
+
+            {/* ===== Display photo if base64 field ===== */}
+            {recipe.photo && (
+              <div className="photo-preview">
+                <img
+                  src={`data:image/png;base64,${recipe.photo}`}
+                  alt="Recipe"
+                  className="preview-image"
+                  style={{ maxWidth: "200px" }}
+                />
+              </div>
+            )}
+
             <h4>Ingredients:</h4>
             {recipe.ingredients?.length ? (
               <ul>
@@ -169,6 +181,7 @@ const GetAllRecipes: React.FC = () => {
             ) : (
               <p>No ingredients listed</p>
             )}
+
             <button
               className="edit-button"
               onClick={() => navigate(`/edit-recipe/${recipe.id}`)}
@@ -188,7 +201,7 @@ const GetAllRecipes: React.FC = () => {
   };
 
   /**
-   * Render function for pagination controls
+   * Render pagination controls
    */
   const renderPagination = () => (
     <div className="pagination">

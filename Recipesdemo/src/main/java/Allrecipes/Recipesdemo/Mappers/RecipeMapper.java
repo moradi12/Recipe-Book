@@ -22,6 +22,15 @@ public class RecipeMapper {
             throw new IllegalArgumentException("Recipe cannot be null");
         }
         logger.info("Mapping Recipe with ID: {}", recipe.getId());
+
+        // Convert the Set<Category> to a List<String> of category names (as an example):
+        List<String> categoryNames = null;
+        if (recipe.getCategories() != null) {
+            categoryNames = recipe.getCategories().stream()
+                    .map(cat -> cat.getName())    // or cat.getTitle(), etc.
+                    .toList();
+        }
+
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
@@ -34,8 +43,13 @@ public class RecipeMapper {
                 .status(recipe.getStatus() != null ? recipe.getStatus().name() : "Unknown")
                 .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "Unknown")
                 .photo(recipe.getPhotoAsBase64())
+
+                // <-- NEW: Pass the categoryNames to the builder
+                .categories(categoryNames)
+
                 .build();
     }
+
 
     public static RecipeReviewResponse toRecipeReviewResponse(RecipeReview review) {
         if (review == null) {

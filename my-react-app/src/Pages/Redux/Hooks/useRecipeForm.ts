@@ -80,9 +80,9 @@ async function createRecipe(
     if (response.status === 201) {
       return { isSuccess: true };
     }
-    return { 
-      isSuccess: false, 
-      message: response.data.message || 'Failed to create recipe.' 
+    return {
+      isSuccess: false,
+      message: response.data.message || 'Failed to create recipe.',
     };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -185,15 +185,17 @@ const useRecipeForm = () => {
   }, []);
 
   /**
-   * Main submit handler. Validates the form, 
+   * Main submit handler. Validates the form,
    * checks for auth token, and calls the creation API.
+   *
+   * **Changed** to accept `selectedCategoryId?: number` to fix TS error.
    */
   const handleSubmit = useCallback(
-    async (e: React.FormEvent, selectedCategory?: string) => {
+    async (e: React.FormEvent, selectedCategoryId?: number) => {
       e.preventDefault();
       setErrors({});
       setIsSubmitting(true);
-
+      console.log('Contains Gluten:', form.containsGluten);
       // Validate form fields
       const validationErrors = validateRecipeForm(form);
       if (Object.keys(validationErrors).length > 0) {
@@ -220,8 +222,9 @@ const useRecipeForm = () => {
         servings: form.servings,
         dietaryInfo: form.dietaryInfo || undefined,
         containsGluten: form.containsGluten,
-        categories: selectedCategory ? [Number(selectedCategory)] : [],
         photo: form.photo || '',
+        // If category ID is present, pass it as a single-element array
+        categories: selectedCategoryId ? [selectedCategoryId] : [],
       };
 
       // Call createRecipe
@@ -231,7 +234,7 @@ const useRecipeForm = () => {
         notify.success('Recipe created successfully!');
         // Reset the form to default
         setForm({ ...DEFAULT_FORM_STATE });
-        // Redirect to home page (or wherever you prefer)
+        // Redirect to home page
         navigate('/');
       } else {
         const errorMsg = message || 'Failed to create recipe.';
@@ -246,7 +249,7 @@ const useRecipeForm = () => {
 
   return {
     form,
-    setForm, // exposing setForm if needed externally
+    setForm, // exposing setForm if needed
     errors,
     isSubmitting,
     handleChange,

@@ -75,15 +75,17 @@ public class Recipe {
     @Column(nullable = false)
     private boolean containsGluten = true;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "recipe_categories",
-            joinColumns = @JoinColumn(name = "recipe_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
-    @Builder.Default
-    @ToString.Exclude // Exclude categories from toString to prevent LazyInitializationException
-    private Set<Category> categories = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "recipe_categories",
+//            joinColumns = @JoinColumn(name = "recipe_id"),
+//            inverseJoinColumns = @JoinColumn(name = "category_id")
+//    )
+//    @Builder.Default
+//    @ToString.Exclude // Exclude categories from toString to prevent LazyInitializationException
+//    private Set<Category> categories = new HashSet<>();
+@ManyToMany
+private Set<Category> categories;
 
     @ManyToMany(mappedBy = "favorites", fetch = FetchType.LAZY)
     @Builder.Default

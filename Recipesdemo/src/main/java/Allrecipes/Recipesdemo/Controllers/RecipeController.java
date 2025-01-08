@@ -6,6 +6,7 @@ import Allrecipes.Recipesdemo.Entities.UserDetails;
 import Allrecipes.Recipesdemo.Exceptions.ErrorMessages;
 import Allrecipes.Recipesdemo.Exceptions.RecipeNotFoundException;
 import Allrecipes.Recipesdemo.Exceptions.UnauthorizedActionException;
+import Allrecipes.Recipesdemo.Mappers.RecipeMapper;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import Allrecipes.Recipesdemo.Recipe.RecipeResponse;
 import Allrecipes.Recipesdemo.Repositories.UserRepository;
@@ -82,9 +83,15 @@ public class RecipeController {
 //        }
 //    }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
+        Recipe recipe = recipeService.getRecipeById(id);
+        RecipeResponse response = RecipeMapper.toRecipeResponse(recipe);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{Oid}")
+    public ResponseEntity<?> OldgetRecipeById(@PathVariable Long id) {
         try {
             log.debug("Fetching recipe with ID: {}", id); // New line
             RecipeResponse recipeResponse = recipeService.toRecipeResponse(recipeService.getRecipeById(id)); // New line

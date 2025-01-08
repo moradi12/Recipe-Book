@@ -20,13 +20,14 @@ public class RecipeResponse {
     private String status;
     private String createdByUsername;
     private String photo;
+    private List<String> categories;
 
     // Default constructor
     public RecipeResponse() {
     }
 
-    // Constructor with all fields
-    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, String photo) {
+    // Constructor with all fields including categories
+    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, String photo, List<String> categories) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -38,10 +39,11 @@ public class RecipeResponse {
         this.status = status;
         this.createdByUsername = createdByUsername;
         this.photo = photo;
+        this.categories = categories;
     }
 
-    // Constructor with photo as Base64 string
-    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, byte[] photoBytes) {
+    // Constructor with photo as Base64 string and categories
+    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, byte[] photoBytes, List<String> categories) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -53,5 +55,6 @@ public class RecipeResponse {
         this.status = status;
         this.createdByUsername = createdByUsername;
         this.photo = photoBytes != null ? Base64.getEncoder().encodeToString(photoBytes) : null;
+        this.categories = categories;
     }
 }

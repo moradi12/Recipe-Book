@@ -30,6 +30,7 @@ public class RecipeDto {
     private LocalDateTime updatedAt;
     private Long createdByUserId;
     private boolean containsGluten;
-    private Set<Category> categories;
+    private Set<CategoryDto> categories;
+
     private Set<Long> categoryIds;
 }

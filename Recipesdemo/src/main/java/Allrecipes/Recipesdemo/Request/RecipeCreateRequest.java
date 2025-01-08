@@ -35,10 +35,13 @@ public class RecipeCreateRequest {
 
     private Boolean containsGluten;
 
+    // Holds category IDs from the frontend
     private Set<Long> categoryIds;
+
+    // Base64-encoded photo
     private String photo;
 
-    // Default value handling
+    // If 'containsGluten' is null, default to true
     public boolean getContainsGlutenOrDefault() {
         return containsGluten == null ? true : containsGluten;
     }

@@ -1,8 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { FoodCategory } from '../../Models/FoodCategory';
-import useRecipeForm from '../Redux/Hooks/useRecipeForm';
-import './CreateRecipe.css';
-import IngredientItem from './IngredientItem';
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Category } from "../../Models/Category";
+import RecipeService from "../../Service/RecipeService";
+import useRecipeForm from "../Redux/Hooks/useRecipeForm";
+import "./CreateRecipe.css";
+import IngredientItem from "./IngredientItem";
 
 const CreateRecipe: React.FC = () => {
   const {
@@ -17,53 +19,68 @@ const CreateRecipe: React.FC = () => {
     handleSubmit,
   } = useRecipeForm();
 
-  /** 
-   * We store only category in local state. 
-   * If you want to unify it with the form state, 
-   * you could add it to your form (like `form.category`).
-   */
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  // We'll store the numeric category ID or "" in local state.
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const navigate = useNavigate();
 
-  /** Convert your category enum to array only once (memoized). */
-  const foodCategoryOptions = useMemo(() => Object.values(FoodCategory), []);
+  /**
+   * Fetch categories once (similar to how you do in GetAllRecipes).
+   */
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await RecipeService.getAllCategories();
+        setCategories(response.data); // e.g. [{id:1, name:"Dessert"}, ...]
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  /** Handler for <select> category changes. */
+  /**
+   * Handler for <select> changes: store the numeric ID or "".
+   */
   const handleCategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedCategory(e.target.value);
+      const value = e.target.value;
+      setSelectedCategoryId(value ? Number(value) : "");
     },
     []
   );
 
-  /** Handler for photo upload. */
+  /**
+   * Handler for photo upload: read as base64, store in form, and keep a local preview.
+   */
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        // Example: "data:image/png;base64,iVBORw0K..."
-        const result = reader.result;
-        // Let's separate the base64 data from the prefix:
-        const base64Data = result.split(',')[1]; 
-        
-        // This sets only the actual base64 in your form
+      if (typeof reader.result === "string") {
+        const fullResult = reader.result; // "data:image/png;base64,iVBORw0KG..."
+        const base64Part = fullResult.split(",")[1] || "";
+
+        // Store raw base64 in form
         setForm((prev) => ({
           ...prev,
-          photo: base64Data,
+          photo: base64Part,
         }));
-  
-        // Meanwhile, keep the full data URL for client-side preview
-        setPhotoPreview(result);
+
+        // Show preview in UI
+        setPhotoPreview(fullResult);
       }
     };
     reader.readAsDataURL(file);
   };
-  
 
-  /** Helper to render all error messages if present. */
+  /**
+   * Render any error messages in a list.
+   */
   const renderErrorMessages = useCallback(() => {
     if (Object.keys(errors).length === 0) return null;
     return (
@@ -77,15 +94,28 @@ const CreateRecipe: React.FC = () => {
     );
   }, [errors]);
 
+  /**
+   * We'll convert our numeric or "" category to a string or undefined
+   * before calling handleSubmit, because `handleSubmit` expects string | undefined.
+   */
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // If selectedCategoryId is "" (meaning none), pass undefined
+    // otherwise parse the string -> number
+    const categoryAsNumber = 
+      selectedCategoryId === "" ? undefined : Number(selectedCategoryId);
+  
+    // Now categoryAsNumber is a number or undefined
+    handleSubmit(e, categoryAsNumber);
+  };
   return (
     <div className="create-recipe-container">
       <h2>Create a New Recipe</h2>
 
       {renderErrorMessages()}
 
-      {/* Pass the selectedCategory to handleSubmit. 
-          Alternatively, store category inside form state. */}
-      <form onSubmit={(e) => handleSubmit(e, selectedCategory)}>
+      <form onSubmit={onFormSubmit}>
         {/* ===== Title ===== */}
         <div className="form-group">
           <label htmlFor="title">Title*</label>
@@ -196,12 +226,12 @@ const CreateRecipe: React.FC = () => {
           />
         </div>
 
-        {/* ===== Category ===== */}
+        {/* ===== Category (Single) ===== */}
         <div className="form-group">
           <label htmlFor="category">Category*</label>
           <select
             id="category"
-            value={selectedCategory}
+            value={selectedCategoryId}
             onChange={handleCategoryChange}
             required
             className="add-recipe__select"
@@ -209,9 +239,9 @@ const CreateRecipe: React.FC = () => {
             <option value="" disabled>
               Select Category
             </option>
-            {foodCategoryOptions.map((category) => (
-              <option key={category} value={category}>
-                {category.replace(/_/g, ' ')}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
               </option>
             ))}
           </select>
@@ -254,7 +284,7 @@ const CreateRecipe: React.FC = () => {
 
         {/* ===== Submit Button ===== */}
         <button type="submit" className="submit-button" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Recipe'}
+          {isSubmitting ? "Creating..." : "Create Recipe"}
         </button>
       </form>
     </div>
