@@ -22,6 +22,7 @@ export interface Recipe {
   updatedAt: string; // ISO date string
   createdBy: User; // User interface
   categories?: string[];  // Array of Category interfaces
+  multiline?: boolean
 }
 
 
@@ -41,8 +42,8 @@ export interface RecipeResponse {
   id: number;
   name: string;
   title: string;
+  categories?: Array<string | { id: number; name: string }>;
   description: string;
-  categories?: string[];  
   ingredients: string[];
   
   preparationSteps: string;
