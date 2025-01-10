@@ -1,0 +1,40 @@
+Folder PATH listing
+Volume serial number is B6C9-5D97
+C:.
++---assets
++---Layout
+¦   +---Footer
+¦   +---Header
+¦   +---Main
+¦   +---MainLayout
++---Models
++---Pages
+¦   +---AddRecipe
+¦   +---CategoryDropdown
+¦   +---Contact Page
+¦   +---Dashboard
+¦   +---DeleteRecipe
+¦   +---Features
+¦   +---FoodCategoryDropdown
+¦   +---FoodCategorySelector
+¦   +---FoodHomePage
+¦   +---FormInput
+¦   +---GetAllRecipes
+¦   +---HomePage
+¦   +---IngredientItem
+¦   +---Login
+¦   +---Navbar
+¦   +---Page404
+¦   +---RecipeDetails
+¦   +---RecipeForm
+¦   +---RecipesPage
+¦   +---Redux
+¦   ¦   +---Hooks
+¦   ¦   +---slices
+¦   +---Register
+¦   +---Route
+¦   ¦   +---MainRoute
+¦   +---SearchRecipes
+¦   +---UpdateRecipe
++---Service
++---Utiles

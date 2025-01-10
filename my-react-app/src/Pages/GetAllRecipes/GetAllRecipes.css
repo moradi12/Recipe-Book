@@ -1,268 +1,186 @@
-/* GetAllRecipes.css */
-
-/* CSS Variables for Theme Management */
-:root {
-  --font-family: 'Roboto', sans-serif;
-  
-  /* Colors */
-  --color-background: #ffffff;
-  --color-primary: #3b3b8d; /* Indigo */
-  --color-secondary: #2a9d8f; /* Teal */
-  --color-accent: #e63946; /* Bright Red */
-  --color-text: #2c394b; /* Deep Blue */
-  --color-muted: #555555; /* Neutral Dark Gray */
-  --color-border: #e0e0e0; /* Light Gray */
-  --color-shadow: rgba(0, 0, 0, 0.1);
-  --color-shadow-hover: rgba(0, 0, 0, 0.2);
-  
-  /* Font Sizes */
-  --font-size-small: 14px;
-  --font-size-medium: 16px;
-  --font-size-large: 22px;
-  --font-size-xlarge: 28px;
-  
-  /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 20px;
-  
-  /* Border Radius */
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  
-  /* Transition */
-  --transition-speed: 0.3s;
-}
-
 /* Container for the entire component */
 .get-all-recipes {
-  font-family: var(--font-family);
+  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--spacing-lg);
-  background-color: var(--color-background);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 4px 8px var(--color-shadow);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
 }
 
-/* Header styling */
+/* Main Header */
 .get-all-recipes h2 {
   text-align: center;
-  color: var(--color-primary);
-  margin-bottom: var(--spacing-lg);
-  font-size: var(--font-size-xlarge);
-  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
 }
 
-/* Loading and error messages */
-.get-all-recipes p {
-  text-align: center;
-  font-size: var(--font-size-medium);
-  margin: var(--spacing-sm) 0;
-}
-
-.error-message {
-  color: var(--color-accent);
-  font-weight: bold;
-}
-
-/* Filter section */
+/* Filter Section */
 .filter-container {
-  margin-bottom: var(--spacing-lg);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
-  gap: var(--spacing-sm);
+  margin-bottom: 20px;
 }
 
 .filter-container label {
-  font-weight: 500;
-  color: var(--color-secondary);
-  margin-right: var(--spacing-xs);
-  font-size: var(--font-size-medium);
+  margin-right: 10px;
+  font-weight: bold;
+  color: #555;
 }
 
 .filter-container select {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-medium);
-  border: 1px solid var(--color-secondary);
-  border-radius: var(--border-radius-sm);
-  background-color: #f4f4f4;
-  color: var(--color-secondary);
-  transition: border-color var(--transition-speed);
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: border-color 0.3s;
 }
 
 .filter-container select:focus {
+  border-color: #007BFF;
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(59, 59, 141, 0.2);
 }
 
-/* Recipe list */
+/* Recipe List */
 .recipe-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
+/* Individual Recipe Item */
 .recipe-item {
-  background-color: var(--color-background);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  box-shadow: 0 2px 4px var(--color-shadow);
-  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
 }
 
 .recipe-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 8px var(--color-shadow-hover);
 }
 
+/* Recipe Title */
 .recipe-item h3 {
-  color: var(--color-primary);
-  font-size: var(--font-size-large);
-  margin-bottom: var(--spacing-sm);
-  font-weight: 600;
+  margin-top: 0;
+  color: #007BFF;
 }
 
+/* Recipe Description and Details */
 .recipe-item p {
-  margin: var(--spacing-xs) 0;
-  font-size: var(--font-size-medium);
-  color: var(--color-muted);
-  line-height: 1.5;
+  margin: 8px 0;
+  color: #555;
 }
 
+.recipe-item strong {
+  color: #333;
+}
+
+/* Photo Preview */
+.photo-preview {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.preview-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Ingredients List */
 .recipe-item h4 {
-  margin-top: var(--spacing-md);
-  font-size: var(--font-size-medium);
-  color: var(--color-secondary);
-  font-weight: bold;
-  text-align: left;
+  margin-bottom: 5px;
+  color: #333;
 }
 
 .recipe-item ul {
   list-style: disc inside;
-  padding-left: var(--spacing-sm);
-  margin: var(--spacing-xs) 0;
+  padding-left: 20px;
+  color: #555;
 }
 
 .recipe-item ul li {
-  margin: var(--spacing-xs) 0;
-  font-size: var(--font-size-medium);
-  color: var(--color-text);
-  line-height: 1.4;
+  margin-bottom: 4px;
 }
 
-/* Buttons */
-.recipe-item button {
-  margin-right: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-medium);
-  color: #ffffff;
+/* Action Buttons */
+.edit-button,
+.delete-button {
+  padding: 8px 12px;
   border: none;
-  border-radius: var(--border-radius-sm);
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color var(--transition-speed), transform var(--transition-speed);
+  margin-right: 10px;
+  font-size: 14px;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.recipe-item button:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 59, 141, 0.3);
-}
-
-/* Edit button in blue */
 .edit-button {
-  background-color: #3bb2e4; /* Indigo Blue */
+  background-color: #28a745;
+  color: #fff;
 }
 
 .edit-button:hover {
-  background-color: #2a7fa0; /* Darker Indigo Blue */
+  background-color: #218838;
   transform: scale(1.05);
 }
 
-/* Delete button in red */
 .delete-button {
-  background-color: var(--color-accent);
+  background-color: #dc3545;
+  color: #fff;
 }
 
 .delete-button:hover {
-  background-color: #c1121f; /* Darker Red */
+  background-color: #c82333;
   transform: scale(1.05);
 }
 
-/* Pagination */
+/* Pagination Controls */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: var(--spacing-lg);
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
+  margin-top: 20px;
 }
 
 .pagination button {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  margin: 0 var(--spacing-xs);
-  font-size: var(--font-size-medium);
-  color: #ffffff;
-  background-color: var(--color-secondary);
+  padding: 8px 16px;
+  margin: 0 10px;
   border: none;
-  border-radius: var(--border-radius-sm);
+  background-color: #007BFF;
+  color: #fff;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color var(--transition-speed), transform var(--transition-speed);
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .pagination button:disabled {
-  background-color: #cccccc;
+  background-color: #6c757d;
   cursor: not-allowed;
 }
 
 .pagination button:not(:disabled):hover {
-  background-color: #1d6d6a;
+  background-color: #0056b3;
   transform: scale(1.05);
 }
 
 .pagination span {
-  font-size: var(--font-size-medium);
-  margin: 0 var(--spacing-sm);
-  color: var(--color-secondary);
+  font-size: 16px;
+  color: #333;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .filter-container {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+/* Loading and Error Messages */
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  .recipe-item {
-    padding: var(--spacing-sm);
-  }
-
-  .recipe-item h3 {
-    font-size: var(--font-size-medium);
-  }
-
-  .recipe-item p, 
-  .recipe-item h4, 
-  .recipe-item ul li {
-    font-size: var(--font-size-small);
-  }
-
-  .pagination {
-    flex-direction: column;
-  }
-
-  .pagination button {
-    width: 100%;
-    margin: var(--spacing-xs) 0;
-  }
-
-  .pagination span {
-    margin: var(--spacing-xs) 0;
-  }
+.get-all-recipes p {
+  text-align: center;
+  color: #555;
 }

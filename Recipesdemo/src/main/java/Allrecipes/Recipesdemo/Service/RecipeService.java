@@ -159,7 +159,6 @@ public class RecipeService {
 
         validateRecipeRequest(req);
 
-        // 1) Load categories from DB
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(req.getCategoryIds())

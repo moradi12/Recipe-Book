@@ -4,12 +4,13 @@ import FormInput from "../FormInput/FormInput";
 
 interface RecipeFormProps {
   recipe: Partial<Recipe>;
-  onSubmit: (recipe: Partial<Recipe>) => void;
+  onSubmit: (recipe: Partial<Recipe>) => Promise<void>;
 }
 
 interface RecipeFormState {
   recipe: Partial<Recipe>;
-  errorMessage: string | null;
+  errorMessage: Record<string, string> | null;
+  isSubmitting: boolean;
 }
 
 class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
@@ -18,6 +19,7 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
     this.state = {
       recipe: props.recipe || {},
       errorMessage: null,
+      isSubmitting: false,
     };
   }
 
@@ -56,33 +58,73 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
     }
   };
 
-  validateFields = (): string | null => {
-    const { recipe } = this.state;
-    if (!recipe.name || !recipe.title || !recipe.description) {
-      return "Please fill out all required fields (Name, Title, Description).";
-    }
-    if (recipe.cookingTime && recipe.cookingTime < 0) {
-      return "Cooking time must be a positive number.";
-    }
-    return null;
+  handleAddCategory = (category: string) => {
+    this.setState((prevState) => ({
+      recipe: {
+        ...prevState.recipe,
+        categories: [...(prevState.recipe.categories || []), category],
+      },
+    }));
   };
 
-  handleSubmit = () => {
-    const errorMessage = this.validateFields();
-    if (errorMessage) {
-      this.setState({ errorMessage });
-    } else {
-      this.setState({ errorMessage: null });
-      this.props.onSubmit(this.state.recipe);
+  handleRemoveCategory = (index: number) => {
+    this.setState((prevState) => ({
+      recipe: {
+        ...prevState.recipe,
+        categories: (prevState.recipe.categories || []).filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  validateFields = (): Record<string, string> => {
+    const { recipe } = this.state;
+    const errors: Record<string, string> = {};
+
+    if (!recipe.name) errors.name = "Recipe name is required.";
+    if (!recipe.title) errors.title = "Title is required.";
+    if (!recipe.description) errors.description = "Description is required.";
+    if (recipe.cookingTime && recipe.cookingTime < 0) {
+      errors.cookingTime = "Cooking time must be a positive number.";
+    }
+
+    return errors;
+  };
+
+  resetForm = () => {
+    this.setState({
+      recipe: {},
+      errorMessage: null,
+      isSubmitting: false,
+    });
+  };
+
+  handleSubmit = async () => {
+    const errors = this.validateFields();
+    if (Object.keys(errors).length > 0) {
+      this.setState({ errorMessage: errors });
+      return;
+    }
+
+    this.setState({ isSubmitting: true, errorMessage: null });
+
+    try {
+      await this.props.onSubmit(this.state.recipe);
+      this.resetForm();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      this.setState({
+        errorMessage: { global: "An error occurred while submitting the form." },
+        isSubmitting: false,
+      });
     }
   };
 
   render() {
-    const { recipe, errorMessage } = this.state;
+    const { recipe, errorMessage, isSubmitting } = this.state;
 
     return (
       <div className="recipe-form">
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {errorMessage?.global && <p className="error-message">{errorMessage.global}</p>}
 
         <FormInput
           label="Recipe Name"
@@ -93,6 +135,8 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           placeholder="Enter recipe name"
           ariaLabel="Recipe Name"
         />
+        {errorMessage?.name && <p className="error-message">{errorMessage.name}</p>}
+
         <FormInput
           label="Title"
           type="text"
@@ -102,6 +146,8 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           placeholder="Enter title"
           ariaLabel="Title"
         />
+        {errorMessage?.title && <p className="error-message">{errorMessage.title}</p>}
+
         <FormInput
           label="Description"
           type="textarea"
@@ -112,6 +158,8 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           multiline
           ariaLabel="Description"
         />
+        {errorMessage?.description && <p className="error-message">{errorMessage.description}</p>}
+
         <FormInput
           label="Preparation Steps"
           type="textarea"
@@ -122,6 +170,7 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           multiline
           ariaLabel="Preparation Steps"
         />
+
         <FormInput
           label="Cooking Time (mins)"
           type="number"
@@ -131,6 +180,8 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           placeholder="Enter cooking time in minutes"
           ariaLabel="Cooking Time"
         />
+        {errorMessage?.cookingTime && <p className="error-message">{errorMessage.cookingTime}</p>}
+
         <FormInput
           label="Servings"
           type="number"
@@ -140,15 +191,29 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           placeholder="Enter number of servings"
           ariaLabel="Servings"
         />
-        <FormInput
-          label="Categories"
-          type="text"
-          name="categories"
-          value={(recipe.categories || []).join(", ")}
-          onChange={this.handleInputChange}
-          placeholder="Enter categories (comma-separated)"
-          ariaLabel="Categories"
-        />
+
+        <div className="categories-section">
+          <label>Categories</label>
+          {(recipe.categories || []).map((category, index) => (
+            <div key={index}>
+              <span>{category}</span>
+              <button type="button" onClick={() => this.handleRemoveCategory(index)}>
+                Remove
+              </button>
+            </div>
+          ))}
+          <input
+            type="text"
+            placeholder="Add a category"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.currentTarget.value) {
+                this.handleAddCategory(e.currentTarget.value);
+                e.currentTarget.value = ""; // Clear input
+              }
+            }}
+          />
+        </div>
+
         <FormInput
           label="Photo"
           type="file"
@@ -157,8 +222,12 @@ class RecipeForm extends Component<RecipeFormProps, RecipeFormState> {
           ariaLabel="Recipe Photo"
         />
 
-        <button onClick={this.handleSubmit} className="submit-button">
-          Submit Recipe
+        <button
+          onClick={this.handleSubmit}
+          className="submit-button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Recipe"}
         </button>
       </div>
     );
