@@ -111,9 +111,7 @@ const GetAllRecipes: React.FC = () => {
   /**
    * Render the list of recipes.
    */
-  const renderRecipeList = () => 
-    
-    {
+  const renderRecipeList = () => {
     if (!recipes.length && !loading) {
       return <p>No recipes found.</p>;
     }
@@ -124,7 +122,8 @@ const GetAllRecipes: React.FC = () => {
           <li key={recipe.id} className="recipe-item">
             <h3>{recipe.title || "No Title"}</h3>
             <p>
-              <strong>Description:</strong> {recipe.description || "No Description"}
+              <strong>Description:</strong>{" "}
+              {recipe.description || "No Description"}
             </p>
             <p>
               <strong>Preparation Steps:</strong>{" "}
@@ -152,13 +151,14 @@ const GetAllRecipes: React.FC = () => {
               <p>
                 <strong>Categories:</strong>{" "}
                 {recipe.categories
-                  .map((cat) =>
-                    typeof cat === "string" ? cat : cat.name
-                  )
+                  .map((cat) => (typeof cat === "string" ? cat : cat.name))
                   .join(", ")}
               </p>
             )}
 
+            {/* Display createdBy */}
+            <p>
+              <strong>Created By:</strong> {recipe.createdByUsername || "Unknown"}            </p>
             {/* ===== Display photo if base64 field ===== */}
             {recipe.photo && (
               <div className="photo-preview">

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Category } from "../../Models/Category";
 import RecipeService from "../../Service/RecipeService";
+import { checkData } from "../../Utiles/checkData";
+import { notify } from "../../Utiles/notif";
 import useRecipeForm from "../Redux/Hooks/useRecipeForm";
 import "./CreateRecipe.css";
 import IngredientItem from "./IngredientItem";
@@ -16,24 +18,21 @@ const CreateRecipe: React.FC = () => {
     handleIngredientChange,
     addIngredient,
     removeIngredient,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSubmit,
   } = useRecipeForm();
 
-  // We'll store the numeric category ID or "" in local state.
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useNavigate();
 
-  /**
-   * Fetch categories once (similar to how you do in GetAllRecipes).
-   */
+  // Fetch categories once
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await RecipeService.getAllCategories();
-        setCategories(response.data); // e.g. [{id:1, name:"Dessert"}, ...]
+        setCategories(response.data); // e.g., [{id:1, name:"Dessert"}, ...]
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
@@ -41,9 +40,19 @@ const CreateRecipe: React.FC = () => {
     fetchCategories();
   }, []);
 
-  /**
-   * Handler for <select> changes: store the numeric ID or "".
-   */
+  // Automatically set "createdBy" using checkData
+  useEffect(() => {
+    checkData(); // Ensure the user is logged in
+    const storedJwt = sessionStorage.getItem("jwt");
+    if (storedJwt) {
+      const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1])); // Decode JWT payload
+      setForm((prev) => ({
+        ...prev,
+        createdBy: decodedJwt.sub, // Assuming "sub" is the username or ID
+      }));
+    }
+  }, [setForm]);
+
   const handleCategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
@@ -52,9 +61,6 @@ const CreateRecipe: React.FC = () => {
     []
   );
 
-  /**
-   * Handler for photo upload: read as base64, store in form, and keep a local preview.
-   */
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,9 +84,6 @@ const CreateRecipe: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  /**
-   * Render any error messages in a list.
-   */
   const renderErrorMessages = useCallback(() => {
     if (Object.keys(errors).length === 0) return null;
     return (
@@ -94,21 +97,38 @@ const CreateRecipe: React.FC = () => {
     );
   }, [errors]);
 
-  /**
-   * We'll convert our numeric or "" category to a string or undefined
-   * before calling handleSubmit, because `handleSubmit` expects string | undefined.
-   */
-  const onFormSubmit = (e: React.FormEvent) => {
+  const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // If selectedCategoryId is "" (meaning none), pass undefined
-    // otherwise parse the string -> number
-    const categoryAsNumber = 
-      selectedCategoryId === "" ? undefined : Number(selectedCategoryId);
   
-    // Now categoryAsNumber is a number or undefined
-    handleSubmit(e, categoryAsNumber);
+    // Convert selectedCategoryId to a plain array of numbers
+    const categories = selectedCategoryId !== "" ? [selectedCategoryId] : [];
+  
+    const finalForm = {
+      ...form,
+      categories, // Pass an array of numbers
+    };
+  
+    // Retrieve the token
+    const storedJwt = sessionStorage.getItem("jwt");
+    if (!storedJwt) {
+      console.error("User is not authenticated.");
+      notify.error("Please log in to create a recipe.");
+      return;
+    }
+  
+    try {
+      await RecipeService.createRecipe(finalForm, storedJwt);
+      notify.success("Recipe created successfully!");
+      navigate("/all/recipes");
+    } catch (error) {
+      console.error("Error creating recipe:", error);
+      notify.error("Failed to create recipe. Please try again.");
+    }
   };
+  
+  
+  
+
   return (
     <div className="create-recipe-container">
       <h2>Create a New Recipe</h2>

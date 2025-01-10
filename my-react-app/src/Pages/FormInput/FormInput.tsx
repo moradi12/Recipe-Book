@@ -6,7 +6,7 @@ interface FormInputProps {
   label: string;
   type: InputType;
   name: string;
-  value?: string | number; // Make value optional for file inputs
+  value?: string | number; 
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   placeholder?: string;
   multiline?: boolean;

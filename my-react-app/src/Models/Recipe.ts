@@ -55,7 +55,7 @@ export interface RecipeResponse {
   status: string;
   createdAt: string;
   updatedAt: string;
-  createdBy: User;
+  createdByUsername: string; 
   foodCategory: Category[];
 }
 
