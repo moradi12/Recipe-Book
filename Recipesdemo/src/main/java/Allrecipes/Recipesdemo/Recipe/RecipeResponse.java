@@ -21,13 +21,16 @@ public class RecipeResponse {
     private String createdByUsername;
     private String photo;
     private List<String> categories;
+    private boolean containsGluten; // Add this field
 
     // Default constructor
     public RecipeResponse() {
     }
 
-    // Constructor with all fields including categories
-    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, String photo, List<String> categories) {
+    // Constructor with all fields including `containsGluten`
+    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps,
+                          int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername,
+                          String photo, List<String> categories, boolean containsGluten) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -40,10 +43,13 @@ public class RecipeResponse {
         this.createdByUsername = createdByUsername;
         this.photo = photo;
         this.categories = categories;
+        this.containsGluten = containsGluten;
     }
 
-    // Constructor with photo as Base64 string and categories
-    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps, int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername, byte[] photoBytes, List<String> categories) {
+    // Constructor with photo as byte[] and all fields including `containsGluten`
+    public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps,
+                          int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername,
+                          byte[] photoBytes, List<String> categories, boolean containsGluten) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -56,5 +62,10 @@ public class RecipeResponse {
         this.createdByUsername = createdByUsername;
         this.photo = photoBytes != null ? Base64.getEncoder().encodeToString(photoBytes) : null;
         this.categories = categories;
+        this.containsGluten = containsGluten;
+    }
+
+    public void setPhotoFromBytes(byte[] photoBytes) {
+        this.photo = photoBytes != null ? Base64.getEncoder().encodeToString(photoBytes) : null;
     }
 }

@@ -43,6 +43,6 @@ public class RecipeCreateRequest {
 
     // If 'containsGluten' is null, default to true
     public boolean getContainsGlutenOrDefault() {
-        return containsGluten == null ? true : containsGluten;
+        return Boolean.TRUE.equals(containsGluten);
     }
 }

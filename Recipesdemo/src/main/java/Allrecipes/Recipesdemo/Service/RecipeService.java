@@ -241,7 +241,9 @@ public class RecipeService {
         if (req.getServings() <= 0) {
             throw new InvalidRecipeDataException("Servings must be greater than zero");
         }
-    }
+        if (req.getContainsGluten() == null) {
+            req.setContainsGluten(true); // Defaulting to true if null
+        }    }
 
     // ================================
     //  MAP RECIPE -> RECIPE RESPONSE
@@ -278,43 +280,34 @@ public class RecipeService {
 //    }
     public RecipeResponse toRecipeResponse(Recipe recipe) {
         if (recipe == null) {
-            // handle null or throw exception
+            throw new RecipeNotFoundException("Recipe is null or invalid");
         }
 
         List<String> categoryNames = recipe.getCategories() == null
                 ? Collections.emptyList()
                 : recipe.getCategories().stream()
-                .map(Category::getName) // or cat -> cat.getName()
+                .map(Category::getName)
                 .collect(Collectors.toList());
 
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
-                .ingredients(
-                        recipe.getIngredients().stream()
-                                .map(ingredient -> ingredient.getQuantity()
-                                        + " " + ingredient.getUnit()
-                                        + " of " + ingredient.getName())
-                                .collect(Collectors.toList())
-                )
+                .ingredients(recipe.getIngredients().stream()
+                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
+                        .collect(Collectors.toList()))
                 .preparationSteps(recipe.getPreparationSteps())
                 .cookingTime(recipe.getCookingTime())
                 .servings(recipe.getServings())
                 .dietaryInfo(recipe.getDietaryInfo())
-                .status(recipe.getStatus() != null
-                        ? recipe.getStatus().name()
-                        : "UNKNOWN")
-                .createdByUsername(recipe.getCreatedBy() != null
-                        ? recipe.getCreatedBy().getUsername()
-                        : "UNKNOWN")
+                .containsGluten(recipe.getContainsGluten()) // Map with default handled by entity
+                .status(recipe.getStatus() != null ? recipe.getStatus().name() : "UNKNOWN")
+                .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "UNKNOWN")
                 .photo(recipe.getPhotoAsBase64())
-
-                // ========== ADD THIS ==========
                 .categories(categoryNames)
-
                 .build();
     }
+
 
     // ================================
     //  GET RECIPE BY ID

@@ -74,7 +74,6 @@ public class Recipe {
 
     @Column(nullable = false)
     private boolean containsGluten = true;
-
 //    @ManyToMany(fetch = FetchType.LAZY)
 //    @JoinTable(
 //            name = "recipe_categories",
@@ -165,4 +164,19 @@ private Set<Category> categories;
         int remainingMinutes = minutes % 60;
         return hours > 0 ? hours + " hrs " + remainingMinutes + " mins" : remainingMinutes + " mins";
     }
+    public boolean isValidContainsGluten(Boolean containsGluten) {
+        return containsGluten != null;
+    }
+    public boolean getContainsGlutenOrDefault() {
+        return containsGluten;
+    }
+
+    public void setContainsGluten(Boolean containsGluten) {
+        this.containsGluten = containsGluten != null ? containsGluten : true;
+    }
+    public boolean getContainsGluten() {
+        return containsGluten;
+    }
+
+
 }

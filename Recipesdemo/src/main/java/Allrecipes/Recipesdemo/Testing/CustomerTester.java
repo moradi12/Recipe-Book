@@ -121,7 +121,8 @@ public class CustomerTester implements CommandLineRunner {
                     .cookingTime(30)
                     .servings(4)
                     .dietaryInfo(FoodCategories.VEGETARIAN.getDescription()) // Using description from enum
-                    .containsGluten(false)
+                    .containsGluten(true)
+                    
                     .categoryIds(categoryIds) // Use actual category IDs
                     .build();
 

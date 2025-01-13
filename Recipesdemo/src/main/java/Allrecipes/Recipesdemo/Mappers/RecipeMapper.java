@@ -24,12 +24,11 @@ public class RecipeMapper {
         logger.info("Mapping Recipe with ID: {}", recipe.getId());
 
         // Convert the Set<Category> to a List<String> of category names (as an example):
-        List<String> categoryNames = null;
-        if (recipe.getCategories() != null) {
-            categoryNames = recipe.getCategories().stream()
-                    .map(cat -> cat.getName())    // or cat.getTitle(), etc.
-                    .toList();
-        }
+        List<String> categoryNames = recipe.getCategories() != null
+                ? recipe.getCategories().stream()
+                .map(cat -> cat.getName())
+                .toList()
+                : Collections.emptyList();
 
         return RecipeResponse.builder()
                 .id(recipe.getId())
@@ -43,7 +42,7 @@ public class RecipeMapper {
                 .status(recipe.getStatus() != null ? recipe.getStatus().name() : "Unknown")
                 .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "Unknown")
                 .photo(recipe.getPhotoAsBase64())
-
+                .containsGluten(recipe.getContainsGluten()) // Include containsGluten
                 // <-- NEW: Pass the categoryNames to the builder
                 .categories(categoryNames)
 
