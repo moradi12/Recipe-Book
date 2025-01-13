@@ -61,17 +61,15 @@ public class RecipeService {
     public Recipe createRecipe(RecipeCreateRequest req, User user) {
         validateRecipeRequest(req);
 
-        // 1) Load categories from DB
+        // 1) Load categories from DB using the numeric IDs from req.getCategoryIds()
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(req.getCategoryIds())
                     .stream()
                     .collect(Collectors.toSet());
-
             if (categories.size() != req.getCategoryIds().size()) {
                 throw new InvalidRecipeDataException("One or more categories not found");
             }
-            // Removed: recipe.setCategories(categories);  <-- 'recipe' isn't defined yet
         }
 
         // 2) Build list of Ingredient entities
@@ -96,7 +94,7 @@ public class RecipeService {
             }
         }
 
-        // 4) Build & save the Recipe entity
+        // 4) Build & save the Recipe entity, including the attached categories
         Recipe recipe = Recipe.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
@@ -110,7 +108,7 @@ public class RecipeService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .containsGluten(req.getContainsGlutenOrDefault())
-                .categories(categories)           // <-- Attach categories here
+                .categories(categories)
                 .photo(photoBlob)
                 .build();
 
@@ -125,7 +123,6 @@ public class RecipeService {
         return savedRecipe;
     }
 
-
     // ================================
     //  DELETE RECIPE
     // ================================
@@ -137,7 +134,7 @@ public class RecipeService {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
-        // Only the user who created the recipe can delete
+        // Only the user who created the recipe can delete it
         if (!recipe.getCreatedBy().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("You do not have permission to delete this recipe");
         }
@@ -162,8 +159,8 @@ public class RecipeService {
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(req.getCategoryIds())
-                    .stream().collect(Collectors.toSet());
-
+                    .stream()
+                    .collect(Collectors.toSet());
             if (categories.size() != req.getCategoryIds().size()) {
                 throw new InvalidRecipeDataException("One or more categories not found");
             }
@@ -194,7 +191,7 @@ public class RecipeService {
             }
         }
 
-        // 4) Update fields
+        // 4) Update fields of the existing recipe
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
         existing.setIngredients(ingredients);
@@ -205,9 +202,6 @@ public class RecipeService {
         existing.setUpdatedAt(LocalDateTime.now());
         existing.setContainsGluten(req.getContainsGlutenOrDefault());
         existing.setCategories(categories);
-
-        // If you want to keep old photo if new not set, you can conditionally set existing.setPhoto(...).
-        // else just overwrite:
         existing.setPhoto(photoBlob);
 
         Recipe updatedRecipe = recipeRepository.save(existing);
@@ -243,71 +237,43 @@ public class RecipeService {
         }
         if (req.getContainsGluten() == null) {
             req.setContainsGluten(true); // Defaulting to true if null
-        }    }
+        }
+    }
 
     // ================================
     //  MAP RECIPE -> RECIPE RESPONSE
     // ================================
-//    public RecipeResponse toRecipeResponse(Recipe recipe) {
-//        return RecipeResponse.builder()
-//                .id(recipe.getId())
-//                .title(recipe.getTitle())
-//                .description(recipe.getDescription())
-//                .ingredients(recipe.getIngredients().stream()
-//                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
-//                        .collect(Collectors.toList()))
-//                .preparationSteps(recipe.getPreparationSteps())
-//                .cookingTime(recipe.getCookingTime())
-//                .servings(recipe.getServings())
-//                .dietaryInfo(recipe.getDietaryInfo())
-//                .status(recipe.getStatus().name())
-//                .createdByUsername(recipe.getCreatedBy().getUsername())
-//                .photo(recipe.getPhotoAsBase64())
-//
-//                // =============================
-//                // NEW: Include categories here
-//                // =============================
-//                .categories(
-//                        recipe.getCategories() == null
-//                                ? List.of()
-//                                : recipe.getCategories().stream()
-//                                // Option A: just the category name
-//                                .map(cat -> cat.getName())
-//                                .collect(Collectors.toList())
-//                )
-//
-//                .build();
-//    }
     public RecipeResponse toRecipeResponse(Recipe recipe) {
         if (recipe == null) {
             throw new RecipeNotFoundException("Recipe is null or invalid");
         }
-
-        List<String> categoryNames = recipe.getCategories() == null
-                ? Collections.emptyList()
-                : recipe.getCategories().stream()
+        // Extract category names from Recipe entity
+        List<String> categoryNames = recipe.getCategories() != null
+                ? recipe.getCategories().stream()
                 .map(Category::getName)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : Collections.emptyList();
 
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())
                 .description(recipe.getDescription())
-                .ingredients(recipe.getIngredients().stream()
-                        .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
-                        .collect(Collectors.toList()))
+                .ingredients(
+                        recipe.getIngredients().stream()
+                                .map(ingredient -> ingredient.getQuantity() + " " + ingredient.getUnit() + " of " + ingredient.getName())
+                                .collect(Collectors.toList())
+                )
                 .preparationSteps(recipe.getPreparationSteps())
                 .cookingTime(recipe.getCookingTime())
                 .servings(recipe.getServings())
                 .dietaryInfo(recipe.getDietaryInfo())
-                .containsGluten(recipe.getContainsGluten()) // Map with default handled by entity
+                .containsGluten(recipe.getContainsGluten())
                 .status(recipe.getStatus() != null ? recipe.getStatus().name() : "UNKNOWN")
                 .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "UNKNOWN")
                 .photo(recipe.getPhotoAsBase64())
                 .categories(categoryNames)
                 .build();
     }
-
 
     // ================================
     //  GET RECIPE BY ID
@@ -318,18 +284,16 @@ public class RecipeService {
     }
 
     // ================================
-    //  SEARCH BY TITLE
+    //  SEARCH RECIPE BY TITLE
     // ================================
     public List<RecipeResponse> searchRecipesByTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new InvalidRecipeDataException("Search title cannot be null or empty");
         }
-
         List<Recipe> recipes = recipeRepository.findByTitleContainingIgnoreCase(title);
         if (recipes.isEmpty()) {
             throw new RecipeNotFoundException("No recipes found with title containing: " + title);
         }
-
         return recipes.stream()
                 .map(this::toRecipeResponse)
                 .collect(Collectors.toList());

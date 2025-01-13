@@ -76,13 +76,15 @@ async function createRecipe(
 ): Promise<{ isSuccess: boolean; message?: string }> {
   try {
     const response = await RecipeService.createRecipe(recipeRequest, token);
-    // If the backend returns 201 for success
+    // If the backend returns 201 for success, return success.
     if (response.status === 201) {
       return { isSuccess: true };
     }
+    // Since RecipeResponse doesn't have a 'message' property,
+    // we return a default error message.
     return {
       isSuccess: false,
-      message: response.data.message || 'Failed to create recipe.',
+      message: 'Failed to create recipe.',
     };
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -185,10 +187,10 @@ const useRecipeForm = () => {
   }, []);
 
   /**
-   * Main submit handler. Validates the form,
-   * checks for auth token, and calls the creation API.
+   * Main submit handler. Validates the form, checks for auth token,
+   * and calls the creation API.
    *
-   * **Changed** to accept `selectedCategoryId?: number` to fix TS error.
+   * Accepts an optional selectedCategoryId (number).
    */
   const handleSubmit = useCallback(
     async (e: React.FormEvent, selectedCategoryId?: number) => {
@@ -212,7 +214,8 @@ const useRecipeForm = () => {
         return;
       }
 
-      // Build the request payload
+      // Build the request payload.
+      // Use 'categories' property (not 'categoryIds') since that's what RecipeCreateRequest expects.
       const recipeRequest: RecipeCreateRequest = {
         title: form.title,
         description: form.description,
@@ -223,7 +226,6 @@ const useRecipeForm = () => {
         dietaryInfo: form.dietaryInfo || undefined,
         containsGluten: form.containsGluten,
         photo: form.photo || '',
-        // If category ID is present, pass it as a single-element array
         categories: selectedCategoryId ? [selectedCategoryId] : [],
       };
 

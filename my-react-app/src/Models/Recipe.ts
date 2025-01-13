@@ -1,4 +1,3 @@
-import { Category } from "./Category";
 import { FoodCategory } from "./FoodCategory";
 import { Ingredient } from "./Ingredient";
 import { RecipeStatus } from "./RecipeStatus";
@@ -21,8 +20,8 @@ export interface Recipe {
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
   createdBy: User; // User interface
-  categories?: string[];  // Array of Category interfaces
-  multiline?: boolean
+  categories: string[]; // Categories as strings
+  //   multiline?: boolean
 }
 
 
@@ -37,28 +36,24 @@ export interface User {
 
 // Models/Category.ts
 
+// src/Models/RecipeResponse.ts
 export interface RecipeResponse {
-  message: string;
   id: number;
-  name: string;
   title: string;
-  categories?: Array<string | { id: number; name: string }>;
   description: string;
   ingredients: string[];
-  
   preparationSteps: string;
   cookingTime: number;
   servings: number;
-  photo?: string;
   dietaryInfo?: string;
   containsGluten: boolean;
   status: string;
   createdAt: string;
   updatedAt: string;
-  createdByUsername: string; 
-  foodCategory: Category[];
+  createdByUsername: string;
+  photo?: string;
+  categories: string[];
 }
-
 
 
 

@@ -1,6 +1,7 @@
 package Allrecipes.Recipesdemo.Mappers;
 
 import Allrecipes.Recipesdemo.DTOs.IngredientDto;
+import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.RecipeReview;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecipeMapper {
 
@@ -26,10 +28,9 @@ public class RecipeMapper {
         // Convert the Set<Category> to a List<String> of category names (as an example):
         List<String> categoryNames = recipe.getCategories() != null
                 ? recipe.getCategories().stream()
-                .map(cat -> cat.getName())
-                .toList()
+                .map(Category::getName) // Or any property that identifies the category
+                .collect(Collectors.toList())
                 : Collections.emptyList();
-
         return RecipeResponse.builder()
                 .id(recipe.getId())
                 .title(recipe.getTitle())

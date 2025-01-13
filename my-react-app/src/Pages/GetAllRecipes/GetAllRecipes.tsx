@@ -1,7 +1,9 @@
+// src/Pages/GetAllRecipes/GetAllRecipes.tsx
+
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Category } from "../../Models/Category";
-import { RecipeResponse } from "../../Models/Recipe";
+import { RecipeResponse } from "../../Models/RecipeResponse";
 import RecipeService, { PaginatedRecipes } from "../../Service/RecipeService";
 import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
@@ -10,7 +12,7 @@ import "./GetAllRecipes.css";
 
 const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]); // explicitly typed as Category[]
   const [pagination, setPagination] = useState({
     page: 0,
     size: 10,
@@ -24,24 +26,42 @@ const GetAllRecipes: React.FC = () => {
   // 1) Ensure JWT token is valid
   useEffect(() => {
     checkData();
+    console.log("Checked user authentication");
   }, []);
 
-  // 2) Fetch categories (for <select>).
+  // 2) Fetch categories (for the select dropdown)
   const fetchCategories = useCallback(async () => {
     try {
       const response = await RecipeService.getAllCategories();
-      setCategories(response.data);
+      console.log("Fetched categories:", response.data);
+      setCategories(response.data); // response.data must be an array of Category objects
     } catch (err) {
       notify.error("Failed to load categories.");
       console.error("Error fetching categories:", err);
     }
   }, []);
 
-  // 3) Fetch recipes with pagination (and optional category filter).
+  // Normalize recipes to ensure consistent category handling.
+  // If recipe.categories is empty or undefined, set it to ["Uncategorized"]
+  const normalizeRecipes = (recipes: RecipeResponse[]): RecipeResponse[] => {
+    return recipes.map((recipe) => ({
+      ...recipe,
+      categories: recipe.categories && recipe.categories.length > 0
+        ? recipe.categories
+        : ["Uncategorized"],
+    }));
+  };
+    // 3) Fetch recipes with pagination (and optional category filter)
   const fetchRecipes = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
+
+      console.log("Fetching recipes with pagination:", {
+        page: pagination.page,
+        size: pagination.size,
+        category: filterCategory || "All",
+      });
 
       const categoryParam = filterCategory || undefined;
 
@@ -52,7 +72,10 @@ const GetAllRecipes: React.FC = () => {
       );
       const data: PaginatedRecipes = response.data;
 
-      setRecipes(data.content);
+      const normalizedRecipes = normalizeRecipes(data.content);
+      console.log("Normalized recipes:", normalizedRecipes);
+
+      setRecipes(normalizedRecipes);
       setPagination((prev) => ({
         ...prev,
         totalPages: data.totalPages,
@@ -62,6 +85,7 @@ const GetAllRecipes: React.FC = () => {
       if (err instanceof Error) {
         errorMessage = err.message || errorMessage;
       }
+      console.error("Error fetching recipes:", err);
       setError(errorMessage);
       notify.error(errorMessage);
     } finally {
@@ -75,6 +99,8 @@ const GetAllRecipes: React.FC = () => {
       const state = recipeSystem.getState();
       const token = state.auth.token;
 
+      console.log("Attempting to delete recipe with ID:", id);
+
       if (!token || token.length < 10) {
         notify.error("Missing authorization token. Please log in again.");
         return;
@@ -83,6 +109,7 @@ const GetAllRecipes: React.FC = () => {
       if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
           await RecipeService.deleteRecipe(id, token);
+          console.log("Recipe deleted successfully:", id);
           notify.success("Recipe deleted successfully!");
           fetchRecipes();
         } catch (err: unknown) {
@@ -90,20 +117,20 @@ const GetAllRecipes: React.FC = () => {
           if (err instanceof Error) {
             errorMessage = err.message || errorMessage;
           }
-          notify.error(errorMessage);
           console.error("Error deleting recipe:", err);
+          notify.error(errorMessage);
         }
       }
     },
     [fetchRecipes]
   );
 
-  // On mount, fetch categories once
+  // Fetch categories on mount
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Whenever pagination or filter changes, refetch recipes
+  // Fetch recipes when pagination or filter changes
   useEffect(() => {
     fetchRecipes();
   }, [fetchRecipes]);
@@ -112,6 +139,7 @@ const GetAllRecipes: React.FC = () => {
    * Render the list of recipes.
    */
   const renderRecipeList = () => {
+    console.log("Rendering recipe list:", recipes);
     if (!recipes.length && !loading) {
       return <p>No recipes found.</p>;
     }
@@ -122,12 +150,10 @@ const GetAllRecipes: React.FC = () => {
           <li key={recipe.id} className="recipe-item">
             <h3>{recipe.title || "No Title"}</h3>
             <p>
-              <strong>Description:</strong>{" "}
-              {recipe.description || "No Description"}
+              <strong>Description:</strong> {recipe.description || "No Description"}
             </p>
             <p>
-              <strong>Preparation Steps:</strong>{" "}
-              {recipe.preparationSteps || "None"}
+              <strong>Preparation Steps:</strong> {recipe.preparationSteps || "None"}
             </p>
             <p>
               <strong>Cooking Time:</strong> {recipe.cookingTime} minutes
@@ -139,27 +165,20 @@ const GetAllRecipes: React.FC = () => {
               <strong>Dietary Info:</strong> {recipe.dietaryInfo || "N/A"}
             </p>
             <p>
-              <strong>Contains Gluten:</strong>{" "}
-              {recipe.containsGluten ? "Yes" : "No"}
+              <strong>Contains Gluten:</strong> {recipe.containsGluten ? "Yes" : "No"}
             </p>
             <p>
               <strong>Status:</strong> {recipe.status || "Unknown"}
             </p>
-
-            {/* ===== Display categories if present ===== */}
-            {recipe.categories && recipe.categories.length > 0 && (
-              <p>
-                <strong>Categories:</strong>{" "}
-                {recipe.categories
-                  .map((cat) => (typeof cat === "string" ? cat : cat.name))
-                  .join(", ")}
-              </p>
-            )}
-
-            {/* Display createdBy */}
             <p>
-              <strong>Created By:</strong> {recipe.createdByUsername || "Unknown"}            </p>
-            {/* ===== Display photo if base64 field ===== */}
+              <strong>Categories:</strong>{" "}
+              {recipe.categories && recipe.categories.length > 0
+                ? recipe.categories.join(", ")
+                : "Uncategorized"}
+            </p>
+            <p>
+              <strong>Created By:</strong> {recipe.createdByUsername || "Unknown"}
+            </p>
             {recipe.photo && (
               <div className="photo-preview">
                 <img
@@ -170,18 +189,14 @@ const GetAllRecipes: React.FC = () => {
                 />
               </div>
             )}
-
             <h4>Ingredients:</h4>
-            {recipe.ingredients?.length ? (
-              <ul>
-                {recipe.ingredients.map((ingredient, idx) => (
-                  <li key={idx}>{ingredient}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No ingredients listed</p>
-            )}
-
+            <ul>
+              {recipe.ingredients.map((ingredient, idx) => (
+                // If ingredients is a string array, render directly.
+                // If not, adjust here accordingly.
+                <li key={idx}>{ingredient}</li>
+              ))}
+            </ul>
             <button
               className="edit-button"
               onClick={() => navigate(`/edit-recipe/${recipe.id}`)}
@@ -201,31 +216,34 @@ const GetAllRecipes: React.FC = () => {
   };
 
   /**
-   * Render pagination controls
+   * Render pagination controls.
    */
-  const renderPagination = () => (
-    <div className="pagination">
-      <button
-        onClick={() =>
-          setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
-        }
-        disabled={pagination.page === 0 || loading}
-      >
-        Previous
-      </button>
-      <span>
-        Page {pagination.page + 1} of {pagination.totalPages}
-      </span>
-      <button
-        onClick={() =>
-          setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-        }
-        disabled={pagination.page >= pagination.totalPages - 1 || loading}
-      >
-        Next
-      </button>
-    </div>
-  );
+  const renderPagination = () => {
+    console.log("Rendering pagination controls:", pagination);
+    return (
+      <div className="pagination">
+        <button
+          onClick={() =>
+            setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+          }
+          disabled={pagination.page === 0 || loading}
+        >
+          Previous
+        </button>
+        <span>
+          Page {pagination.page + 1} of {pagination.totalPages}
+        </span>
+        <button
+          onClick={() =>
+            setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+          }
+          disabled={pagination.page >= pagination.totalPages - 1 || loading}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="get-all-recipes">
@@ -238,7 +256,6 @@ const GetAllRecipes: React.FC = () => {
       {loading && <p>Loading...</p>}
       {error && <p className="error-message">{error}</p>}
 
-      {/* Filter by Category */}
       <div className="filter-container">
         <label htmlFor="category-filter">Filter by Category:</label>
         <select
@@ -248,7 +265,7 @@ const GetAllRecipes: React.FC = () => {
           disabled={loading}
         >
           <option value="">All Categories</option>
-          {categories.map((cat) => (
+          {categories.map((cat: Category) => (
             <option key={cat.id} value={String(cat.id)}>
               {cat.name}
             </option>
@@ -256,10 +273,7 @@ const GetAllRecipes: React.FC = () => {
         </select>
       </div>
 
-      {/* Render recipes */}
       {renderRecipeList()}
-
-      {/* Pagination controls */}
       {recipes.length > 0 && renderPagination()}
     </div>
   );

@@ -18,29 +18,32 @@ const CreateRecipe: React.FC = () => {
     handleIngredientChange,
     addIngredient,
     removeIngredient,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handleSubmit,
+    // We are not using handleSubmit from the hook
   } = useRecipeForm();
 
+  // We'll use the fetched categories to populate the dropdown.
   const [categories, setCategories] = useState<Category[]>([]);
+  // Now we store the selected category ID (a number) or an empty string.
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Fetch categories once
+  // Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await RecipeService.getAllCategories();
-        setCategories(response.data); // e.g., [{id:1, name:"Dessert"}, ...]
+        // Assuming each category from the API includes an id and a name.
+        setCategories(response.data);
       } catch (err) {
         console.error("Error fetching categories:", err);
+        setCategories([]);
       }
     };
     fetchCategories();
   }, []);
 
-  // Automatically set "createdBy" using checkData
+  // Automatically set "createdBy" using checkData (for example, from a JWT)
   useEffect(() => {
     checkData(); // Ensure the user is logged in
     const storedJwt = sessionStorage.getItem("jwt");
@@ -48,19 +51,26 @@ const CreateRecipe: React.FC = () => {
       const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1])); // Decode JWT payload
       setForm((prev) => ({
         ...prev,
-        createdBy: decodedJwt.sub, // Assuming "sub" is the username or ID
+        createdBy: decodedJwt.sub, // Assuming "sub" is the user id or username
       }));
     }
   }, [setForm]);
 
+  // Update the selectedCategoryId using the category's numeric id
   const handleCategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
-      setSelectedCategoryId(value ? Number(value) : "");
+      const parsedValue = Number(value);
+      if (!isNaN(parsedValue)) {
+        setSelectedCategoryId(parsedValue);
+      } else {
+        setSelectedCategoryId("");
+      }
     },
     []
   );
 
+  // Handle photo selection and convert to base64 for both preview and form storage
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -68,22 +78,23 @@ const CreateRecipe: React.FC = () => {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        const fullResult = reader.result; // "data:image/png;base64,iVBORw0KG..."
+        // e.g., "data:image/png;base64,iVBORw0KG..."
+        const fullResult = reader.result;
         const base64Part = fullResult.split(",")[1] || "";
 
-        // Store raw base64 in form
+        // Store raw base64 in form state
         setForm((prev) => ({
           ...prev,
           photo: base64Part,
         }));
-
-        // Show preview in UI
+        // Set the preview image
         setPhotoPreview(fullResult);
       }
     };
     reader.readAsDataURL(file);
   };
 
+  // Render error messages if any exist
   const renderErrorMessages = useCallback(() => {
     if (Object.keys(errors).length === 0) return null;
     return (
@@ -97,27 +108,32 @@ const CreateRecipe: React.FC = () => {
     );
   }, [errors]);
 
+  // Form submission: Build the final request payload and call the API.
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    // Convert selectedCategoryId to a plain array of numbers
-    const categories = selectedCategoryId !== "" ? [selectedCategoryId] : [];
-  
+
+    // Ensure that a valid category has been selected.
+    if (selectedCategoryId === "") {
+      notify.error("Please select a valid category.");
+      return;
+    }
+
+    // Build the request payload.
+    // Note: The API expects "categories" as an array of number IDs.
     const finalForm = {
       ...form,
-      categories, // Pass an array of numbers
+      categories: [selectedCategoryId],
     };
-  
-    // Retrieve the token
+
     const storedJwt = sessionStorage.getItem("jwt");
     if (!storedJwt) {
-      console.error("User is not authenticated.");
       notify.error("Please log in to create a recipe.");
       return;
     }
-  
+
     try {
-      await RecipeService.createRecipe(finalForm, storedJwt);
+      const response = await RecipeService.createRecipe(finalForm, storedJwt);
+      console.log("Created Recipe Response:", response.data);
       notify.success("Recipe created successfully!");
       navigate("/all/recipes");
     } catch (error) {
@@ -125,9 +141,6 @@ const CreateRecipe: React.FC = () => {
       notify.error("Failed to create recipe. Please try again.");
     }
   };
-  
-  
-  
 
   return (
     <div className="create-recipe-container">
@@ -246,7 +259,7 @@ const CreateRecipe: React.FC = () => {
           />
         </div>
 
-        {/* ===== Category (Single) ===== */}
+        {/* ===== Category ===== */}
         <div className="form-group">
           <label htmlFor="category">Category*</label>
           <select

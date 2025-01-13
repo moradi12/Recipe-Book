@@ -1,14 +1,24 @@
-// src/components/FoodHomePage/FoodHomePage.tsx
-import { motion } from 'framer-motion';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import styles from './FoodHomePage.module.css';
+import { motion } from "framer-motion";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import AvocadoSaladImage from "../../assets/Pics/AvocadoSaladImage.jpg";
+import ChickenAvocadoImage from "../../assets/Pics/ChickenAvocado.jpg";
+import TacosImage from "../../assets/Pics/Mexican+Tacos.jpg";
+import SteakImage from "../../assets/Pics/steak.jpg";
+import styles from "./FoodHomePage.module.css";
 
 const FoodHomePage: React.FC = () => {
   const navigate = useNavigate();
+
   const handleBrowseRecipes = () => {
-    navigate('/all/recipes');
+    navigate("/all/recipes");
   };
+
+  const handleSubscribe = () => {
+    // You can add subscription functionality here
+    alert("Thank you for subscribing!");
+  };
+
   return (
     <div className={styles.container}>
       {/* Hero Section */}
@@ -21,7 +31,7 @@ const FoodHomePage: React.FC = () => {
         >
           <h1 className={styles.title}>Welcome to Foodie Haven</h1>
           <p className={styles.subtitle}>
-            Discover, cook, and enjoy delicious recipes from around the world.
+            Discover, cook, and enjoy delicious recipes with a pink twist!
           </p>
           <button className={styles.ctaButton} onClick={handleBrowseRecipes}>
             Browse Recipes
@@ -29,6 +39,7 @@ const FoodHomePage: React.FC = () => {
         </motion.div>
         <div className={styles.animatedBackground}></div>
       </section>
+
       {/* Features Section */}
       <section className={styles.features}>
         <h2>Our Platform Highlights</h2>
@@ -48,7 +59,7 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={styles.icon}>\uD83E\uDD51</div>
+            <div className={styles.icon}>🥑</div>
             <h3>Healthy Options</h3>
             <p>Explore nutritious recipes packed with vitamins and flavors.</p>
           </motion.div>
@@ -58,7 +69,7 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={styles.icon}>\uD83C\uDF57</div>
+            <div className={styles.icon}>🍲</div>
             <h3>Global Cuisines</h3>
             <p>Indulge in cuisines from different cultures and traditions.</p>
           </motion.div>
@@ -68,10 +79,25 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.3 }}
           >
-            <div className={styles.icon}>\uD83D\uDCDA</div>
+            <div className={styles.icon}>📚</div>
             <h3>Expert Tips</h3>
             <p>Learn cooking secrets and pro tips from master chefs.</p>
           </motion.div>
+
+          {/* Additional Platform Highlights */}
+          <motion.div
+            className={styles.featureCard}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className={styles.icon}>💰</div>
+            <h3>Budget-Friendly</h3>
+            <p>
+              Enjoy meals that are not only delicious but also kind to your
+              wallet.
+            </p>
+          </motion.div>
+
         </div>
       </section>
 
@@ -84,7 +110,7 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.03 }}
           >
             <img
-              src="https://via.placeholder.com/300?text=Mexican+Tacos"
+              src={TacosImage}
               alt="Mexican Tacos"
               className={styles.recipeImage}
             />
@@ -97,12 +123,14 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.03 }}
           >
             <img
-              src="https://via.placeholder.com/300?text=Pasta+Carbonara"
-              alt="Pasta Carbonara"
+              src={SteakImage}
+              alt="Beef Steak"
               className={styles.recipeImage}
             />
-            <h3>Pasta Carbonara</h3>
-            <p>Rich and creamy Italian classic with bacon and cheese.</p>
+            <h3>Beef Steak</h3>
+            <p>
+              Perfectly grilled steak with savory flavors and a juicy texture.
+            </p>
           </motion.div>
 
           <motion.div
@@ -110,12 +138,25 @@ const FoodHomePage: React.FC = () => {
             whileHover={{ scale: 1.03 }}
           >
             <img
-              src="https://via.placeholder.com/300?text=Avocado+Salad"
+              src={AvocadoSaladImage}
               alt="Avocado Salad"
               className={styles.recipeImage}
             />
             <h3>Avocado Salad</h3>
             <p>Fresh and healthy salad loaded with avocado goodness.</p>
+          </motion.div>
+
+          <motion.div
+            className={styles.recipeCard}
+            whileHover={{ scale: 1.03 }}
+          >
+            <img
+              src={ChickenAvocadoImage}
+              alt="Chicken and Avocado"
+              className={styles.recipeImage}
+            />
+            <h3>Chicken and Avocado</h3>
+            <p>Fresh and healthy Chicken Salad with Avocado.</p>
           </motion.div>
         </div>
       </section>
@@ -132,7 +173,8 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "Foodie Haven helped me find easy and healthy meals for my busy schedule!"
+              "Foodie Haven helped me find easy and healthy meals for my busy
+              schedule!"
             </p>
             <h4>- Sarah K.</h4>
           </motion.div>
@@ -145,7 +187,8 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "I'm in love with their authentic international recipes—always a hit at dinner parties."
+              "I'm in love with their authentic international recipes—always a
+              hit at dinner parties."
             </p>
             <h4>- David L.</h4>
           </motion.div>
@@ -158,17 +201,53 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "The expert tips section has made me a better cook, even though I'm a beginner!"
+              "The expert tips section has made me a better cook, even though
+              I'm a beginner!"
             </p>
             <h4>- Maria R.</h4>
           </motion.div>
         </div>
       </section>
 
-      {/* Call-to-Action Section */}
-      <section className={styles.cta}>
-        <h2>Ready to Spice Up Your Cooking?</h2>
-        <button className={styles.ctaButton}>Join Us Today</button>
+      {/* Featured Chef Section */}
+      <section className={styles.featuredChef}>
+        <h2>Meet Our Featured Chef</h2>
+        <motion.div
+          className={styles.chefCard}
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <img
+            src="https://via.placeholder.com/200?text=Chef+Anna"
+            alt="Chef Anna"
+            className={styles.chefImage}
+          />
+          <h3>Chef Anna</h3>
+          <p>
+            With a passion for fusion cuisine and a creative twist, Chef Anna
+            brings a burst of flavor and color to every dish.
+          </p>
+        </motion.div>
+      </section>
+
+      {/* Newsletter Subscription Section */}
+      <section className={styles.subscribe}>
+        <h2>Join Our Newsletter</h2>
+        <p>
+          Get the latest recipes, tips, and more delivered right to your inbox!
+        </p>
+        <div className={styles.subscriptionForm}>
+          <input
+            type="email"
+            placeholder="Your email address"
+            className={styles.emailInput}
+          />
+          <button className={styles.subscribeButton} onClick={handleSubscribe}>
+            Subscribe
+          </button>
+        </div>
       </section>
     </div>
   );

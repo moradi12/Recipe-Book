@@ -1,199 +1,302 @@
+/* CSS Variables for consistency */
+:root {
+  --color-bright-pink: #e91e63;
+  --color-dark-pink: #c2185b;
+  --color-medium-pink: #d81b60;
+  --color-light-pink-start: #f8bbd0;
+  --color-light-pink-end: #f48fb1;
+  --bg-faded: #fff0f5;
+  --bg-testimonial: #ffe0f0;
+  --text-secondary: #ad1457;
+  --text-accent: #880e4f;
+}
 
+/* Global Container */
 .container {
-    display: flex;
-    flex-direction: column;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    box-sizing: border-box;
-  }
-  
-  /* Hero Section */
-  .hero {
-    position: relative;
-    text-align: center;
-    margin-bottom: 3rem;
-    overflow: hidden;
-  }
-  
-  .heroContent {
-    position: relative;
-    z-index: 2;
-  }
-  
-  .title {
-    font-size: 3rem;
-    margin: 1rem 0;
-    color: #333;
-  }
-  
-  .subtitle {
-    color: #666;
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .ctaButton {
-    padding: 0.75rem 1.5rem;
-    background-color: #ff5722;
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease-in-out;
-  }
-  
-  .ctaButton:hover {
-    background-color: #e64a19;
-  }
-  
-  .animatedBackground {
-    position: absolute;
-    top: -20%;
-    left: -20%;
-    width: 150%;
-    height: 150%;
-    background: linear-gradient(135deg, #ffe0b2 0%, #ffc107 100%);
-    z-index: 1;
-    transform: rotate(25deg);
-  }
-  
-  /* Features Section */
-  .features {
-    margin-bottom: 3rem;
-    text-align: center;
-  }
-  
-  .features h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-  
-  .featuresGrid {
-    display: grid;
-    grid-gap: 2rem;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    margin-top: 1rem;
-  }
-  
-  .featureCard {
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .featureCard .icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .featureCard h3 {
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-  
-  .featureCard p {
-    color: #666;
-  }
-  
-  .highlights {
-    margin-bottom: 3rem;
-    text-align: center;
-  }
-  
-  .highlights h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-  
-  .recipesGrid {
-    display: grid;
-    grid-gap: 2rem;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-  
-  .recipeCard {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 1rem;
-    text-align: center;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .recipeImage {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-  }
-  
-  .recipeCard h3 {
-    margin-top: 0.5rem;
-    font-size: 1.4rem;
-    color: #333;
-  }
-  
-  .recipeCard p {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-  
-  /* Testimonials Section */
-  .testimonials {
-    margin-bottom: 3rem;
-    text-align: center;
-  }
-  
-  .testimonials h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-  
-  .carousel {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    align-items: center;
-  }
-  
-  .testimonial {
-    max-width: 700px;
-    background: #ffecd2;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  
-  .testimonial p {
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 1rem;
-  }
-  
-  .testimonial h4 {
-    color: #333;
-    font-size: 1rem;
-    text-align: right;
-  }
-  
-  /* CTA Section */
-  .cta {
-    text-align: center;
-    margin: 4rem 0;
-  }
-  
-  .cta h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    color: #333;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* === Hero Section === */
+.hero {
+  position: relative;
+  text-align: center;
+  margin-bottom: 3rem;
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+}
+
+.title {
+  font-size: 3rem;
+  margin: 1rem 0;
+  color: var(--color-dark-pink);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.ctaButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-bright-pink);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.ctaButton:hover {
+  background-color: var(--color-medium-pink);
+}
+
+.animatedBackground {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 150%;
+  height: 150%;
+  background: linear-gradient(135deg, var(--color-light-pink-start) 0%, var(--color-light-pink-end) 100%);
+  z-index: 1;
+  transform: rotate(25deg);
+}
+
+/* === Features Section === */
+.features {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.features h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-dark-pink);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  margin-top: 1rem;
+}
+
+.featureCard {
+  background: var(--bg-faded);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.featureCard .icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-bright-pink);
+}
+
+.featureCard h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-dark-pink);
+}
+
+.featureCard p {
+  color: var(--text-secondary);
+}
+
+/* === Recipe Highlights Section === */
+.highlights {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.highlights h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-dark-pink);
+}
+
+.recipesGrid {
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.recipeCard {
+  background-color: var(--bg-faded);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Ensure all recipe images display at the same size */
+.recipeImage {
+  width: 100%;
+  height: 200px; /* Fixed height */
+  object-fit: cover; /* Crop and cover the area */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.recipeCard h3 {
+  margin-top: 0.5rem;
+  font-size: 1.4rem;
+  color: var(--color-dark-pink);
+}
+
+.recipeCard p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* === Testimonials Section === */
+.testimonials {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.testimonials h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-dark-pink);
+}
+
+.carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.testimonial {
+  max-width: 700px;
+  background: var(--bg-testimonial);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.testimonial p {
+  font-size: 1rem;
+  color: var(--text-accent);
+  margin-bottom: 1rem;
+}
+
+.testimonial h4 {
+  color: var(--color-dark-pink);
+  font-size: 1rem;
+  text-align: right;
+}
+
+/* === Featured Chef Section === */
+.featuredChef {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.featuredChef h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-dark-pink);
+}
+
+.chefCard {
+  background: var(--bg-testimonial);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.chefImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 4px solid var(--color-bright-pink);
+}
+
+.chefCard h3 {
+  color: var(--color-dark-pink);
+  margin-bottom: 0.5rem;
+}
+
+/* === Newsletter Subscription Section === */
+.subscribe {
+  margin-bottom: 3rem;
+  text-align: center;
+  background: var(--bg-faded);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.subscribe h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-dark-pink);
+}
+
+.subscribe p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.subscriptionForm {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.emailInput {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid var(--color-bright-pink);
+  border-radius: 25px;
+  outline: none;
+  min-width: 250px;
+}
+
+.subscribeButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-bright-pink);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.subscribeButton:hover {
+  background-color: var(--color-medium-pink);
+}
+
+/* === Call-to-Action Section === */
+.cta {
+  text-align: center;
+  margin: 4rem 0;
+}
+
+.cta h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--color-dark-pink);
+}
