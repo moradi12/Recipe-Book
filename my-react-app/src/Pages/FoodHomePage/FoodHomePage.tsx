@@ -210,27 +210,7 @@ const FoodHomePage: React.FC = () => {
       </section>
 
       {/* Featured Chef Section */}
-      <section className={styles.featuredChef}>
-        <h2>Meet Our Featured Chef</h2>
-        <motion.div
-          className={styles.chefCard}
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <img
-            src="https://via.placeholder.com/200?text=Chef+Anna"
-            alt="Chef Anna"
-            className={styles.chefImage}
-          />
-          <h3>Chef Anna</h3>
-          <p>
-            With a passion for fusion cuisine and a creative twist, Chef Anna
-            brings a burst of flavor and color to every dish.
-          </p>
-        </motion.div>
-      </section>
+      
 
       {/* Newsletter Subscription Section */}
       <section className={styles.subscribe}>

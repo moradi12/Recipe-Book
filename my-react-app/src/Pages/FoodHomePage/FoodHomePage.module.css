@@ -1,14 +1,14 @@
 /* CSS Variables for consistency */
 :root {
   --color-bright-pink: #e91e63;
-  --color-dark-pink: #c2185b;
+  --color-dark-pink: #000000;
   --color-medium-pink: #d81b60;
-  --color-light-pink-start: #f8bbd0;
+  --color-light-pink-start: #f48fb1;
   --color-light-pink-end: #f48fb1;
   --bg-faded: #fff0f5;
-  --bg-testimonial: #ffe0f0;
-  --text-secondary: #ad1457;
-  --text-accent: #880e4f;
+  --bg-testimonial: #f48fb1;
+  --text-secondary: #131011;
+  --text-accent: #1b1117;
 }
 
 /* Global Container */

@@ -15,7 +15,7 @@
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.7.9",
     "axios-jwt": "^4.0.3",
-    "framer-motion": "^11.15.0",
+    "framer-motion": "^11.18.0",
     "jwt-decode": "^4.0.0",
     "notif": "^0.0.1",
     "notyf": "^3.10.0",
