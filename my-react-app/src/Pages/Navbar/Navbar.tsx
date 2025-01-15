@@ -93,13 +93,6 @@ const Navbar: React.FC = () => {
         </li>
 
         <li>
-          <NavLink to="/dessert" onClick={() => setIsOpen(false)}>
-            All dessert
-          </NavLink>
-        </li>
-
-
-        <li>
           <NavLink to="/contact" onClick={() => setIsOpen(false)}>
             Contact
           </NavLink>
