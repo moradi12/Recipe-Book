@@ -12,12 +12,15 @@ import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
 import Allrecipes.Recipesdemo.Repositories.RecipeRepository;
 import Allrecipes.Recipesdemo.Repositories.CategoryRepository;
 import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.rowset.serial.SerialException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -35,6 +38,27 @@ public class RecipeService {
         this.categoryRepository = categoryRepository;
     }
 
+    public void savePhoto(String base64Photo, String targetPath) {
+        try {
+            byte[] decodedBytes = Base64.getDecoder().decode(base64Photo);
+            Files.write(Path.of(targetPath), decodedBytes);
+        } catch (Exception e) {
+            System.err.println("Error saving photo: " + e.getMessage());
+        }}
+
+
+
+
+    @Value("${app.recipe-photos.directory}")
+    private String photoDirectory;
+
+    public String getPhotoDirectory() {
+        return photoDirectory;
+    }
+
+    public void setPhotoDirectory(Recipe recipe) {
+        recipe.setPhotoDirectory(photoDirectory);
+    }
     // ================================
     //  GET ALL (Paginated)
     // ================================

@@ -36,6 +36,9 @@ public class Recipe {
     @Column(nullable = false)
     private String title;
 
+
+    private String photoDirectory;
+
     @Lob
     @JsonIgnore
     private Blob photo;

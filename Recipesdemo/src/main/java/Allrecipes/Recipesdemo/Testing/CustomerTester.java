@@ -16,9 +16,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -35,8 +36,18 @@ public class CustomerTester implements CommandLineRunner {
     private User customer1;
     private User customer2;
     private Recipe testRecipe;
+    private String encodeImageToBase64(String filePath) {
+        try {
+            byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (Exception e) {
+            System.err.println("Error encoding image: " + e.getMessage());
+            return null;
+        }
+    }
 
     @Override
+
     public void run(String... args) {
         System.out.println("\n======== Customer Tester ========\n");
 
@@ -104,30 +115,169 @@ public class CustomerTester implements CommandLineRunner {
 
         try {
             // Fetch category IDs by category names
-            Set<Long> categoryIds = FoodCategories.VEGETARIAN.getDescription().equals("Vegetarian") ?
-                    Collections.singleton(
-                            categoryService.getCategoryByName(FoodCategories.VEGETARIAN.name()).getId()
-                    ) :
-                    Collections.emptySet();
+            Long vegetarianCategoryId = categoryService.getCategoryByName(FoodCategories.VEGETARIAN.name()).getId();
+            Long dessertCategoryId = categoryService.getCategoryByName(FoodCategories.DESSERT.name()).getId();
+            Long seafoodCategoryId = categoryService.getCategoryByName(FoodCategories.SEAFOOD.name()).getId();
+            Long veganCategoryId = categoryService.getCategoryByName(FoodCategories.VEGAN.name()).getId();
+            Long breakfastCategoryId = categoryService.getCategoryByName(FoodCategories.BREAKFAST.name()).getId();
 
+            // Recipe 1
             RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
-                    .title("Test Recipe 1")
-                    .description("A simple test recipe 1.")
+                    .title("Classic Pancakes")
+                    .description("Fluffy and delicious pancakes perfect for breakfast.")
                     .ingredients(List.of(
-                            new IngredientRequest("Ingredient 1", "2", "cups"),
-                            new IngredientRequest("Ingredient 2", "1", "tsp")
+                            new IngredientRequest("Flour", "2", "cups"),
+                            new IngredientRequest("Milk", "1.5", "cups"),
+                            new IngredientRequest("Eggs", "2", "large"),
+                            new IngredientRequest("Baking Powder", "2", "tsp")
                     ))
-                    .preparationSteps("Step 1: Do this. Step 2: Do that.")
-                    .cookingTime(30)
+                    .preparationSteps("Mix dry ingredients, add wet ingredients, and cook on a griddle.")
+                    .cookingTime(20)
                     .servings(4)
-                    .dietaryInfo(FoodCategories.VEGETARIAN.getDescription()) // Using description from enum
+                    .dietaryInfo("Vegetarian")
                     .containsGluten(true)
+                    .categoryIds(Set.of(vegetarianCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Classic Pancakes.jpg")) // Set Base64 photo
 
-                    .categoryIds(categoryIds) // Use actual category IDs
                     .build();
 
             testRecipe = recipeService.createRecipe(recipeRequest1, customer1);
-            System.out.println("Added Test Recipe 1: " + testRecipe);
+            System.out.println("Added Recipe 1: " + testRecipe);
+
+            // Recipe 2
+            RecipeCreateRequest recipeRequest2 = RecipeCreateRequest.builder()
+                    .title("Chocolate Lava Cake")
+                    .description("A decadent dessert with a gooey chocolate center.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Dark Chocolate", "200", "grams"),
+                            new IngredientRequest("Butter", "100", "grams"),
+                            new IngredientRequest("Sugar", "1", "cup"),
+                            new IngredientRequest("Eggs", "3", "large")
+                    ))
+                    .preparationSteps("Melt chocolate and butter, mix with other ingredients, and bake.")
+                    .cookingTime(15)
+                    .servings(2)
+                    .dietaryInfo("Dessert")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(dessertCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/LavaCake.jpg")) // Set Base64 photo
+
+                    .build();
+
+            Recipe lavaCakeRecipe = recipeService.createRecipe(recipeRequest2, customer2);
+            System.out.println("Added Recipe 2: " + lavaCakeRecipe);
+
+            // Recipe 3
+            RecipeCreateRequest recipeRequest3 = RecipeCreateRequest.builder()
+                    .title("Garlic Butter Shrimp")
+                    .description("Succulent shrimp cooked in a garlic butter sauce.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Shrimp", "500", "grams"),
+                            new IngredientRequest("Garlic", "4", "cloves"),
+                            new IngredientRequest("Butter", "50", "grams"),
+                            new IngredientRequest("Parsley", "2", "tbsp")
+                    ))
+                    .preparationSteps("Saute garlic in butter, add shrimp, and cook until done.")
+                    .cookingTime(10)
+                    .servings(4)
+                    .dietaryInfo("Seafood")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(seafoodCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/ButterShrimp.jpg")) // Set Base64 photo
+                    .build();
+
+            Recipe shrimpRecipe = recipeService.createRecipe(recipeRequest3, customer1);
+            System.out.println("Added Recipe 3: " + shrimpRecipe);
+
+            // Recipe 4
+            RecipeCreateRequest recipeRequest4 = RecipeCreateRequest.builder()
+                    .title("Vegan Buddha Bowl")
+                    .description("A healthy and colorful vegan meal bowl.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Quinoa", "1", "cup"),
+                            new IngredientRequest("Chickpeas", "1", "can"),
+                            new IngredientRequest("Avocado", "1", "sliced"),
+                            new IngredientRequest("Spinach", "2", "cups")
+                    ))
+                    .preparationSteps("Cook quinoa, add toppings, and drizzle with tahini sauce.")
+                    .cookingTime(25)
+                    .servings(2)
+                    .dietaryInfo("Vegan")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(veganCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/BuddhaBowl.jpg")) // Set Base64 photo
+
+                    .build();
+
+            Recipe buddhaBowlRecipe = recipeService.createRecipe(recipeRequest4, customer2);
+            System.out.println("Added Recipe 4: " + buddhaBowlRecipe);
+
+            // Recipe 5
+            RecipeCreateRequest recipeRequest5 = RecipeCreateRequest.builder()
+                    .title("Egg and Avocado Toast")
+                    .description("A quick and nutritious breakfast option.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Whole Grain Bread", "2", "slices"),
+                            new IngredientRequest("Avocado", "1", "mashed"),
+                            new IngredientRequest("Eggs", "2", "poached"),
+                            new IngredientRequest("Lemon Juice", "1", "tsp")
+                    ))
+                    .preparationSteps("Toast bread, spread avocado, add eggs, and drizzle with lemon juice.")
+                    .cookingTime(10)
+                    .servings(1)
+                    .dietaryInfo("Vegetarian")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(breakfastCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/EggandAvocado.jpg"))
+                    .build();
+
+            Recipe avocadoToastRecipe = recipeService.createRecipe(recipeRequest5, customer1);
+            System.out.println("Added Recipe 5: " + avocadoToastRecipe);
+
+            // Recipe 6
+            RecipeCreateRequest recipeRequest6 = RecipeCreateRequest.builder()
+                    .title("Grilled Salmon with Dill Sauce")
+                    .description("Perfectly grilled salmon served with a creamy dill sauce.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Salmon Fillets", "2", "pieces"),
+                            new IngredientRequest("Dill", "1", "tbsp"),
+                            new IngredientRequest("Yogurt", "1/2", "cup"),
+                            new IngredientRequest("Lemon", "1", "sliced")
+                    ))
+                    .preparationSteps("Grill salmon, mix sauce ingredients, and serve together.")
+                    .cookingTime(15)
+                    .servings(2)
+                    .dietaryInfo("Seafood")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(seafoodCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Salmon.jpg"))
+
+                    .build();
+
+            Recipe salmonRecipe = recipeService.createRecipe(recipeRequest6, customer2);
+            System.out.println("Added Recipe 6: " + salmonRecipe);
+
+            // Recipe 7
+            RecipeCreateRequest recipeRequest7 = RecipeCreateRequest.builder()
+                    .title("Spaghetti Aglio e Olio")
+                    .description("A classic Italian pasta dish with garlic and olive oil.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Spaghetti", "200", "grams"),
+                            new IngredientRequest("Garlic", "6", "cloves"),
+                            new IngredientRequest("Olive Oil", "1/4", "cup"),
+                            new IngredientRequest("Red Pepper Flakes", "1", "tsp")
+                    ))
+                    .preparationSteps("Cook spaghetti, saute garlic in olive oil, and toss together.")
+                    .cookingTime(20)
+                    .servings(2)
+                    .dietaryInfo("Vegetarian")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(vegetarianCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Spaghetti.jpg"))
+                    .build();
+
+            Recipe pastaRecipe = recipeService.createRecipe(recipeRequest7, customer1);
+            System.out.println("Added Recipe 7: " + pastaRecipe);
 
         } catch (Exception e) {
             System.err.println("Error adding recipes: " + e.getMessage());

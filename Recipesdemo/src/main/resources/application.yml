@@ -18,6 +18,13 @@ spring:
       max-request-size: 5MB
       file-size-threshold: 2KB
 
+
 admin:
   email: admin@admin.com
   password: admin
+
+
+
+app:
+  recipe-photos:
+    directory: src/main/resources/images/recipes
