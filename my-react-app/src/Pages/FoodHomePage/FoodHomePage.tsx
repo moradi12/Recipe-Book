@@ -97,7 +97,6 @@ const FoodHomePage: React.FC = () => {
               wallet.
             </p>
           </motion.div>
-
         </div>
       </section>
 
@@ -161,6 +160,13 @@ const FoodHomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Explore Recipes Section */}
+      <section className={styles.exploreRecipes}>
+        <button className={styles.exploreButton} onClick={handleBrowseRecipes}>
+          Explore All Recipes
+        </button>
+      </section>
+
       {/* Testimonials Section */}
       <section className={styles.testimonials}>
         <h2>What Our Users Say</h2>
@@ -210,7 +216,7 @@ const FoodHomePage: React.FC = () => {
       </section>
 
       {/* Featured Chef Section */}
-      
+      {/* You can add the Featured Chef Section here */}
 
       {/* Newsletter Subscription Section */}
       <section className={styles.subscribe}>
