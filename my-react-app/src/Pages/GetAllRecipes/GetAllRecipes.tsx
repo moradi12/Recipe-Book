@@ -152,9 +152,7 @@ const GetAllRecipes: React.FC = () => {
             <p>
               <strong>Description:</strong> {recipe.description || "No Description"}
             </p>
-            <p>
-              <strong>Preparation Steps:</strong> {recipe.preparationSteps || "None"}
-            </p>
+           
             <p>
               <strong>Cooking Time:</strong> {recipe.cookingTime} minutes
             </p>
@@ -175,6 +173,9 @@ const GetAllRecipes: React.FC = () => {
               {recipe.categories && recipe.categories.length > 0
                 ? recipe.categories.join(", ")
                 : "Uncategorized"}
+            </p>
+            <p>
+              <strong>Preparation Steps:</strong> {recipe.preparationSteps || "None"}
             </p>
             <p>
               <strong>Created By:</strong> {recipe.createdByUsername || "Unknown"}
