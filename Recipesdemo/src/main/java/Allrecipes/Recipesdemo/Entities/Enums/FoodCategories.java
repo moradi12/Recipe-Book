@@ -16,7 +16,8 @@ public enum FoodCategories {
     BREAD("Bread"),
     BREAKFAST("Breakfast"),
     SEAFOOD("Seafood"),
-
+    BEEF ("Beef "),
+    MEXICAN("Mexican"),
     // Dietary preferences
     VEGETARIAN("Vegetarian"),
     VEGAN("Vegan"),

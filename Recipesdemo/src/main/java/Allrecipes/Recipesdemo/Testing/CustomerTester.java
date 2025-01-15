@@ -120,6 +120,8 @@ public class CustomerTester implements CommandLineRunner {
             Long seafoodCategoryId = categoryService.getCategoryByName(FoodCategories.SEAFOOD.name()).getId();
             Long veganCategoryId = categoryService.getCategoryByName(FoodCategories.VEGAN.name()).getId();
             Long breakfastCategoryId = categoryService.getCategoryByName(FoodCategories.BREAKFAST.name()).getId();
+            Long BeefCategoryId = categoryService.getCategoryByName(FoodCategories.BEEF.name()).getId();
+            Long mexicanCategoryId = categoryService.getCategoryByName(FoodCategories.MEXICAN.name()).getId();
 
             // Recipe 1
             RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
@@ -276,8 +278,78 @@ public class CustomerTester implements CommandLineRunner {
                     .photo(encodeImageToBase64("src/main/resources/images/recipes/Spaghetti.jpg"))
                     .build();
 
+
             Recipe pastaRecipe = recipeService.createRecipe(recipeRequest7, customer1);
             System.out.println("Added Recipe 7: " + pastaRecipe);
+
+            RecipeCreateRequest recipeRequest8 = RecipeCreateRequest.builder()
+                    .title("Mexican Tacos")
+                    .description("Delicious Mexican-style tacos with seasoned beef, fresh veggies, and spicy salsa.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Ground Beef", "500", "grams"),
+                            new IngredientRequest("Taco Shells", "10", "pieces"),
+                            new IngredientRequest("Lettuce", "1", "cup"),
+                            new IngredientRequest("Tomato", "2", "diced"),
+                            new IngredientRequest("Cheddar Cheese", "1", "cup"),
+                            new IngredientRequest("Salsa", "1/2", "cup")
+                    ))
+                    .preparationSteps("Cook the beef with spices, assemble tacos with toppings, and serve.")
+                    .cookingTime(15)
+                    .servings(4)
+                    .dietaryInfo("Main Dish")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(mexicanCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Mexican+Tacos.jpg"))
+                    .build();
+
+            Recipe tacosRecipe = recipeService.createRecipe(recipeRequest8, customer1);
+            System.out.println("Added Recipe 8: " + tacosRecipe);
+
+            // Recipe 9: Beef Steak Avocado Salad
+            RecipeCreateRequest recipeRequest9 = RecipeCreateRequest.builder()
+                    .title("Beef Steak ")
+                    .description("A protein-packed salad with juicy beef steak,")
+                    .ingredients(List.of(
+                            new IngredientRequest("Beef Steak", "300", "grams"),
+                            new IngredientRequest("Cherry Tomatoes", "1", "cup"),
+                            new IngredientRequest("Olive Oil", "2", "tbsp"),
+                            new IngredientRequest("Balsamic Vinegar", "1", "tbsp")
+                    ))
+                    .preparationSteps("Grill steak to desired doneness, Internal Temperature: 120°F - 125°F (49°C - 52°C)")
+                    .cookingTime(30)
+                    .servings(2)
+                    .dietaryInfo("Main Dish")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(BeefCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/steak.jpg"))
+                    .build();
+
+            Recipe steakSaladRecipe = recipeService.createRecipe(recipeRequest9, customer2);
+            System.out.println("Added Recipe 9: " + steakSaladRecipe);
+
+            // Recipe 10: Chicken and Avocado
+            RecipeCreateRequest recipeRequest10 = RecipeCreateRequest.builder()
+                    .title("Chicken and Avocado")
+                    .description("A quick and healthy dish with grilled chicken and creamy avocado slices.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Chicken Breast", "2", "pieces"),
+                            new IngredientRequest("Avocado", "1", "sliced"),
+                            new IngredientRequest("Lime Juice", "1", "tbsp"),
+                            new IngredientRequest("Garlic Powder", "1", "tsp"),
+                            new IngredientRequest("Salt", "1/2", "tsp"),
+                            new IngredientRequest("Black Pepper", "1/2", "tsp")
+                    ))
+                    .preparationSteps("Season chicken, grill until golden, and serve with avocado slices.")
+                    .cookingTime(20)
+                    .servings(2)
+                    .dietaryInfo("Main Dish")
+                    .containsGluten(false)
+                    .categoryIds(Set.of())
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Chicken-and-Avocado.jpg"))
+                    .build();
+
+            Recipe chickenAvocadoRecipe = recipeService.createRecipe(recipeRequest10, customer1);
+            System.out.println("Added Recipe 10: " + chickenAvocadoRecipe);
 
         } catch (Exception e) {
             System.err.println("Error adding recipes: " + e.getMessage());
