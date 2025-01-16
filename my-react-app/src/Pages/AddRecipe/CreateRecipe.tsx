@@ -122,7 +122,7 @@ const CreateRecipe: React.FC = () => {
     // Note: The API expects "categories" as an array of number IDs.
     const finalForm = {
       ...form,
-      categories: [selectedCategoryId],
+      categoryIds: [selectedCategoryId],
     };
 
     const storedJwt = sessionStorage.getItem("jwt");

@@ -16,6 +16,6 @@ export interface RecipeCreateRequest {
     photo?: string; 
     dietaryInfo?: string;
     containsGluten: boolean;
-    categories: number[]; // Array of category IDs if backend requires
+    categoryIds: number[]; // Array of category IDs if backend requires
     // Alternatively, use categories: Category[]; if backend expects full objects
 }
