@@ -54,23 +54,20 @@ const CreateRecipe: React.FC = () => {
       const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1]));
       setForm((prev) => ({
         ...prev,
-        createdBy: decodedJwt.sub, 
+        createdBy: decodedJwt.sub,
       }));
     }
   }, [setForm]);
 
   // Handle category selection
-  const handleCategoryChange = useCallback(
-    (value: string) => {
-      const parsedValue = Number(value);
-      if (!isNaN(parsedValue)) {
-        setSelectedCategoryId(parsedValue);
-      } else {
-        setSelectedCategoryId("");
-      }
-    },
-    []
-  );
+  const handleCategoryChange = useCallback((value: string) => {
+    const parsedValue = Number(value);
+    if (!isNaN(parsedValue)) {
+      setSelectedCategoryId(parsedValue);
+    } else {
+      setSelectedCategoryId("");
+    }
+  }, []);
 
   // Handle form submission
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -232,7 +229,7 @@ const CreateRecipe: React.FC = () => {
         />
 
         {/* Photo Uploader */}
-        <PhotoUploader 
+        <PhotoUploader
           onPhotoChange={handlePhotoChange}
           photoPreview={photoPreview}
         />
