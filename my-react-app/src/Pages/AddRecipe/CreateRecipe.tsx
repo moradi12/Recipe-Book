@@ -1,12 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { Category } from "../../Models/Category";
 import RecipeService from "../../Service/RecipeService";
 import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
+
 import useRecipeForm from "../Redux/Hooks/useRecipeForm";
+
+import CategorySelect from "./CategorySelect";
 import "./CreateRecipe.css";
-import IngredientItem from "./IngredientItem";
+import ErrorMessages from "./ErrorMessages";
+import IngredientsList from "./IngredientsList";
+import PhotoUploader from "./PhotoUploader";
 
 const CreateRecipe: React.FC = () => {
   const {
@@ -15,17 +21,15 @@ const CreateRecipe: React.FC = () => {
     errors,
     isSubmitting,
     handleChange,
-    handleIngredientChange,
     addIngredient,
     removeIngredient,
-    // We are not using handleSubmit from the hook
+    handleIngredientChange,
   } = useRecipeForm();
 
-  // We'll use the fetched categories to populate the dropdown.
   const [categories, setCategories] = useState<Category[]>([]);
-  // Now we store the selected category ID (a number) or an empty string.
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   // Fetch categories from backend
@@ -33,7 +37,6 @@ const CreateRecipe: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await RecipeService.getAllCategories();
-        // Assuming each category from the API includes an id and a name.
         setCategories(response.data);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -43,23 +46,22 @@ const CreateRecipe: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // Automatically set "createdBy" using checkData (for example, from a JWT)
+  // Automatically set "createdBy" using checkData
   useEffect(() => {
     checkData(); // Ensure the user is logged in
     const storedJwt = sessionStorage.getItem("jwt");
     if (storedJwt) {
-      const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1])); // Decode JWT payload
+      const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1]));
       setForm((prev) => ({
         ...prev,
-        createdBy: decodedJwt.sub, // Assuming "sub" is the user id or username
+        createdBy: decodedJwt.sub, 
       }));
     }
   }, [setForm]);
 
-  // Update the selectedCategoryId using the category's numeric id
+  // Handle category selection
   const handleCategoryChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value;
+    (value: string) => {
       const parsedValue = Number(value);
       if (!isNaN(parsedValue)) {
         setSelectedCategoryId(parsedValue);
@@ -70,56 +72,15 @@ const CreateRecipe: React.FC = () => {
     []
   );
 
-  // Handle photo selection and convert to base64 for both preview and form storage
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        // e.g., "data:image/png;base64,iVBORw0KG..."
-        const fullResult = reader.result;
-        const base64Part = fullResult.split(",")[1] || "";
-
-        // Store raw base64 in form state
-        setForm((prev) => ({
-          ...prev,
-          photo: base64Part,
-        }));
-        // Set the preview image
-        setPhotoPreview(fullResult);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Render error messages if any exist
-  const renderErrorMessages = useCallback(() => {
-    if (Object.keys(errors).length === 0) return null;
-    return (
-      <div className="error-messages">
-        <ul>
-          {Object.values(errors).map((error, idx) => (
-            <li key={idx}>{error}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }, [errors]);
-
-  // Form submission: Build the final request payload and call the API.
-  const onFormSubmit = async (e: React.FormEvent) => {
+  // Handle form submission
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Ensure that a valid category has been selected.
     if (selectedCategoryId === "") {
       notify.error("Please select a valid category.");
       return;
     }
 
-    // Build the request payload.
-    // Note: The API expects "categories" as an array of number IDs.
     const finalForm = {
       ...form,
       categoryIds: [selectedCategoryId],
@@ -142,14 +103,33 @@ const CreateRecipe: React.FC = () => {
     }
   };
 
+  // Handle photo selection and convert to base64
+  const handlePhotoChange = (file: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        const fullResult = reader.result;
+        const base64Part = fullResult.split(",")[1] || "";
+
+        setForm((prev) => ({
+          ...prev,
+          photo: base64Part,
+        }));
+        setPhotoPreview(fullResult);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="create-recipe-container">
       <h2>Create a New Recipe</h2>
 
-      {renderErrorMessages()}
+      <ErrorMessages errors={errors} />
 
-      <form onSubmit={onFormSubmit}>
-        {/* ===== Title ===== */}
+      <form onSubmit={handleFormSubmit}>
+        {/* Title */}
         <div className="form-group">
           <label htmlFor="title">Title*</label>
           <input
@@ -162,7 +142,7 @@ const CreateRecipe: React.FC = () => {
           {errors.title && <span className="error-text">{errors.title}</span>}
         </div>
 
-        {/* ===== Description ===== */}
+        {/* Description */}
         <div className="form-group">
           <label htmlFor="description">Description*</label>
           <textarea
@@ -176,32 +156,16 @@ const CreateRecipe: React.FC = () => {
           )}
         </div>
 
-        {/* ===== Ingredients ===== */}
-        <div className="form-group">
-          <label>Ingredients*</label>
-          {form.ingredients.map((ingredient, index) => (
-            <IngredientItem
-              key={index}
-              index={index}
-              ingredient={ingredient}
-              onChange={handleIngredientChange}
-              onRemove={removeIngredient}
-              canRemove={form.ingredients.length > 1}
-            />
-          ))}
-          {errors.ingredients && (
-            <span className="error-text">{errors.ingredients}</span>
-          )}
-          <button
-            type="button"
-            onClick={addIngredient}
-            className="add-ingredient-button"
-          >
-            Add Ingredient
-          </button>
-        </div>
+        {/* Ingredients List */}
+        <IngredientsList
+          ingredients={form.ingredients}
+          onIngredientChange={handleIngredientChange}
+          onRemoveIngredient={removeIngredient}
+          onAddIngredient={addIngredient}
+          error={errors.ingredients}
+        />
 
-        {/* ===== Preparation Steps ===== */}
+        {/* Preparation Steps */}
         <div className="form-group">
           <label htmlFor="preparationSteps">Preparation Steps*</label>
           <textarea
@@ -215,7 +179,7 @@ const CreateRecipe: React.FC = () => {
           )}
         </div>
 
-        {/* ===== Cooking Time ===== */}
+        {/* Cooking Time */}
         <div className="form-group">
           <label htmlFor="cookingTime">Cooking Time (minutes)*</label>
           <input
@@ -231,7 +195,7 @@ const CreateRecipe: React.FC = () => {
           )}
         </div>
 
-        {/* ===== Servings ===== */}
+        {/* Servings */}
         <div className="form-group">
           <label htmlFor="servings">Servings*</label>
           <input
@@ -247,7 +211,7 @@ const CreateRecipe: React.FC = () => {
           )}
         </div>
 
-        {/* ===== Dietary Info ===== */}
+        {/* Dietary Info */}
         <div className="form-group">
           <label htmlFor="dietaryInfo">Dietary Information</label>
           <input
@@ -259,47 +223,21 @@ const CreateRecipe: React.FC = () => {
           />
         </div>
 
-        {/* ===== Category ===== */}
-        <div className="form-group">
-          <label htmlFor="category">Category*</label>
-          <select
-            id="category"
-            value={selectedCategoryId}
-            onChange={handleCategoryChange}
-            required
-            className="add-recipe__select"
-          >
-            <option value="" disabled>
-              Select Category
-            </option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-          {errors.category && (
-            <span className="error-text">{errors.category}</span>
-          )}
-        </div>
+        {/* Category Select */}
+        <CategorySelect
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onChange={handleCategoryChange}
+          error={errors.category}
+        />
 
-        {/* ===== Photo ===== */}
-        <div className="form-group">
-          <label htmlFor="photo">Photo</label>
-          <input
-            type="file"
-            id="photo"
-            accept="image/*"
-            onChange={handlePhotoChange}
-          />
-          {photoPreview && (
-            <div className="photo-preview">
-              <img src={photoPreview} alt="Preview" className="preview-image" />
-            </div>
-          )}
-        </div>
+        {/* Photo Uploader */}
+        <PhotoUploader 
+          onPhotoChange={handlePhotoChange}
+          photoPreview={photoPreview}
+        />
 
-        {/* ===== Contains Gluten ===== */}
+        {/* Contains Gluten */}
         <div className="form-group checkbox-group">
           <label htmlFor="containsGluten">Contains Gluten</label>
           <input
@@ -310,12 +248,12 @@ const CreateRecipe: React.FC = () => {
           />
         </div>
 
-        {/* ===== Submit Errors ===== */}
+        {/* Submit Errors */}
         {errors.submit && (
           <div className="error-text submit-error">{errors.submit}</div>
         )}
 
-        {/* ===== Submit Button ===== */}
+        {/* Submit Button */}
         <button type="submit" className="submit-button" disabled={isSubmitting}>
           {isSubmitting ? "Creating..." : "Create Recipe"}
         </button>
