@@ -7,6 +7,7 @@ import Dashboard from "../../Dashboard/Dashboard";
 import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
+import GetSingleRecipe from "../../GetSingleRecipe/GetSingleRecipe";
 import HomePage from "../../HomePage/OldHomePage";
 import LoginForm from "../../Login/LoginForm";
 import { Page404 } from "../../Page404/Page404";
@@ -29,6 +30,7 @@ export function MainRoute(): JSX.Element {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/categories" element={<CategoryDropdown />} />
       <Route path="/create" element={<CreateRecipe />} />
+      <Route path="/recipes/:recipeId" element={<GetSingleRecipe />} />
 
       {/* Existing "All Recipes" route */}
       <Route path="/all/recipes" element={<GetAllRecipes />} />

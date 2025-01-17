@@ -1,7 +1,7 @@
-// src/Pages/GetAllRecipes/RecipeList.tsx
-
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { RecipeResponse } from "../../Models/RecipeResponse";
+import "./RecipeList.css";
 
 interface RecipeListProps {
   recipes: RecipeResponse[];
@@ -14,6 +14,8 @@ const RecipeList: React.FC<RecipeListProps> = ({
   onDeleteRecipe,
   onEditRecipe,
 }) => {
+  const navigate = useNavigate();
+
   if (!recipes.length) {
     return <p>No recipes found.</p>;
   }
@@ -75,16 +77,22 @@ const RecipeList: React.FC<RecipeListProps> = ({
           </ul>
 
           <button
-            className="edit-button"
+            className="button button-primary"
             onClick={() => onEditRecipe(recipe.id)}
           >
             Edit
           </button>
           <button
-            className="delete-button"
+            className="button button-danger"
             onClick={() => onDeleteRecipe(recipe.id)}
           >
             Delete
+          </button>
+          <button
+            className="button button-primary"
+            onClick={() => navigate(`/recipes/${recipe.id}`)}
+          >
+            View
           </button>
         </li>
       ))}

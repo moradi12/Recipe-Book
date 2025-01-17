@@ -29,6 +29,17 @@ class RecipeService {
   }
 
   // ===========================
+// GET RECIPE BY ID
+// ===========================
+// Calls: GET http://localhost:8080/api/recipes/{id}
+public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
+  return axios.get<RecipeResponse>(`${this.baseUrl}/${id}`);
+}
+
+
+
+
+  // ===========================
   // GET ALL CATEGORIES (Recipe-based endpoint)
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes/categories
@@ -133,5 +144,7 @@ class RecipeService {
     return axios.get<RecipeResponse[]>(url);
   }
 }
+
+
 
 export default RecipeService.getInstance();

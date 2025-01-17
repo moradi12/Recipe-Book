@@ -1,4 +1,3 @@
-// src/Navbar/Navbar.tsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -19,7 +18,7 @@ const Navbar: React.FC = () => {
 
   // Toggle the mobile menu
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
   const handleLogout = () => {
@@ -29,6 +28,7 @@ const Navbar: React.FC = () => {
     setIsOpen(false);
   };
 
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(`.${styles.navbar}`);
@@ -36,6 +36,7 @@ const Navbar: React.FC = () => {
         setIsOpen(false);
       }
     };
+
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -44,20 +45,22 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={styles.navbar}>
+      {/* Logo */}
       <div className={styles.logo}>
         <NavLink to="/" onClick={() => setIsOpen(false)}>
           Dessert Delights
         </NavLink>
       </div>
 
+      {/* Hamburger Menu */}
       <div className={styles.hamburger} onClick={toggleMenu}>
         <span className={styles.bar} />
         <span className={styles.bar} />
         <span className={styles.bar} />
       </div>
 
+      {/* Navigation Links */}
       <ul className={`${styles.navLinks} ${isOpen ? styles.active : ""}`}>
-        {/* Existing Links */}
         <li>
           <NavLink to="/" onClick={() => setIsOpen(false)}>
             Home
@@ -78,9 +81,6 @@ const Navbar: React.FC = () => {
             Features
           </NavLink>
         </li>
-       
-
-        {/* Add recipe pages */}
         <li>
           <NavLink to="/create" onClick={() => setIsOpen(false)}>
             Create Recipe
@@ -91,14 +91,13 @@ const Navbar: React.FC = () => {
             All Recipes
           </NavLink>
         </li>
-
         <li>
           <NavLink to="/contact" onClick={() => setIsOpen(false)}>
             Contact
           </NavLink>
         </li>
 
-        {/* Auth Links (Login / Register vs Logout) */}
+        {/* Auth Links */}
         {!isLogged ? (
           <>
             <li>
@@ -111,12 +110,13 @@ const Navbar: React.FC = () => {
                 Register
               </NavLink>
             </li>
-
-            
           </>
         ) : (
           <li>
-            <button className={styles.logoutButton} onClick={handleLogout}>
+            <button
+              className={`${styles.logoutButton} ${styles.button}`}
+              onClick={handleLogout}
+            >
               Logout
             </button>
           </li>
