@@ -122,7 +122,12 @@ public class CustomerTester implements CommandLineRunner {
             Long breakfastCategoryId = categoryService.getCategoryByName(FoodCategories.BREAKFAST.name()).getId();
             Long BeefCategoryId = categoryService.getCategoryByName(FoodCategories.BEEF.name()).getId();
             Long mexicanCategoryId = categoryService.getCategoryByName(FoodCategories.MEXICAN.name()).getId();
-
+            Long appetizerCategoryId = categoryService.getCategoryByName(FoodCategories.APPETIZER.name()).getId();
+            Long saladCategoryId = categoryService.getCategoryByName(FoodCategories.SALAD.name()).getId();
+            Long mainCourseCategoryId = categoryService.getCategoryByName(FoodCategories.MAIN_COURSE.name()).getId();
+            Long beverageCategoryId = categoryService.getCategoryByName(FoodCategories.BEVERAGE.name()).getId();
+            Long snackCategoryId = categoryService.getCategoryByName(FoodCategories.SNACK.name()).getId();
+            Long soupCategoryId = categoryService.getCategoryByName(FoodCategories.SOUP.name()).getId();
             // Recipe 1
             RecipeCreateRequest recipeRequest1 = RecipeCreateRequest.builder()
                     .title("Classic Pancakes")
@@ -344,12 +349,130 @@ public class CustomerTester implements CommandLineRunner {
                     .servings(2)
                     .dietaryInfo("Main Dish")
                     .containsGluten(false)
-                    .categoryIds(Set.of())
+                    .categoryIds(Set.of(saladCategoryId))
                     .photo(encodeImageToBase64("src/main/resources/images/recipes/Chicken-and-Avocado.jpg"))
                     .build();
 
             Recipe chickenAvocadoRecipe = recipeService.createRecipe(recipeRequest10, customer1);
             System.out.println("Added Recipe 10: " + chickenAvocadoRecipe);
+
+            // Recipe 11: Appetizer - Stuffed Mushrooms
+            RecipeCreateRequest recipeRequest11 = RecipeCreateRequest.builder()
+                    .title("Stuffed Mushrooms")
+                    .description("Juicy mushrooms stuffed with a cheesy herb filling, perfect for an appetizer.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Button Mushrooms", "12", "pieces"),
+                            new IngredientRequest("Cream Cheese", "100", "grams"),
+                            new IngredientRequest("Garlic", "2", "cloves"),
+                            new IngredientRequest("Parsley", "2", "tbsp"),
+                            new IngredientRequest("Parmesan Cheese", "50", "grams")
+                    ))
+                    .preparationSteps("Clean mushrooms, remove stems, mix filling ingredients, stuff mushrooms, and bake at 180°C for 15 minutes.")
+                    .cookingTime(15)
+                    .servings(4)
+                    .dietaryInfo("Vegetarian")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(appetizerCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/StuffedMushrooms.jpg"))
+                    .build();
+
+            Recipe stuffedMushroomsRecipe = recipeService.createRecipe(recipeRequest11, customer2);
+            System.out.println("Added Recipe 11: " + stuffedMushroomsRecipe);
+
+            // Recipe 12: Main Course - Herb-Crusted Chicken
+            RecipeCreateRequest recipeRequest12 = RecipeCreateRequest.builder()
+                    .title("Herb-Crusted Chicken")
+                    .description("Juicy chicken breast coated in a flavorful herb crust.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Chicken Breast", "2", "pieces"),
+                            new IngredientRequest("Breadcrumbs", "1", "cup"),
+                            new IngredientRequest("Parsley", "2", "tbsp"),
+                            new IngredientRequest("Garlic Powder", "1", "tsp"),
+                            new IngredientRequest("Salt", "1", "tsp")
+                    ))
+                    .preparationSteps("Coat chicken in herb mixture, bake at 200°C for 25 minutes.")
+                    .cookingTime(25)
+                    .servings(2)
+                    .dietaryInfo("Main Course")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(mainCourseCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/HerbCrustedChicken.jpg"))
+                    .build();
+
+            Recipe herbCrustedChickenRecipe = recipeService.createRecipe(recipeRequest12, customer1);
+            System.out.println("Added Recipe 12: " + herbCrustedChickenRecipe);
+
+            // Recipe 13: Beverage - Fresh Lemonade
+            RecipeCreateRequest recipeRequest13 = RecipeCreateRequest.builder()
+                    .title("Fresh Lemonade")
+                    .description("Refreshing homemade lemonade with a hint of mint.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Lemon Juice", "1/2", "cup"),
+                            new IngredientRequest("Water", "4", "cups"),
+                            new IngredientRequest("Sugar", "1/4", "cup"),
+                            new IngredientRequest("Mint Leaves", "5", "leaves")
+                    ))
+                    .preparationSteps("Mix ingredients, chill, and serve over ice.")
+                    .cookingTime(5)
+                    .servings(4)
+                    .dietaryInfo("Beverage")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(beverageCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/FreshLemonade.jpg"))
+                    .build();
+
+            Recipe freshLemonadeRecipe = recipeService.createRecipe(recipeRequest13, customer1);
+            System.out.println("Added Recipe 13: " + freshLemonadeRecipe);
+
+            // Recipe 14: Snack - Cheesy Nachos
+            RecipeCreateRequest recipeRequest14 = RecipeCreateRequest.builder()
+                    .title("Cheesy Nachos")
+                    .description("Crispy tortilla chips topped with melted cheese and jalapeños.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Tortilla Chips", "200", "grams"),
+                            new IngredientRequest("Cheddar Cheese", "1", "cup"),
+                            new IngredientRequest("Jalapeños", "1/4", "cup"),
+                            new IngredientRequest("Sour Cream", "1/2", "cup")
+                    ))
+                    .preparationSteps("Layer chips with cheese and jalapeños, bake at 180°C for 10 minutes, serve with sour cream.")
+                    .cookingTime(10)
+                    .servings(2)
+                    .dietaryInfo("Snack")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(snackCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/CheesyNachos.jpg"))
+                    .build();
+
+            Recipe cheesyNachosRecipe = recipeService.createRecipe(recipeRequest14, customer2);
+            System.out.println("Added Recipe 14: " + cheesyNachosRecipe);
+
+            // Recipe 15: Soup - Creamy Tomato Soup
+            RecipeCreateRequest recipeRequest15 = RecipeCreateRequest.builder()
+                    .title("Creamy Tomato Soup")
+                    .description("A warm and comforting tomato soup with a creamy texture.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Tomatoes", "6", "large"),
+                            new IngredientRequest("Onion", "1", "large"),
+                            new IngredientRequest("Heavy Cream", "1/2", "cup"),
+                            new IngredientRequest("Vegetable Broth", "2", "cups"),
+                            new IngredientRequest("Garlic", "2", "cloves")
+                    ))
+                    .preparationSteps("Cook tomatoes and onion, blend with broth and cream, simmer for 10 minutes.")
+                    .cookingTime(20)
+                    .servings(4)
+                    .dietaryInfo("Soup")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(soupCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/CreamyTomatoSoup.jpg"))
+                    .build();
+
+            Recipe creamyTomatoSoupRecipe = recipeService.createRecipe(recipeRequest15, customer1);
+            System.out.println("Added Recipe 15: " + creamyTomatoSoupRecipe);
+
+
+
+
+
 
         } catch (Exception e) {
             System.err.println("Error adding recipes: " + e.getMessage());
