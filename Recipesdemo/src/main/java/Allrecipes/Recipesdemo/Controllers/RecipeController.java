@@ -90,7 +90,7 @@ public class RecipeController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{Oid}")
+    @GetMapping("/old/{id}")
     public ResponseEntity<?> OldgetRecipeById(@PathVariable Long id) {
         try {
             log.debug("Fetching recipe with ID: {}", id); // New line

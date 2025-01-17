@@ -18,10 +18,12 @@ const GetSingleRecipe: React.FC = () => {
       try {
         setLoading(true);
         setError("");
+
         if (!recipeId) {
           setError("Invalid recipe ID.");
           return;
         }
+
         const response = await RecipeService.getRecipeById(Number(recipeId));
         setRecipe(response.data);
       } catch (err: unknown) {
@@ -45,11 +47,56 @@ const GetSingleRecipe: React.FC = () => {
 
   return (
     <div className="get-single-recipe">
-      <h2>{recipe.title}</h2>
-      <p><strong>Description:</strong> {recipe.description}</p>
-      <p><strong>Ingredients:</strong> {recipe.ingredients?.join(", ")}</p>
-      <p><strong>Categories:</strong> {recipe.categories?.join(", ")}</p>
-      <button onClick={() => navigate("/recipes")}>Back to Recipes</button>
+      <div className="recipe-header">
+        <h2>{recipe.title}</h2>
+        {recipe.photo && (
+          <img
+            src={`data:image/png;base64,${recipe.photo}`}
+            alt={recipe.title}
+            className="recipe-photo"
+          />
+        )}
+      </div>
+
+      <div className="recipe-details">
+        <p>
+          <strong>Description:</strong> {recipe.description || "No description provided."}
+        </p>
+        <p>
+          <strong>Ingredients:</strong>{" "}
+          {recipe.ingredients?.length > 0 ? recipe.ingredients.join(", ") : "No ingredients listed."}
+        </p>
+        <p>
+          <strong>Categories:</strong>{" "}
+          {recipe.categories?.length > 0 ? recipe.categories.join(", ") : "Uncategorized"}
+        </p>
+        <p>
+          <strong>Cooking Time:</strong> {recipe.cookingTime} minutes
+        </p>
+        <p>
+          <strong>Servings:</strong> {recipe.servings}
+        </p>
+        <p>
+          <strong>Dietary Info:</strong> {recipe.dietaryInfo || "N/A"}
+        </p>
+        <p>
+          <strong>Contains Gluten:</strong> {recipe.containsGluten ? "Yes" : "No"}
+        </p>
+        <p>
+          <strong>Status:</strong> {recipe.status || "Unknown"}
+        </p>
+        <p>
+          <strong>Preparation Steps:</strong>{" "}
+          {recipe.preparationSteps || "No preparation steps provided."}
+        </p>
+        <p>
+          <strong>Created By:</strong> {recipe.createdByUsername || "Unknown"}
+        </p>
+      </div>
+
+      <button className="back-button" onClick={() => navigate("/recipes")}>
+        Back to Recipes
+      </button>
     </div>
   );
 };
