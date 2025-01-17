@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { registerUser } from "../../Utiles/AuthService";
+import { registerUser } from "../../Utiles/authService";
 import { notify } from "../../Utiles/notif";
 import { authState, loginAction } from "../Redux/AuthReducer";
-import { AppDispatch } from "../Redux/store"; // typed dispatch
-import "./RegisterForm.css"; // optional CSS file
+import { AppDispatch } from "../Redux/store";
+import "./RegisterForm.css";
 
 const RegisterForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,23 +17,19 @@ const RegisterForm: React.FC = () => {
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
 
-    // 1. Basic front-end password length check (optional)
     if (password.length < 6) {
       notify.error("Password must be at least 6 characters long.");
       return;
     }
 
-    // 2. Check if passwords match
     if (password !== confirmPassword) {
       notify.error("Passwords do not match.");
       return;
     }
 
     try {
-      // 3. Make the backend request
       const response = await registerUser({ username, email, password });
 
-      // 4. Build a new authState object
       const userState: authState = {
         email: response.email,
         name: response.username,
@@ -43,16 +39,12 @@ const RegisterForm: React.FC = () => {
         isLogged: true,
       };
 
-      // 5. Dispatch login action to update Redux store
       dispatch(loginAction(userState));
 
-      // 6. Save token to sessionStorage
       sessionStorage.setItem("jwt", response.token);
 
-      // 7. Notify success
       notify.success("Registration Successful!");
     } catch (err: unknown) {
-      // Display or log error message
       notify.error("Registration Failed");
       console.error(err);
     }

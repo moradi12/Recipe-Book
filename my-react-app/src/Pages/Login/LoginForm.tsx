@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom"; // <-- for navigation
-import { loginUser } from "../../Utiles/AuthService";
+import { loginUser } from "../../Utiles/authService";
 import { notify } from "../../Utiles/notif";
 import { authState, loginAction } from "../Redux/AuthReducer";
 import { AppDispatch } from "../Redux/store";
@@ -32,20 +32,13 @@ const LoginForm: React.FC = () => {
         userType: response.userType,
         isLogged: true,
       };
-
-      // 3) Dispatch to Redux
       dispatch(loginAction(userState));
-
-      // 4) Save token to sessionStorage for refresh persistence
       sessionStorage.setItem("jwt", response.token);
 
-      // 5) Notify success
       notify.success("Login Successful!");
-
-      // 6) Navigate to root (http://localhost:5173/)
       navigate("/");
     } catch (err: unknown) {
-      notify.error("Login Failed");
+      notify.error("Login Failed please check your credentials");
       console.error(err);
     }
   }

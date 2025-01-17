@@ -5,8 +5,8 @@ import "./RecipeList.css";
 
 interface RecipeListProps {
   recipes: RecipeResponse[];
-  onDeleteRecipe: (id: number) => void;
-  onEditRecipe: (id: number) => void;
+  onDeleteRecipe?: (id: number) => void; // Optional for admins only
+  onEditRecipe?: (id: number) => void; // Optional for admins only
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
@@ -76,18 +76,26 @@ const RecipeList: React.FC<RecipeListProps> = ({
             ))}
           </ul>
 
-          <button
-            className="button button-primary"
-            onClick={() => onEditRecipe(recipe.id)}
-          >
-            Edit
-          </button>
-          <button
-            className="button button-danger"
-            onClick={() => onDeleteRecipe(recipe.id)}
-          >
-            Delete
-          </button>
+          {/* Conditionally render Edit button */}
+          {onEditRecipe && (
+            <button
+              className="button button-primary"
+              onClick={() => onEditRecipe(recipe.id)}
+            >
+              Edit
+            </button>
+          )}
+
+          {/* Conditionally render Delete button */}
+          {onDeleteRecipe && (
+            <button
+              className="button button-danger"
+              onClick={() => onDeleteRecipe(recipe.id)}
+            >
+              Delete
+            </button>
+          )}
+
           <button
             className="button button-primary"
             onClick={() => navigate(`/recipes/${recipe.id}`)}

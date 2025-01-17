@@ -1,6 +1,7 @@
 // src/Pages/GetAllRecipes/GetAllRecipes.tsx
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Category } from "../../Models/Category";
 import { RecipeResponse } from "../../Models/RecipeResponse";
@@ -8,18 +9,17 @@ import RecipeService, { PaginatedRecipes } from "../../Service/RecipeService";
 import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
 import { recipeSystem } from "../Redux/store";
-
 import CategoryFilter from "./CategoryFilter";
+import "./GetAllRecipes.css";
 import PaginationControls from "./PaginationControls";
 import RecipeList from "./RecipeList";
-
-import "./GetAllRecipes.css";
 
 const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("");
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const auth = useSelector((state: any) => state.auth); // Update the type as needed
   const [pagination, setPagination] = useState({
     page: 0,
     size: 10,
@@ -61,7 +61,9 @@ const GetAllRecipes: React.FC = () => {
       setLoading(true);
       setError("");
 
-      const categoryParam = filterCategory || undefined;
+      // Convert the selected category (string) to a number, if set.
+      const categoryParam = filterCategory ? Number(filterCategory) : undefined;
+
       console.log("Fetching recipes with:", {
         page: pagination.page,
         size: pagination.size,
@@ -105,6 +107,11 @@ const GetAllRecipes: React.FC = () => {
         return;
       }
 
+      if (auth.userType !== "ADMIN") {
+        notify.error("Unauthorized: Only admins can delete recipes.");
+        return;
+      }
+
       if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
           await RecipeService.deleteRecipe(id, token);
@@ -121,7 +128,7 @@ const GetAllRecipes: React.FC = () => {
         }
       }
     },
-    [fetchRecipes]
+    [auth.userType, fetchRecipes]
   );
 
   // Fetch categories on mount
@@ -156,8 +163,14 @@ const GetAllRecipes: React.FC = () => {
       {/* Recipe List */}
       <RecipeList
         recipes={recipes}
-        onDeleteRecipe={handleDeleteRecipe}
-        onEditRecipe={(recipeId) => navigate(`/edit-recipe/${recipeId}`)}
+        onDeleteRecipe={
+          auth.userType === "ADMIN" ? handleDeleteRecipe : undefined
+        }
+        onEditRecipe={
+          auth.userType === "ADMIN"
+            ? (recipeId) => navigate(`/edit-recipe/${recipeId}`)
+            : undefined
+        }
       />
 
       {/* Pagination */}

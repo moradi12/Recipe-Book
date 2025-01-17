@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ import javax.security.auth.login.LoginException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -105,71 +107,46 @@ public class RecipeController {
         }
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getRecipeById(@PathVariable String id) {
-//        try {
-//            Long recipeId = Long.parseLong(id);
-//            Recipe recipe = recipeService.getRecipeById(recipeId);
-//            return ResponseEntity.ok(recipe);
-//        } catch (NumberFormatException e) {
-//            log.warn("Invalid recipe ID format: {}", id);
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body("Recipe ID must be a numeric value.");
-//        } catch (RecipeNotFoundException e) {
-//            log.warn("Recipe not found for ID: {}", id);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(String.format("Recipe with ID %s not found.", id));
-//        } catch (Exception e) {
-//            log.error("Error retrieving recipe with ID: {}", id, e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("An unexpected error occurred.");
-//        }
-//    }
+    @GetMapping
+    public ResponseEntity<?> getAllRecipes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long category) {
+        try {
+            log.debug("Fetching recipes with pagination - Page: {}, Size: {}, Category: {}", page, size, category);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<RecipeResponse> resultPage;
 
-//    @GetMapping
-//    public ResponseEntity<?> getAllRecipes(@RequestParam(defaultValue = "0") int page,
-//                                           @RequestParam(defaultValue = "10") int size) {
-//        try {
-//            log.debug("Fetching all recipes with pagination - Page: {}, Size: {}", page, size);
-//            Pageable pageable = PageRequest.of(page, size);
-//            Page<RecipeResponse> resultPage = recipeService.getAllRecipesWithResponse(pageable);
-//            log.info("Retrieved {} recipes.", resultPage.getTotalElements());
-//
-//            Map<String, Object> responseBody = new HashMap<>();
-//            responseBody.put("content", resultPage.getContent());
-//            responseBody.put("totalPages", resultPage.getTotalPages());
-//            responseBody.put("totalElements", resultPage.getTotalElements());
-//            responseBody.put("size", resultPage.getSize());
-//            responseBody.put("number", resultPage.getNumber());
-//
-//            return ResponseEntity.ok(responseBody);
-//        } catch (Exception e) {
-//            log.error("Error retrieving all recipes.", e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ErrorMessages.INTERNAL_ERROR);
-//        }
-//    }
-@GetMapping
-public ResponseEntity<?> getAllRecipes(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-    try {
-        log.debug("Fetching all recipes with pagination - Page: {}, Size: {}", page, size); // New line
-        Pageable pageable = PageRequest.of(page, size);
-        Page<RecipeResponse> resultPage = recipeService.getAllRecipesWithResponse(pageable);
-        log.info("Retrieved {} recipes.", resultPage.getTotalElements()); // New line
+            if (category != null) {
+                // Fetch recipes that belong to the given category
+                Page<Recipe> recipePage = recipeService.getRecipesByCategory(category, pageable);
+                // Map each Recipe to RecipeResponse
+                List<RecipeResponse> responses = recipePage.getContent()
+                        .stream()
+                        .map(RecipeMapper::toRecipeResponse)
+                        .collect(Collectors.toList());
+                // Create a PageImpl containing the response objects
+                resultPage = new PageImpl<>(responses, pageable, recipePage.getTotalElements());
+            } else {
+                // If no category is provided, fetch all recipes with response mapping
+                resultPage = recipeService.getAllRecipesWithResponse(pageable);
+            }
 
-        Map<String, Object> responseBody = new HashMap<>(); // New line
-        responseBody.put("content", resultPage.getContent());
-        responseBody.put("totalPages", resultPage.getTotalPages());
-        responseBody.put("totalElements", resultPage.getTotalElements());
-        responseBody.put("size", resultPage.getSize());
-        responseBody.put("number", resultPage.getNumber());
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("content", resultPage.getContent());
+            responseBody.put("totalPages", resultPage.getTotalPages());
+            responseBody.put("totalElements", resultPage.getTotalElements());
+            responseBody.put("size", resultPage.getSize());
+            responseBody.put("number", resultPage.getNumber());
 
-        return ResponseEntity.ok(responseBody);
-    } catch (Exception e) {
-        log.error("Error retrieving all recipes.", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessages.INTERNAL_ERROR);
+            log.info("Retrieved {} recipes.", resultPage.getTotalElements());
+            return ResponseEntity.ok(responseBody);
+        } catch (Exception e) {
+            log.error("Error retrieving recipes.", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ErrorMessages.INTERNAL_ERROR);
+        }
     }
-}
 
 
 //    @PutMapping("/{id}")

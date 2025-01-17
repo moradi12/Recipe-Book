@@ -46,7 +46,13 @@ public class RecipeService {
             System.err.println("Error saving photo: " + e.getMessage());
         }}
 
+    public Page<Recipe> getRecipesByCategory(Long categoryId, Pageable pageable) {
+        return recipeRepository.findByCategoryId(categoryId, pageable);
+    }
 
+    public Page<Recipe> getAllRecipes(Pageable pageable) {
+        return recipeRepository.findAll(pageable);
+    }
 
 
     @Value("${app.recipe-photos.directory}")

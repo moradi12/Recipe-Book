@@ -31,4 +31,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("UPDATE Recipe r SET r.photo = :photo WHERE r.id = :id")
     void updatePhoto(@Param("id") Long id, @Param("photo") Blob photo);
 
+
+    @Query("SELECT r FROM Recipe r JOIN r.categories c WHERE c.id = :categoryId")
+    Page<Recipe> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 }

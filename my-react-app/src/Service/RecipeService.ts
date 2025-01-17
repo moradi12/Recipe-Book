@@ -71,20 +71,21 @@ public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
   // GET ALL RECIPES (Paginated + optional category)
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes?page=X&size=Y&category=Z
-  public async getAllRecipesPaginated(
-    pageNumber: number,
-    pageSize: number,
-    category?: string
-  ): Promise<AxiosResponse<PaginatedRecipes>> {
-    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
+// GET ALL RECIPES (Paginated + optional category)
+// GET ALL RECIPES (Paginated + optional category)
+public async getAllRecipesPaginated(
+  pageNumber: number,
+  pageSize: number,
+  category?: number
+): Promise<AxiosResponse<PaginatedRecipes>> {
+  let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
 
-    if (category) {
-      url += `&category=${encodeURIComponent(category)}`;
-    }
-
-    return axios.get<PaginatedRecipes>(url);
+  if (category !== undefined) {
+    url += `&category=${encodeURIComponent(String(category))}`;
   }
 
+  return axios.get<PaginatedRecipes>(url);
+}
   // ===========================
   // CREATE RECIPE
   // ===========================

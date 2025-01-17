@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { Category } from "../../Models/Category";
 import RecipeService from "../../Service/RecipeService";
-import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
 
 import useRecipeForm from "../Redux/Hooks/useRecipeForm";
@@ -15,6 +15,10 @@ import IngredientsList from "./IngredientsList";
 import PhotoUploader from "./PhotoUploader";
 
 const CreateRecipe: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const auth = useSelector((state: any) => state.auth); // Replace `any` with the appropriate type for your auth state
+  const navigate = useNavigate();
+
   const {
     form,
     setForm,
@@ -30,9 +34,14 @@ const CreateRecipe: React.FC = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  // Redirect if user is not logged in
+  useEffect(() => {
+    if (!auth.isLogged) {
+      notify.error("You must log in to create a recipe.");
+      navigate("/login"); 
+    }
+  }, [auth.isLogged, navigate]);
 
-  // Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -45,19 +54,6 @@ const CreateRecipe: React.FC = () => {
     };
     fetchCategories();
   }, []);
-
-  // Automatically set "createdBy" using checkData
-  useEffect(() => {
-    checkData(); // Ensure the user is logged in
-    const storedJwt = sessionStorage.getItem("jwt");
-    if (storedJwt) {
-      const decodedJwt = JSON.parse(atob(storedJwt.split(".")[1]));
-      setForm((prev) => ({
-        ...prev,
-        createdBy: decodedJwt.sub,
-      }));
-    }
-  }, [setForm]);
 
   // Handle category selection
   const handleCategoryChange = useCallback((value: string) => {
@@ -83,14 +79,15 @@ const CreateRecipe: React.FC = () => {
       categoryIds: [selectedCategoryId],
     };
 
-    const storedJwt = sessionStorage.getItem("jwt");
-    if (!storedJwt) {
+    const token = sessionStorage.getItem("jwt");
+    if (!token) {
       notify.error("Please log in to create a recipe.");
+      navigate("/login");
       return;
     }
 
     try {
-      const response = await RecipeService.createRecipe(finalForm, storedJwt);
+      const response = await RecipeService.createRecipe(finalForm, token);
       console.log("Created Recipe Response:", response.data);
       notify.success("Recipe created successfully!");
       navigate("/all/recipes");
@@ -118,6 +115,10 @@ const CreateRecipe: React.FC = () => {
     };
     reader.readAsDataURL(file);
   };
+
+  if (!auth.isLogged) {
+    return null; // Prevent rendering the component while redirecting
+  }
 
   return (
     <div className="create-recipe-container">
