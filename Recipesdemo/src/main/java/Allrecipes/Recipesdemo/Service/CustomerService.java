@@ -25,9 +25,6 @@ public class CustomerService {
         this.recipeRepository = recipeRepository;
     }
 
-    /**
-     * Seeds an admin user upon application startup if it doesn't already exist.
-     */
     @PostConstruct
     @Transactional
     public void seedAdminUser() {
@@ -42,14 +39,7 @@ public class CustomerService {
         }
     }
 
-    /**
-     * Authenticates a user based on username/email and password.
-     *
-     * @param usernameOrEmail The username or email of the user.
-     * @param rawPassword     The plain-text password of the user.
-     * @return The authenticated User object.
-     * @throws UserNotFoundException If the user is not found or the password is incorrect.
-     */
+
     @Transactional(readOnly = true)
     public User login(String usernameOrEmail, String rawPassword) {
         User user = userRepository.findByUsername(usernameOrEmail)
@@ -64,17 +54,6 @@ public class CustomerService {
         return user;
     }
 
-    /**
-     * Registers a new user with the given details.
-     *
-     * @param username    The desired username.
-     * @param email       The user's email address.
-     * @param rawPassword The user's plain-text password.
-     * @return The registered User object.
-     * @throws UsernameAlreadyTakenException If the username is already in use.
-     * @throws EmailAlreadyTakenException    If the email is already in use.
-     * @throws IllegalArgumentException      If any input data is invalid.
-     */
     @Transactional
     public User registerUser(String username, String email, String rawPassword) {
         validateRegistrationData(username, email, rawPassword);
@@ -96,14 +75,7 @@ public class CustomerService {
         return userRepository.save(user);
     }
 
-    /**
-     * Validates the registration data.
-     *
-     * @param username    The desired username.
-     * @param email       The user's email address.
-     * @param rawPassword The user's plain-text password.
-     * @throws IllegalArgumentException If any input data is invalid.
-     */
+
     private void validateRegistrationData(String username, String email, String rawPassword) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("Username cannot be null or empty.");
@@ -116,44 +88,24 @@ public class CustomerService {
         }
     }
 
-    /**
-     * Finds a user by either username or email.
-     *
-     * @param usernameOrEmail The username or email to search for.
-     * @return An Optional containing the User if found, or empty otherwise.
-     */
     @Transactional(readOnly = true)
     public Optional<User> findByUsernameOrEmail(String usernameOrEmail) {
         return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
     }
 
-    /**
-     * Finds a user by their ID.
-     *
-     * @param id The ID of the user.
-     * @return An Optional containing the User if found, or empty otherwise.
-     */
+
     @Transactional(readOnly = true)
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
-    /**
-     * Retrieves all users in the system.
-     *
-     * @return A list of all User objects.
-     */
+
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    /**
-     * Deletes a user by their ID.
-     *
-     * @param id The ID of the user to delete.
-     * @throws UserNotFoundException If the user with the given ID does not exist.
-     */
+
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
@@ -162,12 +114,7 @@ public class CustomerService {
         userRepository.deleteById(id);
     }
 
-    /**
-     * Converts a User entity to a UserResponse DTO.
-     *
-     * @param user The User entity.
-     * @return The UserResponse DTO.
-     */
+
     @Transactional(readOnly = true)
     public UserResponse toUserResponse(User user) {
         return UserResponse.builder()
@@ -183,11 +130,7 @@ public class CustomerService {
                 .build();
     }
 
-    /**
-     * Retrieves all users and maps them to UserResponse DTOs.
-     *
-     * @return A list of UserResponse DTOs.
-     */
+
     @Transactional(readOnly = true)
     public List<UserResponse> getAllUserResponses() {
         return userRepository.findAll().stream()
@@ -195,17 +138,7 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Updates a user's details.
-     *
-     * @param userId      The ID of the user to update.
-     * @param newUsername The new username (optional).
-     * @param newEmail    The new email (optional).
-     * @param newPassword The new password (optional).
-     * @throws UserNotFoundException         If the user with the given ID does not exist.
-     * @throws UsernameAlreadyTakenException If the new username is already in use.
-     * @throws EmailAlreadyTakenException    If the new email is already in use.
-     */
+
     @Transactional
     public void updateUser(Long userId, String newUsername, String newEmail, String newPassword) {
         User user = userRepository.findById(userId)
@@ -232,14 +165,7 @@ public class CustomerService {
         userRepository.save(user);
     }
 
-    /**
-     * Adds a recipe to a user's favorites.
-     *
-     * @param user     The User entity.
-     * @param recipeId The ID of the recipe to add.
-     * @throws RecipeNotFoundException If the recipe does not exist.
-     * @throws IllegalArgumentException If the recipe is already in favorites.
-     */
+
     @Transactional
     public void addFavoriteRecipe(User user, Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
@@ -251,14 +177,7 @@ public class CustomerService {
         userRepository.save(user);
     }
 
-    /**
-     * Removes a recipe from a user's favorites.
-     *
-     * @param user     The User entity.
-     * @param recipeId The ID of the recipe to remove.
-     * @throws RecipeNotFoundException If the recipe does not exist.
-     * @throws IllegalArgumentException If the recipe is not in favorites.
-     */
+
     @Transactional
     public void removeFavoriteRecipe(User user, Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
@@ -270,13 +189,6 @@ public class CustomerService {
         userRepository.save(user);
     }
 
-    /**
-     * Assigns a new user type to a user.
-     *
-     * @param userId      The ID of the user.
-     * @param newUserType The new UserType to assign.
-     * @throws UserNotFoundException If the user with the given ID does not exist.
-     */
     @Transactional
     public void assignUserTypeToUser(Long userId, UserType newUserType) {
         User user = userRepository.findById(userId)

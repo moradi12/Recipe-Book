@@ -12,30 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor // Lombok annotation to generate constructor for final fields
+@RequiredArgsConstructor
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
-    /**
-     * Retrieves a category by its name.
-     *
-     * @param name The name of the category.
-     * @return The Category object if found, else null.
-     */
     @Transactional(readOnly = true)
     public Category getCategoryByName(String name) {
         logger.debug("Fetching category with name: {}", name);
         return categoryRepository.findByName(name).orElse(null);
     }
 
-    /**
-     * Creates a new category based on the provided FoodCategories enum.
-     *
-     * @param foodCategory The FoodCategories enum representing the category.
-     * @return The created or existing Category object.
-     */
     @Transactional
     public Category createCategory(FoodCategories foodCategory) {
         String categoryName = foodCategory.name();
@@ -52,58 +40,33 @@ public class CategoryService {
                 });
     }
 
-    /**
-     * Retrieves all categories.
-     *
-     * @return A list of all Category objects.
-     */
+
     @Transactional(readOnly = true)
     public List<Category> getAllCategories() {
         logger.debug("Fetching all categories.");
         return categoryRepository.findAll();
     }
 
-    /**
-     * Searches for categories containing the specified keyword in their name, case-insensitive.
-     *
-     * @param keyword The keyword to search for.
-     * @return A list of matching Category objects.
-     */
+
     @Transactional(readOnly = true)
     public List<Category> searchCategoriesByName(String keyword) {
         logger.debug("Searching categories with keyword: {}", keyword);
         return categoryRepository.findByNameContainingIgnoreCase(keyword);
     }
 
-    /**
-     * Retrieves all categories sorted by their name in ascending order.
-     *
-     * @return A list of sorted Category objects.
-     */
     @Transactional(readOnly = true)
     public List<Category> getCategoriesSortedByName() {
         logger.debug("Fetching all categories sorted by name in ascending order.");
         return categoryRepository.findAllByOrderByNameAsc();
     }
 
-    /**
-     * Checks if a category exists by its name.
-     *
-     * @param name The name of the category.
-     * @return True if the category exists, else false.
-     */
+
     @Transactional(readOnly = true)
     public boolean categoryExists(String name) {
         logger.debug("Checking existence of category with name: {}", name);
         return categoryRepository.existsByName(name);
     }
 
-    /**
-     * Deletes a category by its name.
-     *
-     * @param name The name of the category to delete.
-     * @throws IllegalArgumentException If the category does not exist.
-     */
     @Transactional
     public void deleteCategoryByName(String name) {
         logger.debug("Attempting to delete category with name: {}", name);
@@ -116,12 +79,6 @@ public class CategoryService {
         }
     }
 
-    /**
-     * Retrieves categories by their IDs.
-     *
-     * @param ids A list of category IDs.
-     * @return A list of matching Category objects.
-     */
     @Transactional(readOnly = true)
     public List<Category> getCategoriesByIds(List<Long> ids) {
         logger.debug("Fetching categories with IDs: {}", ids);

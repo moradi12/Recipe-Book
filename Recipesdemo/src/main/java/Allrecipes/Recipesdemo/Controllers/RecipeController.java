@@ -64,27 +64,6 @@ public class RecipeController {
         }
     }
 
-//    @PostMapping
-//    public ResponseEntity<?> createRecipe(@RequestBody RecipeCreateRequest request,
-//                                          HttpServletRequest httpRequest) {
-//        try {
-//            log.debug("Attempting to create a new recipe.");
-//            User user = getCurrentUser(httpRequest);
-//            recipeService.createRecipe(request, user);
-//            log.info("Recipe created successfully by User ID: {}", user.getId());
-//            return ResponseEntity.status(HttpStatus.CREATED)
-//                    .body("Recipe created successfully.");
-//        } catch (IllegalArgumentException e) {
-//            log.warn("Recipe creation failed: {}", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(String.format(ErrorMessages.INVALID_REQUEST, e.getMessage()));
-//        } catch (Exception e) {
-//            log.error("Error creating recipe.", e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ErrorMessages.INTERNAL_ERROR);
-//        }
-//    }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecipeById(@PathVariable Long id) {
         Recipe recipe = recipeService.getRecipeById(id);
@@ -149,51 +128,26 @@ public class RecipeController {
     }
 
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> updateRecipe(@PathVariable Long id,
-//                                          @Valid @RequestBody RecipeCreateRequest request,
-//                                          HttpServletRequest httpRequest) {
-//        User user = null;
-//        try {
-//            log.debug("Attempting to update recipe with ID: {}", id);
-//            user = getCurrentUser(httpRequest);
-//            recipeService.updateRecipe(id, request, user);
-//            log.info("Recipe with ID {} updated successfully by User ID {}", id, user.getId());
-//            return ResponseEntity.ok("Recipe updated successfully.");
-//        } catch (RecipeNotFoundException e) {
-//            log.warn("Recipe not found for update: {}", id);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(String.format(ErrorMessages.RECIPE_NOT_FOUND, id));
-//        } catch (UnauthorizedActionException e) {
-//            log.warn("Unauthorized update attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(ErrorMessages.UNAUTHORIZED_ACTION);
-//        } catch (Exception e) {
-//            log.error("Error updating recipe with ID: {}", id, e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ErrorMessages.INTERNAL_ERROR);
-//        }
-//    }
-@PutMapping("/{id}")
-public ResponseEntity<?> updateRecipe(@PathVariable Long id, @Valid @RequestBody RecipeCreateRequest request, HttpServletRequest httpRequest) {
-    User user = null;
-    try {
-        log.debug("Attempting to update recipe with ID: {}", id); // New line
-        user = getCurrentUser(httpRequest);
-        recipeService.updateRecipe(id, request, user);
-        log.info("Recipe with ID {} updated successfully by User ID {}", id, user.getId()); // New line
-        return ResponseEntity.ok("Recipe updated successfully.");
-    } catch (RecipeNotFoundException e) {
-        log.warn("Recipe not found for update: {}", id);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format(ErrorMessages.RECIPE_NOT_FOUND, id));
-    } catch (UnauthorizedActionException e) {
-        log.warn("Unauthorized update attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorMessages.UNAUTHORIZED_ACTION);
-    } catch (Exception e) {
-        log.error("Error updating recipe with ID: {}", id, e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessages.INTERNAL_ERROR);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRecipe(@PathVariable Long id, @Valid @RequestBody RecipeCreateRequest request, HttpServletRequest httpRequest) {
+        User user = null;
+        try {
+            log.debug("Attempting to update recipe with ID: {}", id); // New line
+            user = getCurrentUser(httpRequest);
+            recipeService.updateRecipe(id, request, user);
+            log.info("Recipe with ID {} updated successfully by User ID {}", id, user.getId()); // New line
+            return ResponseEntity.ok("Recipe updated successfully.");
+        } catch (RecipeNotFoundException e) {
+            log.warn("Recipe not found for update: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format(ErrorMessages.RECIPE_NOT_FOUND, id));
+        } catch (UnauthorizedActionException e) {
+            log.warn("Unauthorized update attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorMessages.UNAUTHORIZED_ACTION);
+        } catch (Exception e) {
+            log.error("Error updating recipe with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessages.INTERNAL_ERROR);
+        }
     }
-}
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         // fetch categories from the DB or service
@@ -202,52 +156,29 @@ public ResponseEntity<?> updateRecipe(@PathVariable Long id, @Valid @RequestBody
     }
 
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest request) {
-//        User user = null; // Declare user outside the try block
-//        try {
-//            log.debug("Attempting to delete recipe with ID: {}", id);
-//            user = getCurrentUser(request);
-//            recipeService.deleteRecipe(id, user);
-//            log.info("Recipe with ID {} deleted successfully by User ID {}", id, user.getId());
-//            return ResponseEntity.noContent().build();
-//        } catch (IllegalArgumentException e) {
-//            log.warn("Invalid request: {}", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        } catch (RecipeNotFoundException e) {
-//            log.warn("Recipe not found for deletion: {}", id);
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipe with ID " + id + " not found.");
-//        } catch (UnauthorizedActionException e) {
-//            log.warn("Unauthorized deletion attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this recipe.");
-//        } catch (Exception e) {
-//            log.error("Error deleting recipe with ID: {}", id, e);
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred while deleting the recipe.");
-//        }
-//    }
-@DeleteMapping("/{id}")
-public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest request) {
-    User user = null; // Declare user outside the try block - New line
-    try {
-        log.debug("Attempting to delete recipe with ID: {}", id); // New line
-        user = getCurrentUser(request);
-        recipeService.deleteRecipe(id, user);
-        log.info("Recipe with ID {} deleted successfully by User ID {}", id, user.getId()); // New line
-        return ResponseEntity.noContent().build();
-    } catch (IllegalArgumentException e) {
-        log.warn("Invalid request: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    } catch (RecipeNotFoundException e) {
-        log.warn("Recipe not found for deletion: {}", id);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipe with ID " + id + " not found.");
-    } catch (UnauthorizedActionException e) {
-        log.warn("Unauthorized deletion attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this recipe.");
-    } catch (Exception e) {
-        log.error("Error deleting recipe with ID: {}", id, e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred while deleting the recipe.");
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest request) {
+        User user = null; // Declare user outside the try block - New line
+        try {
+            log.debug("Attempting to delete recipe with ID: {}", id); // New line
+            user = getCurrentUser(request);
+            recipeService.deleteRecipe(id, user);
+            log.info("Recipe with ID {} deleted successfully by User ID {}", id, user.getId()); // New line
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid request: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RecipeNotFoundException e) {
+            log.warn("Recipe not found for deletion: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Recipe with ID " + id + " not found.");
+        } catch (UnauthorizedActionException e) {
+            log.warn("Unauthorized deletion attempt by User ID {} on Recipe ID {}", user != null ? user.getId() : "Unknown", id);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this recipe.");
+        } catch (Exception e) {
+            log.error("Error deleting recipe with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred while deleting the recipe.");
+        }
     }
-}
 
 
     private User getCurrentUser(HttpServletRequest request) throws IllegalArgumentException {

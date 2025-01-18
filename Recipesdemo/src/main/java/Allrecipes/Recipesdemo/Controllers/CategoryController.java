@@ -50,23 +50,6 @@ public class CategoryController {
         return ResponseEntity.ok(foodCategories);
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<Category>> getAllCategories(@RequestHeader("Authorization") String authHeader) throws LoginException {
-//        log.debug("Fetching all categories with admin authorization.");
-//        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
-//        List<Category> categories = categoryService.getAllCategories();
-//        log.info("Retrieved {} categories.", categories.size());
-//        return ResponseEntity.ok(categories);
-//    }
-//
-    /**
-     * Retrieves a specific category by its name. Accessible only by Admin users.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @param name       The name of the category to retrieve.
-     * @return A ResponseEntity containing the category if found.
-     * @throws LoginException If the user is not authorized.
-     */
     @GetMapping("/{name}")
     public ResponseEntity<Category> getCategoryByName(
             @RequestHeader("Authorization") String authHeader,
@@ -82,14 +65,6 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-    /**
-     * Creates a new category. Accessible only by Admin users.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @param category   The Category object to be created.
-     * @return A ResponseEntity containing the created category.
-     * @throws LoginException If the user is not authorized.
-     */
     @PostMapping
     public ResponseEntity<Category> createCategory(
             @RequestHeader("Authorization") String authHeader,
@@ -101,14 +76,7 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-    /**
-     * Deletes a category by its name. Accessible only by Admin users.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @param name       The name of the category to delete.
-     * @return A ResponseEntity containing a success message.
-     * @throws LoginException If the user is not authorized.
-     */
+
     @DeleteMapping("/{name}")
     public ResponseEntity<Map<String, String>> deleteCategory(
             @RequestHeader("Authorization") String authHeader,
@@ -120,14 +88,6 @@ public class CategoryController {
         return ResponseEntity.ok(Map.of("message", "Category deleted successfully."));
     }
 
-    /**
-     * Checks if a category exists by its name. Accessible only by Admin users.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @param name       The name of the category to check.
-     * @return A ResponseEntity containing a boolean indicating existence.
-     * @throws LoginException If the user is not authorized.
-     */
     @GetMapping("/{name}/exists")
     public ResponseEntity<Boolean> checkCategoryExists(
             @RequestHeader("Authorization") String authHeader,

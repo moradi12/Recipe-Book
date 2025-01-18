@@ -322,14 +322,6 @@ public class CustomerController {
         }
     }
 
-    /**
-     * Helper method to retrieve the current user based on the JWT token.
-     *
-     * @param authHeader The Authorization header containing the JWT token.
-     * @return The current User.
-     * @throws LoginException         If the token is invalid.
-     * @throws UserNotFoundException  If the user is not found.
-     */
     private User getCurrentUser(String authHeader) throws LoginException, UserNotFoundException {
         String token = authHeader.replace("Bearer ", "");
         jwtUtil.validateToken(token);
