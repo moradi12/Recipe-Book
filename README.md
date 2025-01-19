@@ -1,6 +1,6 @@
-# AllrecipesV2
+# Recipe Book
 
-AllrecipesV2 is a web application that helps users explore and manage a variety of recipes. Built using a **TypeScript frontend** and a **Java Spring Boot backend**, it offers a modern and efficient way to discover, organize, and share culinary inspiration.
+Recipe Book is a web application that helps users explore and manage a variety of recipes. Built using a **TypeScript frontend** and a **Java Spring Boot backend**, it offers a modern and efficient way to discover, organize, and share culinary inspiration.
 
 ## Table of Contents
 
