@@ -1,5 +1,4 @@
-// src/Pages/GetAllRecipes/GetAllRecipes.tsx
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -121,7 +120,6 @@ const GetAllRecipes: React.FC = () => {
     },
     [fetchRecipes]
   );
-  
 
   // -------------------------------
   // Handler to Reject Recipe
@@ -161,10 +159,7 @@ const GetAllRecipes: React.FC = () => {
         notify.error("Missing authorization token. Please log in again.");
         return;
       }
-      if (auth.userType !== "ADMIN") {
-        notify.error("Unauthorized: Only admins can delete recipes.");
-        return;
-      }
+      // Removed admin check to allow deletion for all users
       if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
           await RecipeService.deleteRecipe(id, token);
@@ -181,7 +176,7 @@ const GetAllRecipes: React.FC = () => {
         }
       }
     },
-    [auth.userType, fetchRecipes]
+    [fetchRecipes]
   );
 
   // -------------------------------
@@ -249,19 +244,10 @@ const GetAllRecipes: React.FC = () => {
             ? (recipeId) => navigate(`/edit-recipe/${recipeId}`)
             : undefined
         }
-        onApproveRecipe={
-          auth.userType === "ADMIN" ? handleApproveRecipe : undefined
-        }
-        onRejectRecipe={
-          auth.userType === "ADMIN" ? handleRejectRecipe : undefined
-        }
-        onDeleteRecipe={
-          auth.userType === "ADMIN" ? handleDeleteRecipe : undefined
-        }
-        // Pass the change status handler only for non-admin users
-        onChangeRecipeStatus={
-          auth.userType !== "ADMIN" ? handleChangeRecipeStatus : undefined
-        }
+        onApproveRecipe={auth.userType === "ADMIN" ? handleApproveRecipe : undefined}
+        onRejectRecipe={auth.userType === "ADMIN" ? handleRejectRecipe : undefined}
+        onDeleteRecipe={handleDeleteRecipe} 
+        // Removed onChangeRecipeStatus prop as it's no longer needed
       />
 
       {/* Pagination */}
