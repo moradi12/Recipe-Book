@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Category } from "../../Models/Category";
 import { RecipeResponse } from "../../Models/RecipeResponse";
+import { RecipeStatus } from "../../Models/RecipeStatus";
 import RecipeService, { PaginatedRecipes } from "../../Service/RecipeService";
 import { checkData } from "../../Utiles/checkData";
 import { notify } from "../../Utiles/notif";
@@ -19,13 +20,12 @@ const GetAllRecipes: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const auth = useSelector((state: any) => state.auth); // Update the type as needed
+  const auth = useSelector((state: any) => state.auth);
   const [pagination, setPagination] = useState({
     page: 0,
     size: 10,
     totalPages: 0,
   });
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
@@ -61,9 +61,7 @@ const GetAllRecipes: React.FC = () => {
       setLoading(true);
       setError("");
 
-      // Convert the selected category (string) to a number, if set.
       const categoryParam = filterCategory ? Number(filterCategory) : undefined;
-
       console.log("Fetching recipes with:", {
         page: pagination.page,
         size: pagination.size,
@@ -96,28 +94,83 @@ const GetAllRecipes: React.FC = () => {
     }
   }, [pagination.page, pagination.size, filterCategory]);
 
-  // 5) Delete recipe
-  const handleDeleteRecipe = useCallback(
+  // -------------------------------
+  // Handler to Approve Recipe
+  // -------------------------------
+  const handleApproveRecipe = useCallback(
     async (id: number) => {
-      const state = recipeSystem.getState();
-      const token = state.auth.token;
-
+      const token = recipeSystem.getState().auth.token;
+      console.log("Token in Approve Handler:", token); // Debugging log
       if (!token || token.length < 10) {
         notify.error("Missing authorization token. Please log in again.");
         return;
       }
+      try {
+        await RecipeService.approveRecipe(id, token);
+        console.log("Recipe approved successfully:", id);
+        notify.success("Recipe approved successfully!");
+        fetchRecipes(); // Refresh the list after status update
+      } catch (err: unknown) {
+        let errorMessage = "Failed to approve recipe.";
+        if (err instanceof Error) {
+          errorMessage = err.message || errorMessage;
+        }
+        console.error("Error approving recipe:", err);
+        notify.error(errorMessage);
+      }
+    },
+    [fetchRecipes]
+  );
+  
 
+  // -------------------------------
+  // Handler to Reject Recipe
+  // -------------------------------
+  const handleRejectRecipe = useCallback(
+    async (id: number) => {
+      const token = recipeSystem.getState().auth.token;
+      if (!token || token.length < 10) {
+        notify.error("Missing authorization token. Please log in again.");
+        return;
+      }
+      try {
+        await RecipeService.rejectRecipe(id, token);
+        console.log("Recipe rejected successfully:", id);
+        notify.success("Recipe rejected successfully!");
+        fetchRecipes(); // Refresh the list after status update
+      } catch (err: unknown) {
+        let errorMessage = "Failed to reject recipe.";
+        if (err instanceof Error) {
+          errorMessage = err.message || errorMessage;
+        }
+        console.error("Error rejecting recipe:", err);
+        notify.error(errorMessage);
+      }
+    },
+    [fetchRecipes]
+  );
+
+  // -------------------------------
+  // Handler to Delete Recipe
+  // -------------------------------
+  const handleDeleteRecipe = useCallback(
+    async (id: number) => {
+      const state = recipeSystem.getState();
+      const token = state.auth.token;
+      if (!token || token.length < 10) {
+        notify.error("Missing authorization token. Please log in again.");
+        return;
+      }
       if (auth.userType !== "ADMIN") {
         notify.error("Unauthorized: Only admins can delete recipes.");
         return;
       }
-
       if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
           await RecipeService.deleteRecipe(id, token);
           console.log("Recipe deleted successfully:", id);
           notify.success("Recipe deleted successfully!");
-          fetchRecipes(); // Refresh the list
+          fetchRecipes();
         } catch (err: unknown) {
           let errorMessage = "An unexpected error occurred.";
           if (err instanceof Error) {
@@ -129,6 +182,34 @@ const GetAllRecipes: React.FC = () => {
       }
     },
     [auth.userType, fetchRecipes]
+  );
+
+  // -------------------------------
+  // Handler to Change Recipe Status (non-admin users)
+  // -------------------------------
+  const handleChangeRecipeStatus = useCallback(
+    async (id: number, newStatus: RecipeStatus) => {
+      const token = recipeSystem.getState().auth.token;
+      if (!token || token.length < 10) {
+        notify.error("Missing authorization token. Please log in again.");
+        return;
+      }
+      try {
+        // Assuming RecipeService.updateRecipeStatus exists
+        await RecipeService.updateRecipeStatus(id, newStatus, token);
+        console.log("Recipe status updated:", id, newStatus);
+        notify.success("Recipe status updated successfully!");
+        fetchRecipes();
+      } catch (err: unknown) {
+        let errorMessage = "Failed to update recipe status.";
+        if (err instanceof Error) {
+          errorMessage = err.message || errorMessage;
+        }
+        console.error("Error updating recipe status:", err);
+        notify.error(errorMessage);
+      }
+    },
+    [fetchRecipes]
   );
 
   // Fetch categories on mount
@@ -163,13 +244,23 @@ const GetAllRecipes: React.FC = () => {
       {/* Recipe List */}
       <RecipeList
         recipes={recipes}
-        onDeleteRecipe={
-          auth.userType === "ADMIN" ? handleDeleteRecipe : undefined
-        }
         onEditRecipe={
           auth.userType === "ADMIN"
             ? (recipeId) => navigate(`/edit-recipe/${recipeId}`)
             : undefined
+        }
+        onApproveRecipe={
+          auth.userType === "ADMIN" ? handleApproveRecipe : undefined
+        }
+        onRejectRecipe={
+          auth.userType === "ADMIN" ? handleRejectRecipe : undefined
+        }
+        onDeleteRecipe={
+          auth.userType === "ADMIN" ? handleDeleteRecipe : undefined
+        }
+        // Pass the change status handler only for non-admin users
+        onChangeRecipeStatus={
+          auth.userType !== "ADMIN" ? handleChangeRecipeStatus : undefined
         }
       />
 

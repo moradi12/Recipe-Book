@@ -7,6 +7,7 @@ import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Exceptions.*;
 import Allrecipes.Recipesdemo.Repositories.RecipeRepository;
 import Allrecipes.Recipesdemo.Repositories.UserRepository;
+import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,12 @@ import java.util.stream.Collectors;
 public class CustomerService {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
+    private final JWT jwt;
 
     public CustomerService(UserRepository userRepository, RecipeRepository recipeRepository) {
         this.userRepository = userRepository;
         this.recipeRepository = recipeRepository;
+        this.jwt = new JWT();
     }
 
     @PostConstruct
@@ -73,8 +76,26 @@ public class CustomerService {
                 .userType(UserType.CUSTOMER) // Default to CUSTOMER
                 .build();
         return userRepository.save(user);
+
+
     }
 
+    public boolean validateToken(String token) {
+        try {
+            return jwt.validateToken(token);
+        } catch (Exception e) {
+            System.out.println("Token validation failed: " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean checkUser(String token, UserType userType) {
+        try {
+            return jwt.checkUser(token, userType);
+        } catch (Exception e) {
+            System.out.println("Failed to check user: " + e.getMessage());
+            return false;
+        }
+    }
 
     private void validateRegistrationData(String username, String email, String rawPassword) {
         if (username == null || username.isBlank()) {
@@ -196,4 +217,6 @@ public class CustomerService {
         user.setUserType(newUserType);
         userRepository.save(user);
     }
+
+
 }

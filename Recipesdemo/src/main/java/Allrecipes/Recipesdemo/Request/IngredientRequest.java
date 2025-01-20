@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class IngredientRequest {
+public class    IngredientRequest {
 
     @NotBlank(message = "Ingredient name is mandatory")
     private String name;

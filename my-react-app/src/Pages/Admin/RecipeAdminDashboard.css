@@ -1,0 +1,149 @@
+/* src/components/RecipeAdminDashboard.css */
+
+/* General container styling */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Headings */
+  h1,
+  h2 {
+    color: #343a40;
+  }
+  
+  /* Section styling */
+.dashboard-section p,
+.recipe-list li {
+  color: #333; /* A dark gray to make sure the text stands out */    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  
+  /* Error message */
+  .error-message {
+    color: #dc3545;
+    font-weight: bold;
+  }
+  
+  /* Recipe list styles */
+  .recipe-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .recipe-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .recipe-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .recipe-list .recipe-info {
+    flex-grow: 1;
+  }
+  
+  .recipe-list button {
+    margin-left: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .recipe-list button:hover {
+    background-color: #0056b3;
+  }
+  
+  .recipe-list button.delete-button {
+    background-color: #dc3545;
+  }
+  
+  .recipe-list button.delete-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* Form styling */
+  .dashboard-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dashboard-form label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #495057;
+  }
+  
+  .dashboard-form input[type="text"],
+  .dashboard-form input[type="number"],
+  .dashboard-form textarea {
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .dashboard-form input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+  
+  .dashboard-form button {
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .dashboard-form button:hover {
+    background-color: #218838;
+  }
+  
+  /* Search form styling */
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .search-form input {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+  }
+  
+  .search-form button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #17a2b8;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .search-form button:hover {
+    background-color: #138496;
+  }
+  

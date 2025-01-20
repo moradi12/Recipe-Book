@@ -1,9 +1,8 @@
-// src/Service/RecipeService.ts
-
 import axios, { AxiosResponse } from 'axios';
 import { Category } from '../Models/Category';
-import { RecipeResponse } from '../Models/Recipe';
+import { RecipeResponse, UpdateStatusResponse } from '../Models/Recipe';
 import { RecipeCreateRequest } from '../Models/RecipeCreateRequest';
+import { RecipeStatus } from '../Models/RecipeStatus';
 
 export interface PaginatedRecipes {
   content: RecipeResponse[];
@@ -16,7 +15,10 @@ export interface PaginatedRecipes {
 
 class RecipeService {
   private static instance: RecipeService;
+  // Base URL for recipe-related endpoints (non-admin)
   private baseUrl: string = 'http://localhost:8080/api/recipes';
+  // Base URL for admin endpoints (for actions like approving recipes)
+  private adminUrl: string = 'http://localhost:8080/api/admin';
   private categoriesUrl: string = 'http://localhost:8080/api/categories';
 
   private constructor() {}
@@ -29,21 +31,17 @@ class RecipeService {
   }
 
   // ===========================
-// GET RECIPE BY ID
-// ===========================
-// Calls: GET http://localhost:8080/api/recipes/{id}
-public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
-  return axios.get<RecipeResponse>(`${this.baseUrl}/${id}`);
-}
-
-
-
+  // GET RECIPE BY ID
+  // ===========================
+  // Calls: GET http://localhost:8080/api/recipes/{id}
+  public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
+    return axios.get<RecipeResponse>(`${this.baseUrl}/${id}`);
+  }
 
   // ===========================
   // GET ALL CATEGORIES (Recipe-based endpoint)
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes/categories
-  // Make sure your backend has @GetMapping("/categories") in RecipeController
   public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
     return axios.get<Category[]>(`${this.baseUrl}/categories`);
   }
@@ -52,7 +50,6 @@ public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
   // GET FOOD CATEGORIES (Separate Categories URL)
   // ===========================
   // Calls: GET http://localhost:8080/api/categories/food-categories
-  // Make sure your backend has @GetMapping("/food-categories") in CategoryController
   public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
     return axios.get<{ name: string; description: string }[]>(
       `${this.categoriesUrl}/food-categories`
@@ -71,21 +68,20 @@ public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
   // GET ALL RECIPES (Paginated + optional category)
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes?page=X&size=Y&category=Z
-// GET ALL RECIPES (Paginated + optional category)
-// GET ALL RECIPES (Paginated + optional category)
-public async getAllRecipesPaginated(
-  pageNumber: number,
-  pageSize: number,
-  category?: number
-): Promise<AxiosResponse<PaginatedRecipes>> {
-  let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
+  public async getAllRecipesPaginated(
+    pageNumber: number,
+    pageSize: number,
+    category?: number
+  ): Promise<AxiosResponse<PaginatedRecipes>> {
+    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
 
-  if (category !== undefined) {
-    url += `&category=${encodeURIComponent(String(category))}`;
+    if (category !== undefined) {
+      url += `&category=${encodeURIComponent(String(category))}`;
+    }
+
+    return axios.get<PaginatedRecipes>(url);
   }
 
-  return axios.get<PaginatedRecipes>(url);
-}
   // ===========================
   // CREATE RECIPE
   // ===========================
@@ -135,6 +131,46 @@ public async getAllRecipesPaginated(
   }
 
   // ===========================
+// UPDATE RECIPE STATUS (for non-admin users)
+// ===========================
+// Calls: PUT http://localhost:8080/api/recipes/{id}/status
+public async updateRecipeStatus(
+  id: number,
+  newStatus: RecipeStatus,
+  token: string
+): Promise<AxiosResponse<UpdateStatusResponse>> {
+  return axios.put<UpdateStatusResponse>(
+    `${this.baseUrl}/${id}/status`,
+    { status: newStatus },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+
+
+  // ===========================
+  // REJECT RECIPE
+  // ===========================
+  // Calls: PUT http://localhost:8080/api/admin/recipes/{id}/reject
+  public async rejectRecipe(
+    id: number,
+    token: string
+  ): Promise<AxiosResponse<UpdateStatusResponse>> {
+    return axios.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/reject`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+
+  // ===========================
   // SEARCH RECIPES BY TITLE
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes/search?title=...
@@ -144,8 +180,25 @@ public async getAllRecipesPaginated(
     const url = `${this.baseUrl}/search?title=${encodeURIComponent(title)}`;
     return axios.get<RecipeResponse[]>(url);
   }
+
+  // ===========================
+  // APPROVE RECIPE
+  // ===========================
+  // Calls: PUT http://localhost:8080/api/admin/recipes/{id}/approve
+  public async approveRecipe(
+    id: number,
+    token: string
+  ): Promise<AxiosResponse<UpdateStatusResponse>> {
+    return axios.put(`${this.adminUrl}/recipes/${id}/approve`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+
+  
 }
-
-
 
 export default RecipeService.getInstance();

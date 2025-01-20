@@ -19,12 +19,26 @@ import java.util.Map;
 @Component
 public class JWT {
 
-    private String signatureAlgorithm = SignatureAlgorithm.HS256.getJcaName();
-    //our private key - מפתח הצפנה שקיים רק אצלנו
-    private String encodedSecretKey = "jwt+secret+key+is+used+for+signing+and+validating+tokens+in+the+app";
-    //create our private key = יצירה של מפתח ההצפנה לשימוש ביצירה של הטוקנים שלנו - VERIFY SIGNATURE
-    private Key decodedSecretKey = new SecretKeySpec(Base64.getDecoder().decode(encodedSecretKey), this.signatureAlgorithm);
+    // ====================================================
+    // 1) Use HS384 to match your token's header (HS384)
+    //    If your token is actually HS256, switch to HS256.
+    // ====================================================
+    private String signatureAlgorithm = SignatureAlgorithm.HS384.getJcaName();
 
+    // ====================================================
+    // 2) Your secret key for signing/validation
+    // ====================================================
+    private String encodedSecretKey = "jwt+secret+key+is+used+for+signing+and+validating+tokens+in+the+app";
+
+    // This decodes the Base64 key and uses your chosen algorithm
+    private Key decodedSecretKey = new SecretKeySpec(
+            Base64.getDecoder().decode(encodedSecretKey),
+            this.signatureAlgorithm
+    );
+
+    // ====================================================
+    // Generate token from UserDetails object
+    // ====================================================
     public String generateToken(UserDetails userData) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userType", userData.getUserType());
@@ -33,6 +47,9 @@ public class JWT {
         return createToken(claims, userData.getEmail());
     }
 
+    // ====================================================
+    // Generate token from an existing token (refresh style)
+    // ====================================================
     public String generateToken(String token) {
         Map<String, Object> claims = new HashMap<>();
         Claims ourClaims = extractAllClaims(token);
@@ -42,32 +59,40 @@ public class JWT {
         return createToken(claims, ourClaims.getSubject());
     }
 
+    // ====================================================
+    // Create the actual JWT string
+    // ====================================================
     private String createToken(Map<String, Object> claims, String email) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .setClaims(claims) //get claims
-                .setSubject(email) //get subject
-                .setIssuedAt(Date.from(now)) //get current time
-                .setExpiration(Date.from(now.plus(30, ChronoUnit.MINUTES)))  //expiration date
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plus(30, ChronoUnit.MINUTES))) // 30 min expiry
                 .signWith(this.decodedSecretKey)
                 .compact();
     }
 
+    // ====================================================
+    // Extract all claims from a token
+    // ====================================================
     public Claims extractAllClaims(String token) throws ExpiredJwtException, SignatureException {
         JwtParser jwtParser = Jwts.parserBuilder()
-                .setSigningKey(decodedSecretKey) //provide our secret key :o)
+                .setSigningKey(decodedSecretKey)
                 .build();
         return jwtParser.parseClaimsJws(token).getBody();
     }
 
+    // ====================================================
+    // Extract subject = user's email
+    // ====================================================
     public String extractEmail(String token) throws SignatureException {
         return extractAllClaims(token).getSubject();
     }
 
-    public java.util.Date extractExpirationDate(String token) {
-        return extractAllClaims(token).getExpiration();
-    }
-
+    // ====================================================
+    // Check if token is expired
+    // ====================================================
     public boolean isTokenExpired(String token) {
         try {
             extractAllClaims(token);
@@ -77,58 +102,67 @@ public class JWT {
         }
     }
 
+    // ====================================================
+    // Extract userType from the token
+    // ====================================================
     public String getUserType(String token) {
         Claims claims = extractAllClaims(token);
         return (String) claims.get("userType");
     }
 
+    // ====================================================
+    // Validate the token against given user details
+    // ====================================================
     public boolean validateToken(String token, UserDetails userDetails) throws MalformedJwtException, SignatureException {
         final String userEmail = extractEmail(token);
         return (userEmail.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
 
+    // ====================================================
+    // Validate token has correct signature & not expired
+    // ====================================================
     public boolean validateToken(String token) throws MalformedJwtException, SignatureException {
-        final Claims claims = extractAllClaims(token);
+        // If no exception is thrown by extractAllClaims, token is valid
+        extractAllClaims(token);
         return true;
     }
 
-    public boolean checkUser(String token, UserType userType) throws LoginException {
-        String newToken = token.replace("Bearer ", "");
-        if (validateToken(newToken)) {
-            if (!getUserType(newToken).equals(userType)) {
+    // ====================================================
+    // Check user type after validating the token
+    // ====================================================
+    public boolean checkUser(String tokenWithoutBearer, UserType requiredUserType) throws LoginException {
+        // 1) Validate the token
+        if (validateToken(tokenWithoutBearer)) {
+            // 2) Compare user types
+            if (!getUserType(tokenWithoutBearer).equals(requiredUserType.name())) {
                 throw new LoginException("User not allowed");
             }
         }
         return true;
     }
 
-
-    public HttpHeaders CheckTheJWT(String jwt) throws Exception {
-        String myJWT = jwt.split(" ")[1];
-        if (validateToken(myJWT)) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + generateToken(myJWT));
-            return headers;
-        }
-        throw new Exception("Invalid token");
-    }
-    public HttpHeaders getHeaders(String jwt) {
+    // ====================================================
+    // If you ever want to build new headers for a new token
+    // ====================================================
+    public HttpHeaders getHeaders(String rawTokenWithoutBearer) {
         HttpHeaders headers = new HttpHeaders();
-        String userJWT = jwt.split(" ")[1];
-        if(validateToken(userJWT)){
-            headers.set("Authorization","Bearer " + generateToken((userJWT)));
+        if (validateToken(rawTokenWithoutBearer)) {
+            // generate a refreshed token
+            String newToken = generateToken(rawTokenWithoutBearer);
+            headers.set("Authorization", "Bearer " + newToken);
         }
-        return  headers;
+        return headers;
     }
 
-
-    public UserDetails getUserDetails(String authHeader) throws LoginException {
-        String token = authHeader.replace("Bearer ", "");
-        if (!validateToken(token)) {
+    // ====================================================
+    // Extract custom userDetails from the token
+    // ====================================================
+    public UserDetails getUserDetails(String rawTokenWithoutBearer) throws LoginException {
+        if (!validateToken(rawTokenWithoutBearer)) {
             throw new LoginException("Invalid or expired token.");
         }
 
-        Claims claims = extractAllClaims(token);
+        Claims claims = extractAllClaims(rawTokenWithoutBearer);
         Long userId = claims.get("id", Long.class);
         String userName = claims.get("userName", String.class);
         String userTypeString = claims.get("userType", String.class);

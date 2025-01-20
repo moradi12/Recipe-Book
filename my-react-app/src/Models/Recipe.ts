@@ -74,3 +74,7 @@ export interface APIRecipeResponse {
   createdByUsername: string; // Ensure this matches backend naming
   categories: { id: number; name: string }[]; // Consistent structure
 }
+
+export interface UpdateStatusResponse {
+  message: string;}
+  

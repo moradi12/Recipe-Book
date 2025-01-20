@@ -1,6 +1,7 @@
 // src/Routes/MainRoute.tsx
 import { Route, Routes } from "react-router-dom";
 import CreateRecipe from "../../AddRecipe/CreateRecipe";
+import RecipeAdminDashboard from "../../Admin/AdminDashboard";
 import CategoryDropdown from "../../CategoryDropdown/CategoryDropdown";
 import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
@@ -34,6 +35,10 @@ export function MainRoute(): JSX.Element {
 
       {/* Existing "All Recipes" route */}
       <Route path="/all/recipes" element={<GetAllRecipes />} />
+
+
+      <Route path="/admin" element={<RecipeAdminDashboard />} />
+
 
       {/*
         Additional routes for the other controller methods:

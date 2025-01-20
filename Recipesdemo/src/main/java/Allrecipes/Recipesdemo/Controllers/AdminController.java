@@ -20,6 +20,7 @@ import javax.security.auth.login.LoginException;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -35,10 +36,20 @@ public class AdminController {
     }
 
     /**
-     * Utility method to extract and validate the JWT token and build a User instance.
+     * Utility method to strip out "Bearer " from the Authorization header,
+     * validate and parse the token, then build a User instance.
      */
     private User getCurrentUser(String authHeader) throws LoginException {
-        UserDetails userDetails = jwtProvider.getUserDetails(authHeader);
+        // 1) Remove "Bearer " from the token
+        String tokenWithoutBearer = authHeader.replace("Bearer ", "");
+
+        // 2) Extract user details using the raw token
+        UserDetails userDetails = jwtProvider.getUserDetails(tokenWithoutBearer);
+
+        // 3) Validate
+        if (userDetails == null || !jwtProvider.validateToken(tokenWithoutBearer)) {
+            throw new LoginException("Invalid token");
+        }
         return User.builder()
                 .id(userDetails.getUserId())
                 .username(userDetails.getUserName())
@@ -47,10 +58,14 @@ public class AdminController {
                 .build();
     }
 
+    /**
+     * Common error-handling wrapper around actions that require admin privileges.
+     */
     private ResponseEntity<?> handleRequest(String authHeader, UserType requiredRole, Supplier<Object> action) {
         try {
-            // Validate JWT token and required role. The checkUser method should throw a LoginException if invalid.
-            jwtProvider.checkUser(authHeader, requiredRole);
+            // Remove "Bearer " before passing the token to checkUser
+            String tokenWithoutBearer = authHeader.replace("Bearer ", "");
+            jwtProvider.checkUser(tokenWithoutBearer, requiredRole);
             return ResponseEntity.ok(action.get());
         } catch (LoginException e) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized: Invalid token"));
@@ -61,9 +76,18 @@ public class AdminController {
         }
     }
 
+    /**
+     * Example usage of jwtProvider.getHeaders(tokenWithoutBearer).
+     * If you only want to send back a refreshed header, you can do something like:
+     *
+     *   HttpHeaders newHeaders = jwtProvider.getHeaders(tokenWithoutBearer);
+     *   return new ResponseEntity<>(someBody, newHeaders, HttpStatus.OK);
+     *
+     * But here we will keep the existing style of returning a body.
+     */
+
     @GetMapping("/recipes/pending")
     public ResponseEntity<?> getPendingRecipes(@RequestHeader("Authorization") String authHeader) {
-        // Since the JWT is validated in handleRequest, you can now call the service.
         return handleRequest(authHeader, UserType.ADMIN, adminService::getPendingRecipes);
     }
 
@@ -88,12 +112,10 @@ public class AdminController {
                                        @RequestBody RecipeCreateRequest request) {
         return handleRequest(authHeader, UserType.ADMIN, () -> {
             try {
-                // Extract the current user from the JWT token
                 User currentUser = getCurrentUser(authHeader);
                 var recipe = recipeService.createRecipe(request, currentUser);
                 return Map.of("message", "Recipe added successfully.", "recipeId", recipe.getId().toString());
             } catch (LoginException e) {
-                // Re-throw as unchecked; will be caught in handleRequest.
                 throw new RuntimeException("Unauthorized: Invalid token", e);
             }
         });
@@ -119,7 +141,6 @@ public class AdminController {
                                           @RequestBody RecipeCreateRequest request) {
         return handleRequest(authHeader, UserType.ADMIN, () -> {
             try {
-                // Retrieve the current user from the JWT token
                 User currentUser = getCurrentUser(authHeader);
                 var updatedRecipe = recipeService.updateRecipe(id, request, currentUser);
                 return Map.of("message", "Recipe updated successfully.", "recipeId", updatedRecipe.getId().toString());
@@ -134,7 +155,6 @@ public class AdminController {
                                           @PathVariable Long id) {
         return handleRequest(authHeader, UserType.ADMIN, () -> {
             try {
-                // Retrieve the current user from the JWT token
                 User currentUser = getCurrentUser(authHeader);
                 recipeService.deleteRecipe(id, currentUser);
                 return Map.of("message", "Recipe deleted successfully.");

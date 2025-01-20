@@ -1,6 +1,5 @@
 package Allrecipes.Recipesdemo.DTOs;
 
-import Allrecipes.Recipesdemo.Entities.Category;
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
