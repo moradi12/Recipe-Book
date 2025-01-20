@@ -330,4 +330,37 @@ public class CustomerController {
         return customerService.findByUsernameOrEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("Current user not found."));
     }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam String newPassword
+    ) {
+        try {
+            User currentUser = getCurrentUser(authHeader);
+            if (newPassword == null || newPassword.length() < 6) {
+                throw new IllegalArgumentException("Password must be at least 6 characters long.");
+            }
+            // Update password
+            customerService.updateUser(currentUser.getId(), null, null, newPassword);
+            Allrecipes.Recipesdemo.Entities.UserDetails userDetails =
+                    new Allrecipes.Recipesdemo.Entities.UserDetails(
+                            currentUser.getId(),
+                            currentUser.getUsername(),
+                            currentUser.getEmail(),
+                            currentUser.getUserType()
+                    );
+            String newToken = jwtUtil.generateToken(userDetails);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + newToken);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(Map.of("message", "Password updated successfully."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update password."));
+        }
+    }
 }

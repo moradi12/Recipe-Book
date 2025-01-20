@@ -80,10 +80,15 @@ const RecipeList: React.FC<RecipeListProps> = ({
           {/* Conditionally render the Edit button */}
           {onEditRecipe && (
             <button
-              className="button button-primary"
-              onClick={() => onEditRecipe(recipe.id)}
-            >
-              Edit
+            className="button button-primary"
+            onClick={() => {
+              // Call the onEditRecipe callback if needed
+              onEditRecipe(recipe.id);
+              // Navigate to the edit-recipe page
+              navigate(`/edit-recipe/${recipe.id}`);
+            }}
+          >
+            Edit
             </button>
           )}
 

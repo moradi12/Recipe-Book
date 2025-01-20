@@ -71,11 +71,13 @@ const Navbar: React.FC = () => {
             Food
           </NavLink>
         </li>
-        <li>
+
+        {/* <li>
           <NavLink to="/recipes" onClick={() => setIsOpen(false)}>
             Recipes
           </NavLink>
-        </li>
+        </li> */}
+
         <li>
           <NavLink to="/features" onClick={() => setIsOpen(false)}>
             Features
@@ -96,6 +98,11 @@ const Navbar: React.FC = () => {
             Contact
           </NavLink>
         </li>
+        <li>
+              <NavLink to="/userpanel" onClick={() => setIsOpen(false)}>
+                UserPanel
+              </NavLink>
+            </li>
 
         {/* Auth Links */}
         {!isLogged ? (
@@ -110,6 +117,8 @@ const Navbar: React.FC = () => {
                 Register
               </NavLink>
             </li>
+
+           
           </>
         ) : (
           <li>

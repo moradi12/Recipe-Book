@@ -13,10 +13,10 @@ import GetSingleRecipe from "../../GetSingleRecipe/GetSingleRecipe";
 import HomePage from "../../HomePage/OldHomePage";
 import LoginForm from "../../Login/LoginForm";
 import { Page404 } from "../../Page404/Page404";
-import RecipesPage from "../../RecipesPage/RecipesPage";
 import RegisterForm from "../../Register/RegisterForm";
 import SearchRecipes from "../../SearchRecipes/SearchRecipes";
 import UpdateRecipe from "../../UpdateRecipe/UpdateRecipe";
+import UserPanel from "../../UserPanel/UserPanel";
 
 export function MainRoute(): JSX.Element {
   return (
@@ -24,7 +24,7 @@ export function MainRoute(): JSX.Element {
       {/* Top-level routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/food" element={<FoodHomePage />} />
-      <Route path="/recipes" element={<RecipesPage />} />
+      {/* <Route path="/recipes" element={<RecipesPage />} /> */}
       <Route path="/features" element={<Features />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<LoginForm />} />
@@ -37,11 +37,10 @@ export function MainRoute(): JSX.Element {
       {/* Existing "All Recipes" route */}
       <Route path="/all/recipes" element={<GetAllRecipes />} />
 
-
       <Route path="/admin" element={<RecipeAdminDashboard />} />
       <Route path="/admin/edit-recipe/:id" element={<EditRecipeAdmin />} />
 
-
+      <Route path="/userpanel" element={<UserPanel />} />
 
       {/*
         Additional routes for the other controller methods:

@@ -159,7 +159,6 @@ const GetAllRecipes: React.FC = () => {
         notify.error("Missing authorization token. Please log in again.");
         return;
       }
-      // Removed admin check to allow deletion for all users
       if (window.confirm("Are you sure you want to delete this recipe?")) {
         try {
           await RecipeService.deleteRecipe(id, token);
@@ -190,7 +189,6 @@ const GetAllRecipes: React.FC = () => {
         return;
       }
       try {
-        // Assuming RecipeService.updateRecipeStatus exists
         await RecipeService.updateRecipeStatus(id, newStatus, token);
         console.log("Recipe status updated:", id, newStatus);
         notify.success("Recipe status updated successfully!");
@@ -246,8 +244,9 @@ const GetAllRecipes: React.FC = () => {
         }
         onApproveRecipe={auth.userType === "ADMIN" ? handleApproveRecipe : undefined}
         onRejectRecipe={auth.userType === "ADMIN" ? handleRejectRecipe : undefined}
-        onDeleteRecipe={handleDeleteRecipe} 
-        // Removed onChangeRecipeStatus prop as it's no longer needed
+        onDeleteRecipe={auth.userType === "ADMIN" ? handleDeleteRecipe : undefined}
+
+        // onDeleteRecipe={handleDeleteRecipe} 
       />
 
       {/* Pagination */}
