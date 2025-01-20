@@ -76,6 +76,19 @@ public class AdminController {
         }
     }
 
+    @DeleteMapping("/recipes/{id}")
+    public ResponseEntity<?> deleteRecipe(@RequestHeader("Authorization") String authHeader,
+                                          @PathVariable Long id) {
+        return handleRequest(authHeader, UserType.ADMIN, () -> {
+            try {
+                User currentUser = getCurrentUser(authHeader);
+                recipeService.deleteRecipe(id, currentUser);
+                return Map.of("message", "Recipe deleted successfully.");
+            } catch (LoginException e) {
+                throw new RuntimeException("Unauthorized: Invalid token", e);
+            }
+        });
+    }
     /**
      * Example usage of jwtProvider.getHeaders(tokenWithoutBearer).
      * If you only want to send back a refreshed header, you can do something like:
@@ -150,17 +163,5 @@ public class AdminController {
         });
     }
 
-    @DeleteMapping("/recipes/{id}")
-    public ResponseEntity<?> deleteRecipe(@RequestHeader("Authorization") String authHeader,
-                                          @PathVariable Long id) {
-        return handleRequest(authHeader, UserType.ADMIN, () -> {
-            try {
-                User currentUser = getCurrentUser(authHeader);
-                recipeService.deleteRecipe(id, currentUser);
-                return Map.of("message", "Recipe deleted successfully.");
-            } catch (LoginException e) {
-                throw new RuntimeException("Unauthorized: Invalid token", e);
-            }
-        });
-    }
+
 }

@@ -1,6 +1,7 @@
 package Allrecipes.Recipesdemo.Service;
 
 import Allrecipes.Recipesdemo.Entities.Category;
+import Allrecipes.Recipesdemo.Entities.Enums.UserType;
 import Allrecipes.Recipesdemo.Entities.Ingredient;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Exceptions.InvalidRecipeDataException;
@@ -57,6 +58,27 @@ public class RecipeService {
 
     @Value("${app.recipe-photos.directory}")
     private String photoDirectory;
+
+
+
+    public void deleteRecipe(Long id, User user) {
+        if (id == null || user == null) {
+            throw new IllegalArgumentException("Invalid input: Recipe ID and user cannot be null.");
+        }
+
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
+
+        // Allow the recipe's creator OR an Admin to delete. Otherwise, deny.
+        boolean isOwner = recipe.getCreatedBy().getId().equals(user.getId());
+        boolean isAdmin = user.getUserType() == UserType.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new UnauthorizedActionException("You do not have permission to delete this recipe");
+        }
+
+        recipeRepository.delete(recipe);
+    }
 
     public String getPhotoDirectory() {
         return photoDirectory;
@@ -156,21 +178,7 @@ public class RecipeService {
     // ================================
     //  DELETE RECIPE
     // ================================
-    public void deleteRecipe(Long id, User user) {
-        if (id == null || user == null) {
-            throw new IllegalArgumentException("Invalid input: Recipe ID and user cannot be null.");
-        }
 
-        Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
-
-        // Only the user who created the recipe can delete it
-        if (!recipe.getCreatedBy().getId().equals(user.getId())) {
-            throw new UnauthorizedActionException("You do not have permission to delete this recipe");
-        }
-
-        recipeRepository.delete(recipe);
-    }
 
     // ================================
     //  UPDATE RECIPE
