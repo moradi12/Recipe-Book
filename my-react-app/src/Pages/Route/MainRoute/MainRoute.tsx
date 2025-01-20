@@ -5,6 +5,7 @@ import RecipeAdminDashboard from "../../Admin/AdminDashboard";
 import CategoryDropdown from "../../CategoryDropdown/CategoryDropdown";
 import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
+import EditRecipeAdmin from "../../EditRecipe/EditRecipeAdmin";
 import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
@@ -38,6 +39,8 @@ export function MainRoute(): JSX.Element {
 
 
       <Route path="/admin" element={<RecipeAdminDashboard />} />
+      <Route path="/admin/edit-recipe/:id" element={<EditRecipeAdmin />} />
+
 
 
       {/*

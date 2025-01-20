@@ -1,9 +1,13 @@
-// RecipeCreateRequest.ts
-
 export interface RecipeCreateRequest {
-    // Define the properties of RecipeCreateRequest based on your requirements
     title: string;
     description: string;
+    cookingTime: number;
+    servings: number;
     ingredients: string[];
-    instructions: string[];
-}
+    preparationSteps: string;
+    dietaryInfo: string;
+    containsGluten: boolean;
+    categoryIds: number[];    // Or categories if you prefer
+    photo?: string | null;
+  }
+  

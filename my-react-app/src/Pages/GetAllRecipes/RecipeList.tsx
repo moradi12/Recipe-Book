@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { RecipeResponse } from "../../Models/RecipeResponse";
-import { RecipeStatus } from "../../Models/RecipeStatus";
 import "./RecipeList.css";
 
 interface RecipeListProps {
@@ -10,7 +9,6 @@ interface RecipeListProps {
   onApproveRecipe?: (id: number) => void; // For approving a recipe
   onRejectRecipe?: (id: number) => void;  // For rejecting a recipe
   onDeleteRecipe?: (id: number) => Promise<void>; // For deleting a recipe
-  onChangeRecipeStatus?: (id: number, newStatus: RecipeStatus) => Promise<void>; // For updating the recipe status
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
@@ -19,35 +17,12 @@ const RecipeList: React.FC<RecipeListProps> = ({
   onApproveRecipe,
   onRejectRecipe,
   onDeleteRecipe,
-  onChangeRecipeStatus,
 }) => {
   const navigate = useNavigate();
 
   if (!recipes.length) {
     return <p>No recipes found.</p>;
   }
-
-  // A helper that triggers when the Change Status button is clicked.
-  // For demo purposes, this uses a simple prompt. You can replace it with your own UI.
-  const handleChangeStatusClick = async (recipeId: number, currentStatus: RecipeStatus | string) => {
-    if (!onChangeRecipeStatus) {
-      return;
-    }
-    const statusValues = Object.values(RecipeStatus);
-    const newStatus = window.prompt(
-      `Enter new status for recipe ${recipeId}.\nValid statuses: ${statusValues.join(", ")}`,
-      currentStatus
-    );
-    if (newStatus && statusValues.includes(newStatus as RecipeStatus)) {
-      try {
-        await onChangeRecipeStatus(recipeId, newStatus as RecipeStatus);
-      } catch (error) {
-        console.error("Error changing status:", error);
-      }
-    } else if (newStatus) {
-      alert("Invalid status provided.");
-    }
-  };
 
   return (
     <ul className="recipe-list">
@@ -72,16 +47,6 @@ const RecipeList: React.FC<RecipeListProps> = ({
           <p>
             <strong>Status:</strong> {recipe.status || "Unknown"}
           </p>
-          {onChangeRecipeStatus && (
-            <button
-              className="button button-secondary"
-              onClick={() =>
-                handleChangeStatusClick(recipe.id, recipe.status || RecipeStatus.DRAFT)
-              }
-            >
-              Change Status
-            </button>
-          )}
           <p>
             <strong>Categories:</strong>{" "}
             {recipe.categories && recipe.categories.length > 0

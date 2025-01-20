@@ -38,7 +38,11 @@ class RecipeService {
     return axios.get<RecipeResponse>(`${this.baseUrl}/${id}`);
   }
 
-  // ===========================
+
+
+  
+  // ==================
+  // =========
   // GET ALL CATEGORIES (Recipe-based endpoint)
   // ===========================
   // Calls: GET http://localhost:8080/api/recipes/categories
@@ -81,6 +85,44 @@ class RecipeService {
 
     return axios.get<PaginatedRecipes>(url);
   }
+// Add below your other methods
+public async updateRecipeAsAdminn(
+  id: number,
+  recipeData: RecipeCreateRequest,
+  token: string
+): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
+  // This calls your ADMIN endpoint
+  return axios.put<{ message: string; recipeId: string }>(
+    `${this.adminUrl}/recipes/${id}`, 
+    recipeData,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+// Right after updateRecipe(...)
+public async updateRecipeAsAdmin(
+  id: number,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  recipeCreateRequest: any, // or a proper interface e.g. RecipeCreateRequest
+  token: string
+): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
+  return axios.put<{ message: string; recipeId: string }>(
+    `${this.adminUrl}/recipes/${id}`,
+    recipeCreateRequest,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
 
   // ===========================
   // CREATE RECIPE
@@ -181,21 +223,23 @@ public async updateRecipeStatus(
     return axios.get<RecipeResponse[]>(url);
   }
 
-  // ===========================
-  // APPROVE RECIPE
-  // ===========================
-  // Calls: PUT http://localhost:8080/api/admin/recipes/{id}/approve
-  public async approveRecipe(
-    id: number,
-    token: string
-  ): Promise<AxiosResponse<UpdateStatusResponse>> {
-    return axios.put(`${this.adminUrl}/recipes/${id}/approve`, {}, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
+// ===========================
+// APPROVE RECIPE
+// ===========================
+// Calls: PUT http://localhost:8080/api/admin/recipes/{id}/approve
+public async approveRecipe(
+  id: number,
+  token: string
+): Promise<AxiosResponse<UpdateStatusResponse>> {
+  console.log("Approving recipe", id, "with token:", token); // Debugging log
+  return axios.put(`${this.adminUrl}/recipes/${id}/approve`, {}, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
 
 
   

@@ -76,6 +76,23 @@ public class AdminController {
         }
     }
 
+
+    @PutMapping("/recipes/{id}")
+    public ResponseEntity<?> updateRecipe(@RequestHeader("Authorization") String authHeader,
+                                          @PathVariable Long id,
+                                          @RequestBody RecipeCreateRequest request) {
+        return handleRequest(authHeader, UserType.ADMIN, () -> {
+            try {
+                User currentUser = getCurrentUser(authHeader);
+                var updatedRecipe = recipeService.updateRecipe(id, request, currentUser);
+                return Map.of("message", "Recipe updated successfully.", "recipeId", updatedRecipe.getId().toString());
+            } catch (LoginException e) {
+                throw new RuntimeException("Unauthorized: Invalid token", e);
+            }
+        });
+    }
+
+
     @DeleteMapping("/recipes/{id}")
     public ResponseEntity<?> deleteRecipe(@RequestHeader("Authorization") String authHeader,
                                           @PathVariable Long id) {
@@ -148,20 +165,6 @@ public class AdminController {
         });
     }
 
-    @PutMapping("/recipes/{id}")
-    public ResponseEntity<?> updateRecipe(@RequestHeader("Authorization") String authHeader,
-                                          @PathVariable Long id,
-                                          @RequestBody RecipeCreateRequest request) {
-        return handleRequest(authHeader, UserType.ADMIN, () -> {
-            try {
-                User currentUser = getCurrentUser(authHeader);
-                var updatedRecipe = recipeService.updateRecipe(id, request, currentUser);
-                return Map.of("message", "Recipe updated successfully.", "recipeId", updatedRecipe.getId().toString());
-            } catch (LoginException e) {
-                throw new RuntimeException("Unauthorized: Invalid token", e);
-            }
-        });
-    }
 
 
 }

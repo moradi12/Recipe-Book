@@ -188,8 +188,10 @@ public class RecipeService {
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
 
         // Only the user who created it can update
-        if (!existing.getCreatedBy().getId().equals(user.getId())) {
+        if (!existing.getCreatedBy().getId().equals(user.getId())
+                && user.getUserType() != UserType.ADMIN) {
             throw new UnauthorizedActionException("You do not have permission to update this recipe");
+
         }
 
         validateRecipeRequest(req);
