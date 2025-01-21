@@ -106,15 +106,6 @@ public class AdminController {
             }
         });
     }
-    /**
-     * Example usage of jwtProvider.getHeaders(tokenWithoutBearer).
-     * If you only want to send back a refreshed header, you can do something like:
-     *
-     *   HttpHeaders newHeaders = jwtProvider.getHeaders(tokenWithoutBearer);
-     *   return new ResponseEntity<>(someBody, newHeaders, HttpStatus.OK);
-     *
-     * But here we will keep the existing style of returning a body.
-     */
 
     @GetMapping("/recipes/pending")
     public ResponseEntity<?> getPendingRecipes(@RequestHeader("Authorization") String authHeader) {

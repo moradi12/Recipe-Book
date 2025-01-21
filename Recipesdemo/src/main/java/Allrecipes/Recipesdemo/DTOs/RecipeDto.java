@@ -14,7 +14,7 @@ public class RecipeDto {
     private String name;
     private String title;
     private String description;
-    private List<IngredientDto> ingredients; // Updated to use IngredientDto
+    private List<IngredientDto> ingredients;
     private String preparationSteps;
 
     @Positive(message = "Cooking time must be positive")

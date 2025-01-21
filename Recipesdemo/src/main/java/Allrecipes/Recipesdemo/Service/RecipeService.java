@@ -175,10 +175,6 @@ public class RecipeService {
         return savedRecipe;
     }
 
-    // ================================
-    //  DELETE RECIPE
-    // ================================
-
 
     // ================================
     //  UPDATE RECIPE
@@ -231,7 +227,6 @@ public class RecipeService {
             }
         }
 
-        // 4) Update fields of the existing recipe
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
         existing.setIngredients(ingredients);
@@ -246,7 +241,6 @@ public class RecipeService {
 
         Recipe updatedRecipe = recipeRepository.save(existing);
 
-        // Maintain bidirectional relationship
         categories.forEach(category -> category.getRecipes().add(updatedRecipe));
 
         return updatedRecipe;

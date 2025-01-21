@@ -19,13 +19,6 @@ public class IngredientService {
 
     private final IngredientsRepo ingredientsRepo;
 
-    /**
-     * Adds a new ingredient after validating the input.
-     *
-     * @param ingredient The Ingredient entity to add.
-     * @return The saved Ingredient entity.
-     * @throws IllegalArgumentException If any mandatory field is missing.
-     */
     @Transactional
     public Ingredient addIngredient(Ingredient ingredient) {
         log.debug("Adding new ingredient: {}", ingredient);
@@ -48,12 +41,6 @@ public class IngredientService {
         return savedIngredient;
     }
 
-    /**
-     * Deletes an ingredient by its ID.
-     *
-     * @param id The ID of the ingredient to delete.
-     * @throws ResourceNotFoundException If the ingredient does not exist.
-     */
     @Transactional
     public void deleteIngredient(Long id) {
         log.debug("Attempting to delete ingredient with ID: {}", id);
@@ -65,11 +52,6 @@ public class IngredientService {
         log.info("Ingredient deleted with ID: {}", id);
     }
 
-    /**
-     * Retrieves all ingredients and maps them to DTOs.
-     *
-     * @return A list of IngredientDto objects.
-     */
     @Transactional(readOnly = true)
     public List<IngredientDto> getAllIngredients() {
         log.debug("Fetching all ingredients.");
@@ -83,12 +65,6 @@ public class IngredientService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves all ingredients associated with a specific recipe.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return A list of Ingredient entities.
-     */
     @Transactional(readOnly = true)
     public List<Ingredient> getIngredientsByRecipe(Long recipeId) {
         log.debug("Fetching ingredients for recipe ID: {}", recipeId);

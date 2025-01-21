@@ -32,14 +32,6 @@ public class RatingService {
     private final UserRepository userRepository;
     private final RatingMapper ratingMapper;
 
-    /**
-     * Creates a new rating for a recipe by a user.
-     *
-     * @param request The RatingCreateRequest containing rating details.
-     * @return The created RatingResponse DTO.
-     * @throws ResourceNotFoundException If the recipe or user is not found.
-     * @throws ValidationException       If the user has already rated the recipe or the score is invalid.
-     */
     @Transactional
     public RatingResponse createRating(RatingCreateRequest request) {
         log.debug("Creating rating with Recipe ID: {} and User ID: {}", request.getRecipeId(), request.getUserId());
@@ -78,13 +70,6 @@ public class RatingService {
         return ratingMapper.toDto(savedRating);
     }
 
-    /**
-     * Retrieves a rating by its ID.
-     *
-     * @param id The ID of the rating.
-     * @return The RatingResponse DTO.
-     * @throws ResourceNotFoundException If the rating is not found.
-     */
     @Transactional(readOnly = true)
     public RatingResponse getRatingById(Long id) {
         log.debug("Fetching rating with ID: {}", id);
@@ -97,17 +82,6 @@ public class RatingService {
         return ratingMapper.toDto(rating);
     }
 
-    /**
-     * Updates an existing rating.
-     *
-     * @param id             The ID of the rating to update.
-     * @param request        The RatingUpdateRequest containing updated details.
-     * @param requestingUser The User attempting to update the rating.
-     * @return The updated RatingResponse DTO.
-     * @throws ResourceNotFoundException      If the rating is not found.
-     * @throws UnauthorizedActionException    If the user is not authorized to modify the rating.
-     * @throws ValidationException            If the updated score is invalid.
-     */
     @Transactional
     public RatingResponse updateRating(Long id, RatingUpdateRequest request, User requestingUser) {
         log.debug("Updating rating with ID: {} by User ID: {}", id, requestingUser.getId());
@@ -142,14 +116,6 @@ public class RatingService {
         return ratingMapper.toDto(updatedRating);
     }
 
-    /**
-     * Deletes a rating by its ID.
-     *
-     * @param id             The ID of the rating to delete.
-     * @param requestingUser The User attempting to delete the rating.
-     * @throws ResourceNotFoundException   If the rating is not found.
-     * @throws UnauthorizedActionException If the user is not authorized to delete the rating.
-     */
     @Transactional
     public void deleteRating(Long id, User requestingUser) {
         log.debug("Deleting rating with ID: {} by User ID: {}", id, requestingUser.getId());
@@ -169,11 +135,6 @@ public class RatingService {
         log.info("Rating deleted with ID: {}", id);
     }
 
-    /**
-     * Retrieves all active ratings.
-     *
-     * @return A list of RatingResponse DTOs.
-     */
     @Transactional(readOnly = true)
     public List<RatingResponse> getAllRatings() {
         log.debug("Fetching all active ratings.");
@@ -183,12 +144,6 @@ public class RatingService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves all ratings for a specific recipe.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return A list of RatingResponse DTOs.
-     */
     @Transactional(readOnly = true)
     public List<RatingResponse> getRatingsByRecipeId(Long recipeId) {
         log.debug("Fetching ratings for Recipe ID: {}", recipeId);
@@ -207,12 +162,7 @@ public class RatingService {
         }
         return isOwner;
     }
-    /**
-     * Retrieves all ratings made by a specific user.
-     *
-     * @param userId The ID of the user.
-     * @return A list of RatingResponse DTOs.
-     */
+
     @Transactional(readOnly = true)
     public List<RatingResponse> getRatingsByUserId(Long userId) {
         log.debug("Fetching ratings for User ID: {}", userId);

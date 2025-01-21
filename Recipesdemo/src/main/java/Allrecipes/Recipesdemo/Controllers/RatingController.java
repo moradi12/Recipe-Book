@@ -31,12 +31,6 @@ public class RatingController {
     private final UserRepository userRepository;
     private final JWT jwtUtil;
 
-    /**
-     * Retrieves a rating by its ID.
-     *
-     * @param id The ID of the rating.
-     * @return The RatingResponse if found.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getRatingById(@PathVariable Long id) {
         try {
@@ -53,13 +47,6 @@ public class RatingController {
         }
     }
 
-    /**
-     * Deletes a rating by its ID. Only the rating owner or an admin can delete.
-     *
-     * @param id      The ID of the rating to delete.
-     * @param request The HTTP request containing the Authorization header.
-     * @return No Content if deletion is successful.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRating(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -69,13 +56,11 @@ public class RatingController {
             User user = userRepository.findById(userDetails.getUserId())
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
-            // Authorization: Only the owner or admin can delete the rating
             if (!user.getUserType().equals(UserType.ADMIN) && !ratingService.isRatingOwner(id, user)) {
                 log.warn("User ID {} is not authorized to delete Rating ID {}", user.getId(), id);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this rating.");
             }
 
-            // Call service method
             ratingService.deleteRating(id, user);
             log.info("Rating with ID {} deleted successfully by User ID {}", id, user.getId());
             return ResponseEntity.noContent().build();
@@ -91,11 +76,6 @@ public class RatingController {
         }
     }
 
-    /**
-     * Retrieves all ratings.
-     *
-     * @return A list of RatingResponse.
-     */
     @GetMapping
     public ResponseEntity<?> getAllRatings() {
         try {
@@ -109,12 +89,6 @@ public class RatingController {
         }
     }
 
-    /**
-     * Retrieves ratings for a specific recipe by Recipe ID.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return A list of RatingResponse.
-     */
     @GetMapping("/recipe/{recipeId}")
     public ResponseEntity<?> getRatingsByRecipeId(@PathVariable Long recipeId) {
         try {
@@ -131,12 +105,7 @@ public class RatingController {
         }
     }
 
-    /**
-     * Retrieves ratings made by a specific user by User ID.
-     *
-     * @param userId The ID of the user.
-     * @return A list of RatingResponse.
-     */
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getRatingsByUserId(@PathVariable Long userId) {
         try {
@@ -153,13 +122,7 @@ public class RatingController {
         }
     }
 
-    /**
-     * Extracts user details from the JWT in the Authorization header.
-     *
-     * @param request The HTTP request.
-     * @return The UserDetails extracted from the token.
-     * @throws LoginException If the token is invalid or missing.
-     */
+
     private UserDetails getUserDetailsFromRequest(HttpServletRequest request) throws LoginException {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

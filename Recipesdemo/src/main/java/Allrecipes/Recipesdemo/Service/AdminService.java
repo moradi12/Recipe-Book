@@ -12,31 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Service class for handling admin-related operations.
- */
 @Service
 @RequiredArgsConstructor
 public class AdminService {
     private final RecipeRepository recipeRepository;
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
-    /**
-     * Fetches all recipes with a status of PENDING.
-     *
-     * @return List of pending recipes.
-     */
     @Transactional(readOnly = true)
     public List<Recipe> getPendingRecipes() {
         logger.debug("Fetching all pending recipes.");
         return recipeRepository.findByStatus(RecipeStatus.PENDING_APPROVAL); // Using enum constant directly
     }
 
-    /**
-     * Approves a recipe by setting its status to APPROVED.
-     *
-     * @param id The ID of the recipe to approve.
-     */
     @Transactional
     public void approveRecipe(Long id) {
         Recipe recipe = recipeRepository.findById(id)
@@ -49,11 +36,7 @@ public class AdminService {
         logger.info("Recipe with ID {} approved.", id);
     }
 
-    /**
-     * Rejects a recipe by setting its status to REJECTED.
-     *
-     * @param id The ID of the recipe to reject.
-     */
+
     @Transactional
     public void rejectRecipe(Long id) {
         Recipe recipe = recipeRepository.findById(id)

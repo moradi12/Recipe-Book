@@ -21,12 +21,6 @@ public class RatingStatisticsService {
     private final RatingRepository ratingRepository;
     private final RecipeRepository recipeRepository;
 
-    /**
-     * Retrieves the top N rated recipes based on average scores.
-     *
-     * @param topN The number of top-rated recipes to retrieve.
-     * @return A list of top-rated Recipe entities.
-     */
     @Transactional(readOnly = true)
     public List<Recipe> getTopRatedRecipes(int topN) {
         log.debug("Fetching top {} rated recipes.", topN);
@@ -36,13 +30,6 @@ public class RatingStatisticsService {
         return topRecipes;
     }
 
-    /**
-     * Retrieves the total number of ratings for a specific recipe.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return The total number of ratings.
-     * @throws ResourceNotFoundException If the recipe does not exist.
-     */
     @Transactional(readOnly = true)
     public long getTotalRatingsForRecipe(Long recipeId) {
         log.debug("Counting total ratings for Recipe ID: {}", recipeId);

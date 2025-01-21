@@ -17,12 +17,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    /**
-     * Create a new comment.
-     *
-     * @param comment The Comment entity to be created.
-     * @return The saved Comment entity.
-     */
     @Transactional
     public Comment createComment(Comment comment) {
         log.debug("Creating a new comment: {}", comment);
@@ -31,13 +25,6 @@ public class CommentService {
         return savedComment;
     }
 
-    /**
-     * Get a comment by its ID.
-     *
-     * @param id The ID of the comment.
-     * @return The Comment entity.
-     * @throws ResourceNotFoundException If the comment is not found.
-     */
     @Transactional(readOnly = true)
     public Comment getCommentById(Long id) {
         log.debug("Fetching comment with ID: {}", id);
@@ -48,14 +35,6 @@ public class CommentService {
                 });
     }
 
-    /**
-     * Update an existing comment.
-     *
-     * @param id      The ID of the comment to update.
-     * @param updated The Comment entity containing updated information.
-     * @return The updated Comment entity.
-     * @throws ResourceNotFoundException If the comment is not found.
-     */
     @Transactional
     public Comment updateComment(Long id, Comment updated) {
         log.debug("Updating comment with ID: {}", id);
@@ -75,12 +54,6 @@ public class CommentService {
         return savedComment;
     }
 
-    /**
-     * Delete a comment by its ID.
-     *
-     * @param id The ID of the comment to delete.
-     * @throws ResourceNotFoundException If the comment is not found.
-     */
     @Transactional
     public void deleteComment(Long id) {
         log.debug("Deleting comment with ID: {}", id);
@@ -94,23 +67,12 @@ public class CommentService {
         log.info("Deleted comment with ID: {}", id);
     }
 
-    /**
-     * Get all comments.
-     *
-     * @return A list of all Comment entities.
-     */
     @Transactional(readOnly = true)
     public List<Comment> getAllComments() {
         log.debug("Fetching all comments.");
         return commentRepository.findAll();
     }
 
-    /**
-     * Get comments by recipe ID.
-     *
-     * @param recipeId The ID of the recipe.
-     * @return A list of Comment entities associated with the recipe.
-     */
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByRecipeId(Long recipeId) {
         log.debug("Fetching comments for recipe ID: {}", recipeId);

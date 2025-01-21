@@ -53,7 +53,7 @@ public class CustomerTester implements CommandLineRunner {
 
         try {
             addCustomers();
-            initializeCategories(); // Ensure categories are initialized
+            initializeCategories();
             addTestRecipes();
 
             if (testRecipe == null) {

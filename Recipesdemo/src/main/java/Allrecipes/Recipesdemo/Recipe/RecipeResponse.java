@@ -23,11 +23,9 @@ public class RecipeResponse {
     private List<String> categories;
     private boolean containsGluten; // Add this field
 
-    // Default constructor
     public RecipeResponse() {
     }
 
-    // Constructor with all fields including `containsGluten`
     public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps,
                           int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername,
                           String photo, List<String> categories, boolean containsGluten) {
@@ -46,7 +44,6 @@ public class RecipeResponse {
         this.containsGluten = containsGluten;
     }
 
-    // Constructor with photo as byte[] and all fields including `containsGluten`
     public RecipeResponse(Long id, String title, String description, List<String> ingredients, String preparationSteps,
                           int cookingTime, int servings, String dietaryInfo, String status, String createdByUsername,
                           byte[] photoBytes, List<String> categories, boolean containsGluten) {

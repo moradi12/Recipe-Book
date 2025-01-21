@@ -50,10 +50,10 @@ public class RecipeController {
     @PostMapping
     public ResponseEntity<?> createRecipe(@RequestBody @Valid RecipeCreateRequest request, HttpServletRequest httpRequest) {
         try {
-            log.debug("Attempting to create a new recipe."); // New line
+            log.debug("Attempting to create a new recipe.");
             User user = getCurrentUser(httpRequest);
             recipeService.createRecipe(request, user);
-            log.info("Recipe created successfully by User ID: {}", user.getId()); // New line
+            log.info("Recipe created successfully by User ID: {}", user.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body("Recipe created successfully.");
         } catch (IllegalArgumentException e) {
             log.warn("Recipe creation failed: {}", e.getMessage());
@@ -74,7 +74,7 @@ public class RecipeController {
     @GetMapping("/old/{id}")
     public ResponseEntity<?> OldgetRecipeById(@PathVariable Long id) {
         try {
-            log.debug("Fetching recipe with ID: {}", id); // New line
+            log.debug("Fetching recipe with ID: {}", id);
             RecipeResponse recipeResponse = recipeService.toRecipeResponse(recipeService.getRecipeById(id)); // New line
             return ResponseEntity.ok(recipeResponse); // Updated to return RecipeResponse - New line
         } catch (RecipeNotFoundException e) {
@@ -97,17 +97,13 @@ public class RecipeController {
             Page<RecipeResponse> resultPage;
 
             if (category != null) {
-                // Fetch recipes that belong to the given category
                 Page<Recipe> recipePage = recipeService.getRecipesByCategory(category, pageable);
-                // Map each Recipe to RecipeResponse
                 List<RecipeResponse> responses = recipePage.getContent()
                         .stream()
                         .map(RecipeMapper::toRecipeResponse)
                         .collect(Collectors.toList());
-                // Create a PageImpl containing the response objects
                 resultPage = new PageImpl<>(responses, pageable, recipePage.getTotalElements());
             } else {
-                // If no category is provided, fetch all recipes with response mapping
                 resultPage = recipeService.getAllRecipesWithResponse(pageable);
             }
 
@@ -158,7 +154,7 @@ public class RecipeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRecipe(@PathVariable Long id, HttpServletRequest request) {
-        User user = null; // Declare user outside the try block - New line
+        User user = null;
         try {
             log.debug("Attempting to delete recipe with ID: {}", id); // New line
             user = getCurrentUser(request);

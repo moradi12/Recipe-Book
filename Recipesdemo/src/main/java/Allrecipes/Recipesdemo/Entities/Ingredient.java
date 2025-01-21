@@ -30,11 +30,10 @@ public class Ingredient {
     private String unit;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id", nullable = false) // Ensures foreign key constraint
-    @ToString.Exclude // Exclude recipe from toString to prevent LazyInitializationException
+    @JoinColumn(name = "recipe_id", nullable = false)
+    @ToString.Exclude
     private Recipe recipe;
 
-    // Helper Method to Manage Bidirectional Relationship
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
         if (recipe != null && !recipe.getIngredients().contains(this)) {

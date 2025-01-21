@@ -35,7 +35,7 @@ public class CustomerService {
             User admin = User.builder()
                     .username("admin")
                     .email("admin@admin.com")
-                    .password("admin") // In production, ensure passwords are hashed
+                    .password("admin")
                     .userType(UserType.ADMIN)
                     .build();
             userRepository.save(admin);
@@ -49,7 +49,6 @@ public class CustomerService {
                 .or(() -> userRepository.findByEmail(usernameOrEmail))
                 .orElseThrow(() -> new UserNotFoundException("User with username or email '" + usernameOrEmail + "' not found."));
 
-        // In production, use a password encoder like BCrypt to verify passwords
         if (!rawPassword.equals(user.getPassword())) {
             throw new UserNotFoundException("Invalid username/email or password.");
         }
@@ -72,8 +71,8 @@ public class CustomerService {
         User user = User.builder()
                 .username(username)
                 .email(email)
-                .password(rawPassword) // In production, ensure passwords are hashed
-                .userType(UserType.CUSTOMER) // Default to CUSTOMER
+                .password(rawPassword)
+                .userType(UserType.CUSTOMER)
                 .build();
         return userRepository.save(user);
 
@@ -142,7 +141,7 @@ public class CustomerService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .userType(user.getUserType().name()) // Reflect the UserType as a string
+                .userType(user.getUserType().name())
                 .favorites(
                         user.getFavorites().stream()
                                 .map(Recipe::getId)
@@ -180,7 +179,7 @@ public class CustomerService {
         }
 
         if (newPassword != null && newPassword.length() >= 6) {
-            user.setPassword(newPassword); // In production, ensure passwords are hashed
+            user.setPassword(newPassword);
         }
 
         userRepository.save(user);
@@ -197,7 +196,6 @@ public class CustomerService {
         user.getFavorites().add(recipe);
         userRepository.save(user);
     }
-
 
     @Transactional
     public void removeFavoriteRecipe(User user, Long recipeId) {

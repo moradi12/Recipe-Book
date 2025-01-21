@@ -25,7 +25,6 @@ public class RecipeMapper {
         }
         logger.info("Mapping Recipe with ID: {}", recipe.getId());
 
-        // Convert the Set<Category> to a List<String> of category names (as an example):
         List<String> categoryNames = recipe.getCategories() != null
                 ? recipe.getCategories().stream()
                 .map(Category::getName) // Or any property that identifies the category
@@ -44,7 +43,6 @@ public class RecipeMapper {
                 .createdByUsername(recipe.getCreatedBy() != null ? recipe.getCreatedBy().getUsername() : "Unknown")
                 .photo(recipe.getPhotoAsBase64())
                 .containsGluten(recipe.getContainsGluten()) // Include containsGluten
-                // <-- NEW: Pass the categoryNames to the builder
                 .categories(categoryNames)
 
                 .build();

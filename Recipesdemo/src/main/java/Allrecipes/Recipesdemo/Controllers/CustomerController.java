@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.security.auth.login.LoginException;
 import java.util.HashMap;
 import java.util.List;
@@ -77,11 +78,10 @@ public class CustomerController {
 
             return new ResponseEntity<>(responseBody, headers, HttpStatus.OK);
         } catch (UserNotFoundException e) {
-            // Handle authentication failures
             log.warn("Login failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            // Handle any other unexpected exceptions
+
             log.error("Login failed due to an unexpected error.", e);
             return new ResponseEntity<>("Login failed due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -102,15 +102,14 @@ public class CustomerController {
 
             return ResponseEntity.ok(users);
         } catch (UserNotFoundException e) {
-            // Handle cases where the user performing the action is not found
+
             log.warn("Fetching all users failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
-            // Handle unauthorized access
             log.warn("Fetching all users unauthorized: {}", e.getMessage());
+
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            // Handle any other unexpected exceptions
             log.error("Failed to retrieve users due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to retrieve users due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -129,15 +128,15 @@ public class CustomerController {
 
             return ResponseEntity.noContent().build();
         } catch (UserNotFoundException e) {
-            // Handle cases where the user to be deleted is not found
+
             log.warn("Deletion failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
-            // Handle unauthorized access
+
             log.warn("Deletion unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
-            // Handle any other unexpected exceptions
+
             log.error("Failed to delete user due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to delete user due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -269,19 +268,19 @@ public class CustomerController {
             UserResponse response = customerService.toUserResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            // Handle cases where the user is not found
+
             log.warn("Removing favorite failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
-            // Handle unauthorized access
+
             log.warn("Removing favorite unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
-            // Handle invalid input parameters
+
             log.warn("Removing favorite failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            // Handle any other unexpected exceptions
+
             log.error("Failed to remove favorite due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to remove favorite due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -304,19 +303,19 @@ public class CustomerController {
             UserResponse response = customerService.toUserResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (UserNotFoundException e) {
-            // Handle cases where the user is not found
+
             log.warn("Assigning user type failed: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (LoginException e) {
-            // Handle unauthorized access
+
             log.warn("Assigning user type unauthorized: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
         } catch (IllegalArgumentException e) {
-            // Handle invalid input parameters
+
             log.warn("Assigning user type failed due to invalid parameters: {}", e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            // Handle any other unexpected exceptions
+
             log.error("Failed to assign user type due to an unexpected error.", e);
             return new ResponseEntity<>("Failed to assign user type due to an unexpected error.", HttpStatus.INTERNAL_SERVER_ERROR);
         }

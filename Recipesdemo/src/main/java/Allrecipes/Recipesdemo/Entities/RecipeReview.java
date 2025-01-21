@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class RecipeReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)
@@ -30,12 +30,12 @@ public class RecipeReview {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    @ToString.Exclude // Exclude recipe from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude // Exclude user from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private User user;
 
     private LocalDateTime createdAt;
@@ -45,7 +45,6 @@ public class RecipeReview {
         createdAt = LocalDateTime.now();
     }
 
-    // Optional: Helper methods to manage bidirectional relationships
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
         if (recipe != null && !recipe.getRecipeReviews().contains(this)) {

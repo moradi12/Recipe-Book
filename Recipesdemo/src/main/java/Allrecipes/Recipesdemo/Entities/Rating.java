@@ -4,9 +4,6 @@ import Allrecipes.Recipesdemo.Recipe.Recipe;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Entity representing a user rating for a specific recipe.
- */
 @Entity
 @Table(name = "ratings",
         uniqueConstraints = @UniqueConstraint(columnNames = {"recipe_id", "user_id"}))

@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class AdminAdvice {
-    ///also adding login
     @ExceptionHandler(value = {AdminException.class, LoginException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrDetails handleError(AdminException e){

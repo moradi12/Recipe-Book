@@ -15,12 +15,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -32,10 +32,9 @@ public class Category {
 
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     @Builder.Default
-    @ToString.Exclude // Exclude recipes from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Set<Recipe> recipes = new HashSet<>();
 
-    // Helper Methods to Manage Bidirectional Relationships
     public void addRecipe(Recipe recipe) {
         this.recipes.add(recipe);
         recipe.getCategories().add(this);

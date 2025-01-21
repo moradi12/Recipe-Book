@@ -72,31 +72,22 @@ public class Recipe {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
-    @ToString.Exclude // Exclude user from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private User createdBy;
 
     @Column(nullable = false)
     private boolean containsGluten = true;
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(
-//            name = "recipe_categories",
-//            joinColumns = @JoinColumn(name = "recipe_id"),
-//            inverseJoinColumns = @JoinColumn(name = "category_id")
-//    )
-//    @Builder.Default
-//    @ToString.Exclude // Exclude categories from toString to prevent LazyInitializationException
-//    private Set<Category> categories = new HashSet<>();
 @ManyToMany
 private Set<Category> categories;
 
     @ManyToMany(mappedBy = "favorites", fetch = FetchType.LAZY)
     @Builder.Default
-    @ToString.Exclude // Exclude favorites from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Set<User> favorites = new HashSet<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @ToString.Exclude // Exclude recipeReviews from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Set<RecipeReview> recipeReviews = new HashSet<>();
 
     public String getPhotoAsBase64() {

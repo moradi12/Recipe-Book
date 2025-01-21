@@ -15,12 +15,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -43,15 +43,14 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "recipe_id")
     )
     @Builder.Default
-    @ToString.Exclude // Exclude favorites from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Set<Recipe> favorites = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @ToString.Exclude // Exclude recipeReviews from toString to prevent LazyInitializationException
+    @ToString.Exclude
     private Set<RecipeReview> recipeReviews = new HashSet<>();
 
-    // Helper Methods to Manage Bidirectional Relationships
     public void addFavorite(Recipe recipe) {
         this.favorites.add(recipe);
         recipe.getFavorites().add(this);

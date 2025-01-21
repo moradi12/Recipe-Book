@@ -37,8 +37,6 @@ public class CategoryController {
     @GetMapping("/food-categories")
     public ResponseEntity<List<Map<String, String>>> getFoodCategories() {
         log.debug("Fetching all predefined food categories.");
-
-        // Convert enum values to a list of maps for better readability (name and description)
         List<Map<String, String>> foodCategories = List.of(FoodCategories.values()).stream()
                 .map(foodCategory -> Map.of(
                         "name", foodCategory.name(),
@@ -70,7 +68,7 @@ public class CategoryController {
             @RequestHeader("Authorization") String authHeader,
             @RequestBody Category category) throws LoginException {
         log.debug("Creating new category: {}", category.getFoodCategory());
-        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
+        jwtUtil.checkUser(authHeader, UserType.ADMIN);
         Category createdCategory = categoryService.createCategory(category.getFoodCategory());
         log.info("Created category with ID: {}", createdCategory.getId());
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
@@ -82,7 +80,7 @@ public class CategoryController {
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String name) throws LoginException {
         log.debug("Deleting category with name: {}", name);
-        jwtUtil.checkUser(authHeader, UserType.ADMIN); // Only Admin can access
+        jwtUtil.checkUser(authHeader, UserType.ADMIN);
         categoryService.deleteCategoryByName(name);
         log.info("Deleted category: {}", name);
         return ResponseEntity.ok(Map.of("message", "Category deleted successfully."));
