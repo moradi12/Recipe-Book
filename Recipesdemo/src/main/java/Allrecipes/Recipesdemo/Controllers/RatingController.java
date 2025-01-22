@@ -129,7 +129,7 @@ public class RatingController {
             log.warn("Missing or invalid Authorization header.");
             throw new IllegalArgumentException("Missing or invalid Authorization header");
         }
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        String token = authHeader.substring(7);
         log.debug("Extracting user details from token.");
         return jwtUtil.getUserDetails(token);
     }
