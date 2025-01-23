@@ -1,52 +1,86 @@
-/* src/components/Features/Features.module.css */
+/* Reset all elements to remove margins and paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
 
 .container {
-  padding: 2rem;
-  background-color: #fff8f0; /* Light background to make colors pop */
+  padding: 3rem 1rem;
+  background: linear-gradient(120deg, #f48fb1, #f48fb1);
+  min-height: 100vh; /* Full height of the viewport */
+  width: 100%; /* Full width of the page */
+  display: flex; /* Flexbox for vertical centering */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .heading {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #d35400; /* Complementary color */
+  font-size: 2.2rem;
+  margin: 0 0 2rem; /* Remove top margin */
+  color: #0e0b0e;
+  font-weight: 700;
 }
 
 .featuresGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
+  max-width: 1200px;
+  width: 100%; /* Ensures grid takes full width */
+  margin: 0 auto; /* Center grid horizontally */
+  padding: 0; /* No extra padding */
 }
 
 .featureCard {
-  background-color: #ffffff;
-  border-radius: 10px;
+  background-color: #fffdfb;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  cursor: pointer;
 }
 
 .featureCard:hover {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  /* Color is now dynamically set via inline styles */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   margin-bottom: 0.5rem;
-  color: #2c3e50;
+  color: #333;
 }
 
 .description {
   font-size: 1rem;
-  color: #7f8c8d;
+  color: #784242;
+  line-height: 1.5;
+  max-width: 90%;
+  margin: 0 auto; /* Center description text */
+}
+
+/* Additional rule for adjacent sections like header/nav */
+header, nav, footer {
+  margin: 0;
+  padding: 0;
 }

@@ -94,7 +94,7 @@ const GetSingleRecipe: React.FC = () => {
         </p>
       </div>
 
-      <button className="back-button" onClick={() => navigate("/recipes")}>
+      <button className="back-button" onClick={() => navigate("/all/recipes")}>
         Back to Recipes
       </button>
     </div>
