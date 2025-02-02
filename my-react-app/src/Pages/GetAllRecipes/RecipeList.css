@@ -9,7 +9,16 @@
     justify-content: space-between; /* Even spacing between items */
     gap: 20px; /* Adds space between items */
   }
-  
+
+.button-favorite {
+  background-color: #ff9800; /* Orange */
+  color: #fff;
+}
+
+.button-favorite:hover {
+  background-color: #fb8c00; /* Slightly darker orange */
+}
+
   /* Individual recipe item */
   .recipe-item {
     flex: 1 1 calc(33.333% - 20px); /* Three items per row, accounting for gaps */

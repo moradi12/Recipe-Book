@@ -1,20 +1,22 @@
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RecipeResponse } from '../../Models/RecipeResponse'; // NEW CODE
-import RecipeService from '../../Service/RecipeService'; // NEW CODE
+import { RecipeResponse } from '../../Models/RecipeResponse';
+import RecipeService from '../../Service/RecipeService';
 import UserService from '../../Service/UserService';
 import { checkData } from '../../Utiles/checkData';
 import { notify } from '../../Utiles/notif';
+import { useFavorites } from '../Redux/Hooks/useFavorites';
 import recipeSystem from '../Redux/store';
 import './UserPanel.css';
 
-// Define the structure of the decoded JWT
+// Import the custom hook
+
 type DecodedJwt = {
   id: number;
   userName: string;
   userType: string;
-  exp: number; // Expiry time in seconds since epoch
+  exp: number; 
 };
 
 const UserPanel: React.FC = () => {
@@ -22,19 +24,20 @@ const UserPanel: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Store the user info from the token
+  // The user info from the token
   const [userInfo, setUserInfo] = useState<DecodedJwt | null>(null);
 
-  // NEW CODE: store recipes created by the current user
+  // The user's own recipes
   const [myRecipes, setMyRecipes] = useState<RecipeResponse[]>([]);
+
+  // Use the favorites hook
+  const { favoriteRecipeIds, toggleFavorite } = useFavorites();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Verify user is logged in and token is valid
     checkData();
-    const state = recipeSystem.getState();
-    const token = state.auth.token;
+    const token = recipeSystem.getState().auth.token;
 
     if (!token) {
       notify.error('You must be logged in to access the user panel.');
@@ -44,18 +47,15 @@ const UserPanel: React.FC = () => {
 
     try {
       const decoded = jwtDecode<DecodedJwt>(token);
-      const isExpired = decoded.exp * 1000 < Date.now();
-
-      if (isExpired) {
+      if (decoded.exp * 1000 < Date.now()) {
         notify.error('Your session has expired. Please log in again.');
         navigate('/login');
         return;
       }
 
-      // If valid token, store user info
       setUserInfo(decoded);
 
-      // NEW CODE: fetch user’s own recipes
+      // Fetch the user's own recipes
       RecipeService.getMyRecipes(token)
         .then((res) => {
           setMyRecipes(res.data);
@@ -63,7 +63,6 @@ const UserPanel: React.FC = () => {
         .catch((err) => {
           console.error('Error fetching my recipes:', err);
         });
-
     } catch (error) {
       console.error('Error decoding JWT:', error);
       notify.error('Invalid token. Please log in again.');
@@ -111,8 +110,6 @@ const UserPanel: React.FC = () => {
       {userInfo ? (
         <>
           <h2>User Panel</h2>
-
-          {/* Show basic user info */}
           <div className="user-info">
             <p><strong>Username:</strong> {userInfo.userName}</p>
             <p><strong>User Type:</strong> {userInfo.userType}</p>
@@ -149,21 +146,29 @@ const UserPanel: React.FC = () => {
             </button>
           </form>
 
-          {/* NEW CODE: Render the user's recipes */}
+          {/* Render the user's recipes */}
           <hr />
           <h3>My Recipes</h3>
           {myRecipes.length === 0 ? (
             <p>You haven't created any recipes yet.</p>
           ) : (
             <ul>
-              {myRecipes.map((recipe) => (
-                <li key={recipe.id}>
-                  <strong>{recipe.title}</strong> - {recipe.description}
-                </li>
-              ))}
+              {myRecipes.map((recipe) => {
+                // Check if this recipe is a favorite
+                const isFav = favoriteRecipeIds.includes(recipe.id);
+
+                return (
+                  <li key={recipe.id}>
+                    <strong>{recipe.title}</strong> - {recipe.description}
+                    <br />
+                    <button onClick={() => toggleFavorite(recipe.id)}>
+                      {isFav ? 'Remove from Favorites' : 'Add to Favorites'}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
-
         </>
       ) : (
         <p>Loading...</p>

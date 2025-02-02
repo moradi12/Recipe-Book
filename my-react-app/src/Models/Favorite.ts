@@ -5,3 +5,7 @@ export interface Favorite {
   recipeId: number;
   createdAt: string; // ISO date string
 }
+export interface FavoriteDTO {
+  id: number;
+  recipeId: number;
+}
