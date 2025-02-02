@@ -6,9 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Repository interface for Comment entities.
- */
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByRecipeId(Long recipeId);

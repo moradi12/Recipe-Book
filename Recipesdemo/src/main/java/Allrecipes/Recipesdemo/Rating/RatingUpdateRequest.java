@@ -5,9 +5,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
-/**
- * Data Transfer Object for updating an existing Rating.
- */
 @Getter
 @Setter
 @NoArgsConstructor

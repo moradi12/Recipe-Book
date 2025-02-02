@@ -68,6 +68,9 @@ class RecipeService {
     return axios.get<RecipeResponse[]>(`${this.baseUrl}/all`);
   }
 
+
+
+  
   // ===========================
   // GET ALL RECIPES (Paginated + optional category)
   // ===========================
@@ -238,6 +241,14 @@ public async approveRecipe(
 ): Promise<AxiosResponse<UpdateStatusResponse>> {
   console.log("Approving recipe", id, "with token:", token); // Debugging log
   return axios.put(`${this.adminUrl}/recipes/${id}/approve`, {}, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+public async getMyRecipes(token: string): Promise<AxiosResponse<RecipeResponse[]>> {
+  return axios.get<RecipeResponse[]>(`${this.baseUrl}/my`, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,

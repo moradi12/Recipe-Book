@@ -23,12 +23,12 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Recipe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include // Only include 'id' in equals and hashCode
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String name;

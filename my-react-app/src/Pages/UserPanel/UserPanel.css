@@ -1,63 +1,123 @@
+
 .user-panel {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .user-panel h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  .user-panel-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 5px;
-    color: #555;
-  }
-  
-  .form-group input {
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button[type="submit"]:hover {
-    background-color: #0056b3;
-  }
-  
-  button[type="submit"]:disabled {
-    background-color: #b3d7ff;
-    cursor: not-allowed;
-  }
-  
-  
+  max-width: 600px;
+  margin: 2rem auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.user-panel h2 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+}
+
+.user-info {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.user-info p {
+  margin: 0.25rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.user-panel-form {
+  margin-bottom: 2rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1.5rem;
+}
+
+.user-panel-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.user-panel-form .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.user-panel-form .form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-panel-form .form-group input:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.2);
+}
+
+.user-panel-form button {
+  background-color: #3b3b8d;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.user-panel-form button:hover {
+  background-color: #42628e;
+}
+
+.user-panel-form button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.user-panel h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-panel p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.user-panel ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.user-panel li {
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.user-panel li:hover {
+  background-color: #f0f0f0;
+}
+
+.user-panel li strong {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}

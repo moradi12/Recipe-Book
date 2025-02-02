@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface IngredientsRepo extends JpaRepository<Ingredient, Long> {
-    List<Ingredient> findByRecipe_Id(Long recipeId); // Correct field access
+    List<Ingredient> findByRecipe_Id(Long recipeId);
 }

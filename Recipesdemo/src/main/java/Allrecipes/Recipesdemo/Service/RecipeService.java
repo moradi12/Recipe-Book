@@ -327,4 +327,14 @@ public class RecipeService {
                 .map(this::toRecipeResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<RecipeResponse> getRecipesCreatedByUser(Long userId) {
+        List<Recipe> recipes = recipeRepository.findByCreatedById(userId);
+        // Convert each Recipe -> RecipeResponse
+        return recipes.stream()
+                .map(this::toRecipeResponse)
+                .collect(Collectors.toList());
+    }
+
 }

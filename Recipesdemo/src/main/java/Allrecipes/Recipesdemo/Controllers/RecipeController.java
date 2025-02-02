@@ -203,5 +203,19 @@ public class RecipeController {
             throw new IllegalArgumentException("Error occurred while validating token.");
         }
     }
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyRecipes(HttpServletRequest request) {
+        try {
+            // Reuse your existing getCurrentUser() to parse the JWT from the header
+            User currentUser = getCurrentUser(request);
+            List<RecipeResponse> myRecipes = recipeService.getRecipesCreatedByUser(currentUser.getId());
+            return ResponseEntity.ok(myRecipes);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching your recipes.");
+        }
+    }
 
 }
