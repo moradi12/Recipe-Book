@@ -20,7 +20,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByCreatedById(Long userId);
 
     List<Recipe> findByTitleContainingIgnoreCase(String title);
-    @Query("SELECT r FROM Recipe r JOIN FETCH r.categories WHERE r.id = :id")
+    @Query("SELECT r FROM Recipe r LEFT JOIN FETCH r.categories WHERE r.id = :id")
     Optional<Recipe> findByIdWithCategories(@Param("id") Long id);
     Page<Recipe> findById(Long id, Pageable pageable);
 

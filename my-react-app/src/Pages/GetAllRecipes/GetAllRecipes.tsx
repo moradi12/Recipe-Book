@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +27,13 @@ const GetAllRecipes: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+
+  /* --------------------------------
+   * Helpers: define user privileges
+   * -------------------------------- */
+  const canEdit = auth.userType === "ADMIN" || auth.userType === "EDITOR";
+  const canApproveOrReject = auth.userType === "ADMIN";
+  const canDelete = auth.userType === "ADMIN";
 
   useEffect(() => {
     checkData();
@@ -93,13 +99,12 @@ const GetAllRecipes: React.FC = () => {
     }
   }, [pagination.page, pagination.size, filterCategory]);
 
-  // -------------------------------
-  // Handler to Approve Recipe
-  // -------------------------------
+  /* --------------------------------
+   * Approve a recipe (ADMIN only)
+   * -------------------------------- */
   const handleApproveRecipe = useCallback(
     async (id: number) => {
       const token = recipeSystem.getState().auth.token;
-      console.log("Token in Approve Handler:", token); // Debugging log
       if (!token || token.length < 10) {
         notify.error("Missing authorization token. Please log in again.");
         return;
@@ -108,7 +113,7 @@ const GetAllRecipes: React.FC = () => {
         await RecipeService.approveRecipe(id, token);
         console.log("Recipe approved successfully:", id);
         notify.success("Recipe approved successfully!");
-        fetchRecipes(); // Refresh the list after status update
+        fetchRecipes(); // Refresh the list
       } catch (err: unknown) {
         let errorMessage = "Failed to approve recipe.";
         if (err instanceof Error) {
@@ -121,9 +126,9 @@ const GetAllRecipes: React.FC = () => {
     [fetchRecipes]
   );
 
-  // -------------------------------
-  // Handler to Reject Recipe
-  // -------------------------------
+  /* --------------------------------
+   * Reject a recipe (ADMIN only)
+   * -------------------------------- */
   const handleRejectRecipe = useCallback(
     async (id: number) => {
       const token = recipeSystem.getState().auth.token;
@@ -135,7 +140,7 @@ const GetAllRecipes: React.FC = () => {
         await RecipeService.rejectRecipe(id, token);
         console.log("Recipe rejected successfully:", id);
         notify.success("Recipe rejected successfully!");
-        fetchRecipes(); // Refresh the list after status update
+        fetchRecipes(); // Refresh the list
       } catch (err: unknown) {
         let errorMessage = "Failed to reject recipe.";
         if (err instanceof Error) {
@@ -148,9 +153,9 @@ const GetAllRecipes: React.FC = () => {
     [fetchRecipes]
   );
 
-  // -------------------------------
-  // Handler to Delete Recipe
-  // -------------------------------
+  /* --------------------------------
+   * Delete a recipe (ADMIN only)
+   * -------------------------------- */
   const handleDeleteRecipe = useCallback(
     async (id: number) => {
       const state = recipeSystem.getState();
@@ -178,9 +183,12 @@ const GetAllRecipes: React.FC = () => {
     [fetchRecipes]
   );
 
-  // -------------------------------
-  // Handler to Change Recipe Status (non-admin users)
-  // -------------------------------
+  /* --------------------------------
+   * Update a recipe status (ADMIN or CREATOR logic)
+   * This example shows how a non-admin might update
+   * a recipe’s status. Adjust accordingly.
+   * -------------------------------- */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChangeRecipeStatus = useCallback(
     async (id: number, newStatus: RecipeStatus) => {
       const token = recipeSystem.getState().auth.token;
@@ -203,6 +211,17 @@ const GetAllRecipes: React.FC = () => {
       }
     },
     [fetchRecipes]
+  );
+
+  /* --------------------------------
+   * Edit a recipe (ADMIN, EDITOR)
+   * -------------------------------- */
+  const handleEditRecipe = useCallback(
+    (recipeId: number) => {
+      // This navigates to an EditRecipe form for the given recipeId
+      navigate(`/edit-recipe/${recipeId}`);
+    },
+    [navigate]
   );
 
   // Fetch categories on mount
@@ -237,16 +256,10 @@ const GetAllRecipes: React.FC = () => {
       {/* Recipe List */}
       <RecipeList
         recipes={recipes}
-        onEditRecipe={
-          auth.userType === "ADMIN"
-            ? (recipeId) => navigate(`/edit-recipe/${recipeId}`)
-            : undefined
-        }
-        onApproveRecipe={auth.userType === "ADMIN" ? handleApproveRecipe : undefined}
-        onRejectRecipe={auth.userType === "ADMIN" ? handleRejectRecipe : undefined}
-        onDeleteRecipe={auth.userType === "ADMIN" ? handleDeleteRecipe : undefined}
-
-        // onDeleteRecipe={handleDeleteRecipe} 
+        onEditRecipe={canEdit ? handleEditRecipe : undefined}
+        onApproveRecipe={canApproveOrReject ? handleApproveRecipe : undefined}
+        onRejectRecipe={canApproveOrReject ? handleRejectRecipe : undefined}
+        onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
       />
 
       {/* Pagination */}

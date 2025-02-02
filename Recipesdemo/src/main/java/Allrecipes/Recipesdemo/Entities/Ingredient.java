@@ -7,7 +7,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true) // Control Lombok's equals and hashCode
@@ -29,9 +28,8 @@ public class Ingredient {
     @NotBlank(message = "Ingredient unit is mandatory")
     private String unit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
-    @ToString.Exclude
     private Recipe recipe;
 
     public void setRecipe(Recipe recipe) {
@@ -40,4 +38,17 @@ public class Ingredient {
             recipe.getIngredients().add(this);
         }
     }
+    // ✅ Add a constructor that matches the method call
+    public Ingredient(String name, String quantity, String unit, Recipe recipe) {
+        this.name = name;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.recipe = recipe;
+    }
+
+    // ✅ Add a default no-args constructor (needed for JPA)
+    public Ingredient() {}
+
+    // ✅ Ensure all getter/setter methods exist
 }
+

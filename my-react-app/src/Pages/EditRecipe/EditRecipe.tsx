@@ -5,12 +5,13 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { Category } from "../../Models/Category";
 import {
-    IngredientRequest,
-    RecipeCreateRequest,
+  IngredientRequest,
+  RecipeCreateRequest,
 } from "../../Models/RecipeCreateRequest";
 import { RecipeResponse } from "../../Models/RecipeResponse";
 import RecipeService from "../../Service/RecipeService";
 import { notify } from "../../Utiles/notif";
+import "./EditRecipe.css";
 
 const EditRecipe: React.FC = () => {
   const { id } = useParams(); // e.g. /edit-recipe/5
@@ -44,16 +45,29 @@ const EditRecipe: React.FC = () => {
     if (!id) return;
     try {
       setLoading(true);
+      setError("");
+
+      // Reset to default to prevent stale data from previous edits
+      setRecipeData({
+        title: "",
+        description: "",
+        cookingTime: 0,
+        servings: 0,
+        dietaryInfo: "",
+        containsGluten: true,
+        ingredients: [],
+        preparationSteps: "",
+        categoryIds: [],
+        photo: "",
+      });
+
       const response = await RecipeService.getRecipeById(Number(id));
       const existing: RecipeResponse = response.data;
 
       // Convert the existing RecipeResponse -> RecipeCreateRequest
-      // For ingredients, we have an array of strings (like "2 cups of sugar").
-      // We'll parse them into { name, quantity, unit } objects:
       const parsedIngredients: IngredientRequest[] = existing.ingredients.map((str) => {
         const parts = str.split(" of ");
         if (parts.length === 2) {
-          // e.g. "2 cups" and "sugar"
           const [qty, unit] = parts[0].split(" ");
           return {
             name: parts[1].trim(),
@@ -69,9 +83,6 @@ const EditRecipe: React.FC = () => {
         }
       });
 
-      // For categories, you only have names in existing.categories;
-      // your backend wants numeric IDs. We'll let user pick again, or
-      // map them if you have a way to convert name -> ID.
       const createReq: RecipeCreateRequest = {
         title: existing.title,
         description: existing.description,
@@ -81,7 +92,7 @@ const EditRecipe: React.FC = () => {
         containsGluten: existing.containsGluten,
         ingredients: parsedIngredients,
         preparationSteps: existing.preparationSteps || "",
-        categoryIds: [], // user can re-check categories in the form below
+        categoryIds: [],
         photo: existing.photo || "",
       };
 
@@ -94,33 +105,30 @@ const EditRecipe: React.FC = () => {
     }
   }, [id]);
 
-  // 2) Fetch categories for checkboxes
   const fetchCategories = useCallback(async () => {
     try {
       const res = await RecipeService.getAllCategories();
       setAllCategories(res.data);
     } catch (err) {
       console.error("Error fetching categories:", err);
+      setError("Failed to load categories.");
     }
   }, []);
 
-  // On mount
   useEffect(() => {
     fetchRecipe();
     fetchCategories();
-  }, [fetchRecipe, fetchCategories]);
+  }, [fetchRecipe, fetchCategories, id]);
 
   // Handler for changing a field
   const handleChange = (field: keyof RecipeCreateRequest, value: unknown) => {
     setRecipeData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Convert IngredientRequest[] to multiline text
   const ingredientsText = recipeData.ingredients
     .map((ing) => `${ing.quantity} ${ing.unit} of ${ing.name}`)
     .join("\n");
 
-  // Parse multiline text back into IngredientRequest[]
   const handleIngredientsText = (text: string) => {
     const lines = text.split("\n");
     const newIngredients: IngredientRequest[] = lines.map((line) => {
@@ -166,7 +174,8 @@ const EditRecipe: React.FC = () => {
       const res = await RecipeService.updateRecipeAsAdmin(Number(id), recipeData, token);
       console.log("Update response:", res.data);
       notify.success("Recipe updated successfully!");
-      navigate("/"); // or wherever you want to go
+
+      navigate("/all/recipes");
     } catch (err) {
       console.error("Error updating recipe:", err);
       notify.error("Failed to update recipe.");
@@ -175,7 +184,7 @@ const EditRecipe: React.FC = () => {
     }
   };
 
-  if (loading && !recipeData.title) {
+  if (loading && !recipeData.title && !error) {
     return <div>Loading recipe...</div>;
   }
   if (error) {
@@ -258,7 +267,6 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        {/* Category checkboxes */}
         <div>
           <label>Categories:</label>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -274,19 +282,6 @@ const EditRecipe: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Photo if your backend uses base64 */}
-        {/* 
-        <div>
-          <label>Photo (Base64):</label>
-          <textarea
-            rows={3}
-            value={recipeData.photo}
-            onChange={(e) => handleChange("photo", e.target.value)}
-          />
-        </div>
-        */}
-
         <button type="submit" disabled={loading}>
           {loading ? "Saving..." : "Save Changes"}
         </button>

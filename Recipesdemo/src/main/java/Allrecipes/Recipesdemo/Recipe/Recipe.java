@@ -47,9 +47,7 @@ public class Recipe {
     @Lob
     private String description;
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    @ToString.Exclude // Exclude ingredients from toString to prevent LazyInitializationException
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
     private List<Ingredient> ingredients = new ArrayList<>();
 
     @Lob

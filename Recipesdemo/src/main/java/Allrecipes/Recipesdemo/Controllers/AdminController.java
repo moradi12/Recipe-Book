@@ -8,6 +8,7 @@ import Allrecipes.Recipesdemo.Recipe.RecipeResponse;
 import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import Allrecipes.Recipesdemo.Service.AdminService;
+import Allrecipes.Recipesdemo.Service.CustomerService;
 import Allrecipes.Recipesdemo.Service.RecipeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,13 +27,15 @@ import java.util.function.Supplier;
 public class AdminController {
 
     private final AdminService adminService;
+    private final CustomerService customerService;
     private final RecipeService recipeService;
     private final JWT jwtProvider;
 
-    public AdminController(AdminService adminService, RecipeService recipeService, JWT jwtProvider) {
+    public AdminController(AdminService adminService,CustomerService customerService, RecipeService recipeService, JWT jwtProvider) {
         this.adminService = adminService;
         this.recipeService = recipeService;
         this.jwtProvider = jwtProvider;
+        this.customerService = customerService;
     }
 
     /**
@@ -75,12 +78,12 @@ public class AdminController {
             return ResponseEntity.status(500).body(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
-
-
     @PutMapping("/recipes/{id}")
-    public ResponseEntity<?> updateRecipe(@RequestHeader("Authorization") String authHeader,
-                                          @PathVariable Long id,
-                                          @RequestBody RecipeCreateRequest request) {
+    public ResponseEntity<?> updateRecipe(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long id,
+            @RequestBody RecipeCreateRequest request) {
+
         return handleRequest(authHeader, UserType.ADMIN, () -> {
             try {
                 User currentUser = getCurrentUser(authHeader);
@@ -91,6 +94,14 @@ public class AdminController {
             }
         });
     }
+
+
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String authHeader) {
+        return handleRequest(authHeader, UserType.ADMIN, customerService::getAllUserResponses);
+    }
+
+
 
 
     @DeleteMapping("/recipes/{id}")

@@ -1,12 +1,16 @@
 // src/api/AdminService.ts
 
-import { RecipeResponse } from '../Models/Recipe';
+import { RecipeResponse, User } from '../Models/Recipe';
 import { RecipeCreateRequest } from '../Models/RecipeCreateRequest';
 import axiosJWT from '../Utiles/axiosJWT';
 
 // Base URL for the admin endpoints
 const API_BASE_URL = 'http://localhost:8080/api/admin';
 
+export async function getAllUsers(): Promise<User[]> {
+  const response = await axiosJWT.get<User[]>(`${API_BASE_URL}/users`);
+  return response.data;
+}
 /**
  * Fetches the list of pending recipes.
  */
@@ -89,4 +93,5 @@ export default {
   getAllRecipes,
   updateRecipe,
   deleteRecipe,
+  getAllUsers
 };

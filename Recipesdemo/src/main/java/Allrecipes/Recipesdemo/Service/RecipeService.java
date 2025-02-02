@@ -10,6 +10,7 @@ import Allrecipes.Recipesdemo.Exceptions.UnauthorizedActionException;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import Allrecipes.Recipesdemo.Recipe.RecipeResponse;
 import Allrecipes.Recipesdemo.Entities.Enums.RecipeStatus;
+import Allrecipes.Recipesdemo.Repositories.IngredientsRepo;
 import Allrecipes.Recipesdemo.Repositories.RecipeRepository;
 import Allrecipes.Recipesdemo.Repositories.CategoryRepository;
 import Allrecipes.Recipesdemo.Request.RecipeCreateRequest;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,10 +35,11 @@ import java.util.stream.Collectors;
 public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
-
-    public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository) {
+    private final IngredientsRepo ingredientsRepo;
+    public RecipeService(RecipeRepository recipeRepository, CategoryRepository categoryRepository, IngredientsRepo ingredientsRepo) {
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
+        this.ingredientsRepo = ingredientsRepo;
     }
 
     public void savePhoto(String base64Photo, String targetPath) {
@@ -179,57 +182,52 @@ public class RecipeService {
     // ================================
     //  UPDATE RECIPE
     // ================================
+    @Transactional
     public Recipe updateRecipe(Long id, RecipeCreateRequest req, User user) {
         Recipe existing = recipeRepository.findById(id)
-                .orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
-        // Only the user who created it can update
-        if (!existing.getCreatedBy().getId().equals(user.getId())
-                && user.getUserType() != UserType.ADMIN) {
+        if (!existing.getCreatedBy().getId().equals(user.getId()) && user.getUserType() != UserType.ADMIN) {
             throw new UnauthorizedActionException("You do not have permission to update this recipe");
-
         }
 
         validateRecipeRequest(req);
 
+        // ✅ Load categories
         Set<Category> categories = new HashSet<>();
         if (req.getCategoryIds() != null && !req.getCategoryIds().isEmpty()) {
-            categories = categoryRepository.findAllById(req.getCategoryIds())
-                    .stream()
-                    .collect(Collectors.toSet());
+            categories = categoryRepository.findAllById(req.getCategoryIds()).stream().collect(Collectors.toSet());
             if (categories.size() != req.getCategoryIds().size()) {
                 throw new InvalidRecipeDataException("One or more categories not found");
             }
         }
 
-        // 2) Build new Ingredient list
-        List<Ingredient> ingredients = req.getIngredients().stream()
-                .map(dto -> {
-                    Ingredient ingredient = Ingredient.builder()
-                            .name(dto.getName())
-                            .quantity(dto.getQuantity())
-                            .unit(dto.getUnit())
-                            .build();
-                    ingredient.setRecipe(existing); // Associate with existing recipe
-                    return ingredient;
-                })
+        // ✅ Load Existing Ingredients
+        List<Ingredient> existingIngredients = ingredientsRepo.findByRecipe_Id(existing.getId());
+
+        // ✅ Remove Old Ingredients Not in the New List
+        existingIngredients.forEach(ingredient -> {
+            boolean existsInNewList = req.getIngredients().stream()
+                    .anyMatch(dto -> dto.getName().equals(ingredient.getName()));
+            if (!existsInNewList) {
+                ingredientsRepo.delete(ingredient); // Delete old ingredient
+            }
+        });
+
+        // ✅ Add or Update Ingredients
+        List<Ingredient> updatedIngredients = req.getIngredients().stream()
+                .map(dto -> new Ingredient(dto.getName(), dto.getQuantity(), dto.getUnit(), existing))
                 .collect(Collectors.toList());
 
-        // 3) Convert Base64 photo to Blob if present
-        Blob photoBlob = null;
-        if (req.getPhoto() != null && !req.getPhoto().isEmpty()) {
-            try {
-                photoBlob = new javax.sql.rowset.serial.SerialBlob(
-                        Base64.getDecoder().decode(req.getPhoto())
-                );
-            } catch (SQLException e) {
-                throw new InvalidRecipeDataException("Error decoding photo", e);
-            }
-        }
+        existing.getIngredients().clear(); // Ensure Hibernate handles relationships correctly
+        existing.getIngredients().addAll(updatedIngredients);
 
+        // ✅ Save Ingredients to Ensure They Persist
+        ingredientsRepo.saveAll(updatedIngredients);
+
+        // ✅ Update Recipe Fields
         existing.setTitle(req.getTitle());
         existing.setDescription(req.getDescription());
-        existing.setIngredients(ingredients);
         existing.setPreparationSteps(req.getPreparationSteps());
         existing.setCookingTime(req.getCookingTime());
         existing.setServings(req.getServings());
@@ -237,14 +235,11 @@ public class RecipeService {
         existing.setUpdatedAt(LocalDateTime.now());
         existing.setContainsGluten(req.getContainsGlutenOrDefault());
         existing.setCategories(categories);
-        existing.setPhoto(photoBlob);
 
-        Recipe updatedRecipe = recipeRepository.save(existing);
-
-        categories.forEach(category -> category.getRecipes().add(updatedRecipe));
-
-        return updatedRecipe;
+        // ✅ Ensure Recipe Updates Immediately
+        return recipeRepository.saveAndFlush(existing);
     }
+
 
     // ================================
     //  VALIDATE RECIPE

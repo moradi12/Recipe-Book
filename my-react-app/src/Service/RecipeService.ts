@@ -107,23 +107,29 @@ public async updateRecipeAsAdminn(
 // Right after updateRecipe(...)
 public async updateRecipeAsAdmin(
   id: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  recipeCreateRequest: any, // or a proper interface e.g. RecipeCreateRequest
+  recipeCreateRequest: RecipeCreateRequest,
   token: string
 ): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
-  return axios.put<{ message: string; recipeId: string }>(
-    `${this.adminUrl}/recipes/${id}`,
-    recipeCreateRequest,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+  try {
+    return await axios.put<{ message: string; recipeId: string }>(
+      `${this.adminUrl}/recipes/${id}`,
+      recipeCreateRequest,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios Error updating recipe:", error.response?.data || error.message);
+    } else {
+      console.error("Unexpected Error updating recipe:", error);
     }
-  );
+    throw error;
+  }
 }
-
-
   // ===========================
   // CREATE RECIPE
   // ===========================
@@ -166,12 +172,11 @@ public async updateRecipeAsAdmin(
   ): Promise<AxiosResponse<RecipeResponse>> {
     return axios.put<RecipeResponse>(`${this.baseUrl}/${id}`, recipe, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
   }
-
   // ===========================
 // UPDATE RECIPE STATUS (for non-admin users)
 // ===========================
