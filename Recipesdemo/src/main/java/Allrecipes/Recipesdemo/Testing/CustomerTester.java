@@ -486,6 +486,81 @@ public class CustomerTester implements CommandLineRunner {
 
 
 
+            // Recipe 16: Gourmet Pizza
+            RecipeCreateRequest recipeRequest16 = RecipeCreateRequest.builder()
+                    .title("Gourmet Pizza")
+                    .description("A handcrafted pizza loaded with artisanal ingredients and a crispy crust.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Pizza Dough", "1", "lb"),
+                            new IngredientRequest("Tomato Sauce", "1/2", "cup"),
+                            new IngredientRequest("Mozzarella Cheese", "200", "grams"),
+                            new IngredientRequest("Fresh Basil", "1/4", "cup"),
+                            new IngredientRequest("Olive Oil", "2", "tbsp"),
+                            new IngredientRequest("Cherry Tomatoes", "10", "pieces")
+                    ))
+                    .preparationSteps("Spread sauce on the dough, add cheese and toppings, and bake at 475°F for about 12 minutes.")
+                    .cookingTime(20)
+                    .servings(2)
+                    .dietaryInfo("Vegetarian")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(mainCourseCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/GourmetPizza.jpg"))
+                    .build();
+
+            Recipe gourmetPizzaRecipe = recipeService.createRecipe(recipeRequest16, customer1);
+            System.out.println("Added Recipe 16: " + gourmetPizzaRecipe);
+
+            // Recipe 17: Juicy Burger
+            RecipeCreateRequest recipeRequest17 = RecipeCreateRequest.builder()
+                    .title("Juicy Burger")
+                    .description("A perfectly grilled burger featuring a juicy beef patty with fresh lettuce, tomato, and melted cheese.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Ground Beef", "500", "grams"),
+                            new IngredientRequest("Burger Buns", "4", "pieces"),
+                            new IngredientRequest("Lettuce", "4", "leaves"),
+                            new IngredientRequest("Tomato", "1", "sliced"),
+                            new IngredientRequest("Cheddar Cheese", "4", "slices"),
+                            new IngredientRequest("Onion", "1", "sliced"),
+                            new IngredientRequest("Pickles", "8", "slices"),
+                            new IngredientRequest("Ketchup", "2", "tbsp"),
+                            new IngredientRequest("Mustard", "2", "tbsp")
+                    ))
+                    .preparationSteps("Form patties, grill them to your desired doneness, and assemble with buns and toppings.")
+                    .cookingTime(15)
+                    .servings(4)
+                    .dietaryInfo("Main Dish")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(BeefCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/JuicyBurger.jpg"))
+                    .build();
+
+            Recipe juicyBurgerRecipe = recipeService.createRecipe(recipeRequest17, customer2);
+            System.out.println("Added Recipe 17: " + juicyBurgerRecipe);
+
+            // Recipe 18: Decadent Dessert
+            RecipeCreateRequest recipeRequest18 = RecipeCreateRequest.builder()
+                    .title("Decadent Dessert")
+                    .description("An indulgent dessert featuring rich chocolate layers and a velvety ganache.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Dark Chocolate", "300", "grams"),
+                            new IngredientRequest("Heavy Cream", "1", "cup"),
+                            new IngredientRequest("Butter", "50", "grams"),
+                            new IngredientRequest("Sugar", "1/2", "cup"),
+                            new IngredientRequest("Vanilla Extract", "1", "tsp")
+                    ))
+                    .preparationSteps("Melt chocolate with butter, mix in the cream and sugar, then chill until set.")
+                    .cookingTime(30)
+                    .servings(4)
+                    .dietaryInfo("Dessert")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(dessertCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/DecadentDessert.jpg"))
+                    .build();
+
+            Recipe decadentDessertRecipe = recipeService.createRecipe(recipeRequest18, customer1);
+            System.out.println("Added Recipe 18: " + decadentDessertRecipe);
+
+
         } catch (Exception e) {
             System.err.println("Error adding recipes: " + e.getMessage());
             e.printStackTrace();
