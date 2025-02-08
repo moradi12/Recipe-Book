@@ -134,8 +134,12 @@ public class CustomerTester implements CommandLineRunner {
                     .description("Fluffy and delicious pancakes perfect for breakfast.")
                     .ingredients(List.of(
                             new IngredientRequest("Flour", "2", "cups"),
+                            new IngredientRequest("Granulated sugar ", "1.5", "tbsp"),
+                            new IngredientRequest("Salt ", "1.5", "tsp"),
+                            new IngredientRequest("Unsalted butter ", "3", "tbsp"),
                             new IngredientRequest("Milk", "1.5", "cups"),
                             new IngredientRequest("Eggs", "2", "large"),
+                            new IngredientRequest("Vanilla extract ", "1", "tsp "),
                             new IngredientRequest("Baking Powder", "2", "tsp")
                     ))
                     .preparationSteps("Mix dry ingredients, add wet ingredients, and cook on a griddle.")
@@ -144,7 +148,7 @@ public class CustomerTester implements CommandLineRunner {
                     .dietaryInfo("Vegetarian")
                     .containsGluten(true)
                     .categoryIds(Set.of(vegetarianCategoryId))
-                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Classic Pancakes.jpg")) // Set Base64 photo
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Classic Pancakes.jpg"))
 
                     .build();
 
@@ -157,8 +161,10 @@ public class CustomerTester implements CommandLineRunner {
                     .description("A decadent dessert with a gooey chocolate center.")
                     .ingredients(List.of(
                             new IngredientRequest("Dark Chocolate", "200", "grams"),
-                            new IngredientRequest("Butter", "100", "grams"),
-                            new IngredientRequest("Sugar", "1", "cup"),
+                            new IngredientRequest("Unsalted butter ", "100", "grams"),
+                            new IngredientRequest("Powdered sugar ", "1", "cup"),
+                            new IngredientRequest("All-purpose flour  ", "2", "cup"),
+                            new IngredientRequest("Vanilla extract", "2", "tsp"),
                             new IngredientRequest("Eggs", "3", "large")
                     ))
                     .preparationSteps("Melt chocolate and butter, mix with other ingredients, and bake.")
@@ -180,8 +186,12 @@ public class CustomerTester implements CommandLineRunner {
                     .description("Succulent shrimp cooked in a garlic butter sauce.")
                     .ingredients(List.of(
                             new IngredientRequest("Shrimp", "500", "grams"),
-                            new IngredientRequest("Garlic", "4", "cloves"),
                             new IngredientRequest("Butter", "50", "grams"),
+                            new IngredientRequest("Unsalted butter", "3", "tbsp"),
+                            new IngredientRequest("Olive oil ", "1", "tbsp"),
+                            new IngredientRequest("Salt ", "1", "tbsp"),
+                            new IngredientRequest("Black pepper  ", "1", "tbsp"),
+                            new IngredientRequest("Garlic", "4", "cloves"),
                             new IngredientRequest("Parsley", "2", "tbsp")
                     ))
                     .preparationSteps("Saute garlic in butter, add shrimp, and cook until done.")
@@ -317,7 +327,10 @@ public class CustomerTester implements CommandLineRunner {
                     .ingredients(List.of(
                             new IngredientRequest("Beef Steak", "300", "grams"),
                             new IngredientRequest("Cherry Tomatoes", "1", "cup"),
+                            new IngredientRequest("Butter ", "1", "tbsp"),
+                            new IngredientRequest("Freshly ground black pepper ", "2", "tbsp"),
                             new IngredientRequest("Olive Oil", "2", "tbsp"),
+                            new IngredientRequest("Coarse salt ", "2", "tbsp"),
                             new IngredientRequest("Balsamic Vinegar", "1", "tbsp")
                     ))
                     .preparationSteps("Grill steak to desired doneness, Internal Temperature: 120°F - 125°F (49°C - 52°C)")
@@ -409,6 +422,8 @@ public class CustomerTester implements CommandLineRunner {
                     .ingredients(List.of(
                             new IngredientRequest("Lemon Juice", "1/2", "cup"),
                             new IngredientRequest("Water", "4", "cups"),
+                            new IngredientRequest("Ice cubes ", "4", "pieces"),
+                            new IngredientRequest("Lemon slices  ", "4", "pieces"),
                             new IngredientRequest("Sugar", "1/4", "cup"),
                             new IngredientRequest("Mint Leaves", "5", "leaves")
                     ))
@@ -468,9 +483,6 @@ public class CustomerTester implements CommandLineRunner {
 
             Recipe creamyTomatoSoupRecipe = recipeService.createRecipe(recipeRequest15, customer1);
             System.out.println("Added Recipe 15: " + creamyTomatoSoupRecipe);
-
-
-
 
 
 
