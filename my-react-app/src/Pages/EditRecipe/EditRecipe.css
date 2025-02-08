@@ -1,108 +1,197 @@
-/* EditRecipe.css */
-.edit-recipe-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: "Arial", sans-serif;
-}
+/* -------------------------------------------------------------
+   1. FONT IMPORT & GLOBAL VARIABLES
+   ------------------------------------------------------------- */
+   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
-.edit-recipe-container h2 {
-    text-align: center;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-}
-
-/* Form Styles */
-.edit-recipe-form {
-    display: grid;
-    gap: 15px;
-}
-
-.edit-recipe-form label {
-    font-weight: bold;
-    font-size: 14px;
-    color: #444;
-}
-
-/* Inputs & Textarea */
-.edit-recipe-form input,
-.edit-recipe-form textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    transition: border 0.2s ease-in-out;
-}
-
-.edit-recipe-form input:focus,
-.edit-recipe-form textarea:focus {
-    border-color: #7c66e3;
-    outline: none;
-}
-
-/* Checkbox Section */
-.edit-recipe-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.edit-recipe-categories label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Buttons */
-.edit-recipe-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.edit-recipe-buttons button {
-    padding: 10px 15px;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out;
-}
-
-.edit-recipe-buttons .save-btn {
-    background: #7c66e3;
-    color: white;
-}
-
-.edit-recipe-buttons .save-btn:hover {
-    background: #654dc7;
-}
-
-.edit-recipe-buttons .cancel-btn {
-    background: #ccc;
-    color: #333;
-}
-
-.edit-recipe-buttons .cancel-btn:hover {
-    background: #bbb;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .edit-recipe-container {
-        max-width: 90%;
-        padding: 15px;
-    }
-
-    .edit-recipe-buttons {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
+   :root {
+     /* Colors */
+     --primary-color: #054e97;
+     --accent-color: #007bff;
+     --secondary-color: #28a745;
+     --danger-color: #dc3545;
+     --text-color: #003366;
+     --muted-text: rgba(0, 0, 0, 0.7);
+     --background-color: #ffffff;
+     --container-bg: #f0f4f8;
+     --border-color: #dddddd;
+     --shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+   }
+   
+   /* Reset defaults */
+   * {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+   }
+   
+   body {
+     font-family: 'Montserrat', sans-serif;
+     background-color: var(--container-bg);
+     color: var(--text-color);
+   }
+   
+   /* -------------------------------------------------------------
+      2. MAIN CONTAINER
+      ------------------------------------------------------------- */
+   .edit-recipe-container {
+     max-width: 700px;
+     margin: 2rem auto;
+     background-color: var(--background-color);
+     border-radius: 8px;
+     box-shadow: var(--shadow);
+     padding: 2rem;
+   }
+   
+   .edit-recipe-container h2 {
+     text-align: center;
+     color: var(--primary-color);
+     font-weight: 700;
+     margin-bottom: 1.5rem;
+   }
+   
+   /* Error message */
+   .error {
+     color: var(--danger-color);
+     text-align: center;
+     font-weight: 600;
+     margin-bottom: 1rem;
+   }
+   
+   /* -------------------------------------------------------------
+      3. FORM LAYOUT
+      ------------------------------------------------------------- */
+   .edit-recipe-form {
+     display: grid;
+     row-gap: 1rem; /* Space out form groups vertically */
+   }
+   
+   /* Each form field container */
+   .form-group {
+     display: flex;
+     flex-direction: column;
+   }
+   
+   /* Labels */
+   .form-group label {
+     font-weight: 600;
+     margin-bottom: 0.5rem;
+     color: var(--text-color);
+   }
+   
+   /* Text inputs, number inputs, and textareas */
+   .form-group input[type="text"],
+   .form-group input[type="number"],
+   .form-group textarea {
+     border: 1px solid var(--border-color);
+     border-radius: 4px;
+     padding: 0.5rem 0.75rem;
+     font-size: 1rem;
+     color: var(--text-color);
+     transition: border 0.3s, box-shadow 0.3s;
+     outline: none;
+   }
+   
+   /* Checkbox */
+   .form-group input[type="checkbox"] {
+     margin-right: 0.5rem;
+     transform: scale(1.1);
+     cursor: pointer;
+   }
+   
+   /* Focus state for inputs and textareas */
+   .form-group input:focus,
+   .form-group textarea:focus {
+     border-color: var(--accent-color);
+     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+   }
+   
+   /* Textareas (ingredients, steps) */
+   .form-group textarea {
+     resize: vertical;
+     min-height: 80px;
+   }
+   
+   /* -------------------------------------------------------------
+      4. CATEGORIES CHECKBOXES
+      ------------------------------------------------------------- */
+   .categories-container {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 1rem;
+   }
+   
+   .categories-container label {
+     display: flex;
+     align-items: center;
+     font-weight: 500;
+     margin: 0;
+     cursor: pointer;
+     color: #000;
+     
+   }
+   
+   /* -------------------------------------------------------------
+      5. BUTTON STYLES
+      ------------------------------------------------------------- */
+   .form-buttons {
+     display: flex;
+     gap: 1rem;
+     justify-content: flex-end;
+     margin-top: 1rem;
+   }
+   
+   /* Generic button style */
+   button {
+     padding: 0.6rem 1.2rem;
+     border: none;
+     border-radius: 4px;
+     font-size: 1rem;
+     font-weight: 600;
+     cursor: pointer;
+     transition: background-color 0.3s, transform 0.2s;
+   }
+   
+   /* Primary (Save) button */
+   button[type="submit"] {
+     background-color: var(--accent-color);
+     color: #fff;
+   }
+   
+   button[type="submit"]:hover:enabled {
+     background-color: var(--primary-color);
+     transform: scale(1.03);
+   }
+   
+   button[type="submit"]:disabled {
+     background-color: var(--border-color);
+     color: #777;
+     cursor: not-allowed;
+   }
+   
+   /* Secondary (Cancel) button */
+   button[type="button"] {
+     background-color: #cccccc;
+     color: #333;
+   }
+   
+   button[type="button"]:hover {
+     background-color: #b3b3b3;
+     transform: scale(1.03);
+   }
+   
+   /* -------------------------------------------------------------
+      6. RESPONSIVE DESIGN
+      ------------------------------------------------------------- */
+   @media (max-width: 576px) {
+     .edit-recipe-container {
+       margin: 1rem;
+       padding: 1rem;
+     }
+   
+     .form-buttons {
+       flex-direction: column;
+       gap: 0.5rem;
+       align-items: stretch;
+     }
+   }
+   

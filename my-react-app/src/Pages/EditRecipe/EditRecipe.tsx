@@ -1,5 +1,3 @@
-// src/Pages/EditRecipe/EditRecipe.tsx
-
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +9,8 @@ import {
 import { RecipeResponse } from "../../Models/RecipeResponse";
 import RecipeService from "../../Service/RecipeService";
 import { notify } from "../../Utiles/notif";
+
+// Import the CSS
 import "./EditRecipe.css";
 
 const EditRecipe: React.FC = () => {
@@ -40,14 +40,14 @@ const EditRecipe: React.FC = () => {
     photo: "",
   });
 
-  // 1) Fetch existing recipe from /api/recipes/{id}
+  // 1) Fetch existing recipe
   const fetchRecipe = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
       setError("");
 
-      // Reset to default to prevent stale data from previous edits
+      // Reset to default to prevent stale data
       setRecipeData({
         title: "",
         description: "",
@@ -65,23 +65,24 @@ const EditRecipe: React.FC = () => {
       const existing: RecipeResponse = response.data;
 
       // Convert the existing RecipeResponse -> RecipeCreateRequest
-      const parsedIngredients: IngredientRequest[] = existing.ingredients.map((str) => {
-        const parts = str.split(" of ");
-        if (parts.length === 2) {
-          const [qty, unit] = parts[0].split(" ");
-          return {
-            name: parts[1].trim(),
-            quantity: qty || "1",
-            unit: unit || "",
-          };
-        } else {
+      const parsedIngredients: IngredientRequest[] = existing.ingredients.map(
+        (str) => {
+          const parts = str.split(" of ");
+          if (parts.length === 2) {
+            const [qty, unit] = parts[0].split(" ");
+            return {
+              name: parts[1].trim(),
+              quantity: qty || "1",
+              unit: unit || "",
+            };
+          }
           return {
             name: str.trim(),
             quantity: "1",
             unit: "",
           };
         }
-      });
+      );
 
       const createReq: RecipeCreateRequest = {
         title: existing.title,
@@ -105,6 +106,7 @@ const EditRecipe: React.FC = () => {
     }
   }, [id]);
 
+  // 2) Fetch categories
   const fetchCategories = useCallback(async () => {
     try {
       const res = await RecipeService.getAllCategories();
@@ -125,10 +127,12 @@ const EditRecipe: React.FC = () => {
     setRecipeData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Build text for the ingredients textarea
   const ingredientsText = recipeData.ingredients
     .map((ing) => `${ing.quantity} ${ing.unit} of ${ing.name}`)
     .join("\n");
 
+  // Parse user-input text -> ingredients array
   const handleIngredientsText = (text: string) => {
     const lines = text.split("\n");
     const newIngredients: IngredientRequest[] = lines.map((line) => {
@@ -140,14 +144,13 @@ const EditRecipe: React.FC = () => {
           quantity: qty || "1",
           unit: unit || "",
         };
-      } else {
-        return { name: line.trim(), quantity: "1", unit: "" };
       }
+      return { name: line.trim(), quantity: "1", unit: "" };
     });
     setRecipeData((prev) => ({ ...prev, ingredients: newIngredients }));
   };
 
-  // Toggle category in recipeData.categoryIds
+  // Toggle category
   const handleToggleCategory = (catId: number) => {
     setRecipeData((prev) => {
       const { categoryIds } = prev;
@@ -171,10 +174,13 @@ const EditRecipe: React.FC = () => {
     }
     try {
       setLoading(true);
-      const res = await RecipeService.updateRecipeAsAdmin(Number(id), recipeData, token);
+      const res = await RecipeService.updateRecipeAsAdmin(
+        Number(id),
+        recipeData,
+        token
+      );
       console.log("Update response:", res.data);
       notify.success("Recipe updated successfully!");
-
       navigate("/all/recipes");
     } catch (err) {
       console.error("Error updating recipe:", err);
@@ -184,6 +190,7 @@ const EditRecipe: React.FC = () => {
     }
   };
 
+  // Loading states
   if (loading && !recipeData.title && !error) {
     return <div>Loading recipe...</div>;
   }
@@ -191,11 +198,18 @@ const EditRecipe: React.FC = () => {
     return <div className="error">{error}</div>;
   }
 
+  // -----------------------------------------------------------
+  // RENDER
+  // -----------------------------------------------------------
   return (
-    <div style={{ padding: "1rem" }}>
+    <div className="edit-recipe-container">
       <h2>Edit Recipe</h2>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: "0.5rem" }}>
-        <div>
+      {/* Show error if needed */}
+      {error && <div className="error">{error}</div>}
+
+      <form className="edit-recipe-form" onSubmit={handleSubmit}>
+        {/* Title */}
+        <div className="form-group">
           <label>Title:</label>
           <input
             type="text"
@@ -204,7 +218,8 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        <div>
+        {/* Description */}
+        <div className="form-group">
           <label>Description:</label>
           <textarea
             rows={3}
@@ -213,16 +228,20 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        <div>
+        {/* Cooking Time */}
+        <div className="form-group">
           <label>Cooking Time (minutes):</label>
           <input
             type="number"
             value={recipeData.cookingTime}
-            onChange={(e) => handleChange("cookingTime", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("cookingTime", Number(e.target.value))
+            }
           />
         </div>
 
-        <div>
+        {/* Servings */}
+        <div className="form-group">
           <label>Servings:</label>
           <input
             type="number"
@@ -231,7 +250,8 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        <div>
+        {/* Dietary Info */}
+        <div className="form-group">
           <label>Dietary Info:</label>
           <input
             type="text"
@@ -240,16 +260,22 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        <div>
-          <label>Contains Gluten:</label>
-          <input
-            type="checkbox"
-            checked={recipeData.containsGluten}
-            onChange={(e) => handleChange("containsGluten", e.target.checked)}
-          />
+        {/* Contains Gluten */}
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={recipeData.containsGluten}
+              onChange={(e) =>
+                handleChange("containsGluten", e.target.checked)
+              }
+            />
+            Contains Gluten
+          </label>
         </div>
 
-        <div>
+        {/* Ingredients */}
+        <div className="form-group">
           <label>Ingredients (one per line):</label>
           <textarea
             rows={4}
@@ -258,20 +284,24 @@ const EditRecipe: React.FC = () => {
           />
         </div>
 
-        <div>
+        {/* Preparation Steps */}
+        <div className="form-group">
           <label>Preparation Steps:</label>
           <textarea
             rows={5}
             value={recipeData.preparationSteps}
-            onChange={(e) => handleChange("preparationSteps", e.target.value)}
+            onChange={(e) =>
+              handleChange("preparationSteps", e.target.value)
+            }
           />
         </div>
 
-        <div>
+        {/* Categories */}
+        <div className="form-group">
           <label>Categories:</label>
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <div className="categories-container">
             {allCategories.map((cat) => (
-              <label key={cat.id} style={{ marginRight: "1rem" }}>
+              <label key={cat.id}>
                 <input
                   type="checkbox"
                   checked={recipeData.categoryIds.includes(cat.id)}
@@ -282,13 +312,16 @@ const EditRecipe: React.FC = () => {
             ))}
           </div>
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
 
-        <button type="button" onClick={() => navigate(-1)}>
-          Cancel
-        </button>
+        {/* Buttons */}
+        <div className="form-buttons">
+          <button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
+          </button>
+          <button type="button" onClick={() => navigate(-1)}>
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
