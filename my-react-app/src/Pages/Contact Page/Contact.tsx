@@ -4,9 +4,7 @@ import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import styles from './Contact.module.css';
 
-/**
- * Interface representing the structure of the contact form data.
- */
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -14,12 +12,8 @@ interface ContactFormData {
   message: string;
 }
 
-/**
- * Interface representing the structure of the API error response.
- */
 interface ApiErrorResponse {
   message: string;
-  // Add other fields if your API returns more information
 }
 
 const Contact: React.FC = () => {
@@ -33,10 +27,7 @@ const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  /**
-   * Handles changes to form input fields.
-   * @param e - The change event from the input or textarea.
-   */
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -121,7 +112,6 @@ const Contact: React.FC = () => {
       }
       setStatus('error');
 
-      // Optional: Log the error for debugging purposes
       console.error('Form submission error:', error);
     }
   };

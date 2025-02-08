@@ -1,5 +1,4 @@
 .Page404 {
-  /* Take up the full viewport height and center all items */
   min-height: 100vh;
   padding: 2rem;
   display: flex;
@@ -7,15 +6,12 @@
   align-items: center;
   justify-content: center;
   
-  /* A fun background gradient */
   background: linear-gradient(135deg, #ffe5ec 0%, #ffcce0 100%);
   
-  /* Center text and use a clean font */
   text-align: center;
   font-family: Arial, sans-serif;
 }
 
-/* Large, animated heading for emphasis */
 .Page404 h1 {
   font-size: 6rem;
   color: #ff4b5c;
@@ -23,7 +19,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* Subtext styling */
 .Page404 p {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
@@ -32,7 +27,6 @@
   color: #333;
 }
 
-/* "Take me home" button styling */
 .back-home-link {
   display: inline-block;
   padding: 1rem 2rem;
@@ -49,7 +43,6 @@
   background-color: #0056b3;
 }
 
-/* Make the image nice and large, but responsive */
 .not-found-img {
   width: 60%;
   max-width: 700px;
@@ -61,7 +54,6 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Subtle floating animation for the 404 heading */
 @keyframes float {
   0% {
     transform: translateY(0);

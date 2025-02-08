@@ -34,7 +34,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
   const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>([]);
 
   useEffect(() => {
-    if (!token) return; // Not logged in, so no favorites to fetch
+    if (!token) return; 
 
     FavoriteService.getFavorites(token)
       .then((res: AxiosResponse<FavoriteItem[]>) => {

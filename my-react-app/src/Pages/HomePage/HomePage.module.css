@@ -1,6 +1,5 @@
 /* src/components/HomePage/HomePage.module.css */
 
-/* Overall Container */
 .container {
   display: flex;
   flex-direction: column;
@@ -22,7 +21,7 @@
   margin-bottom: 3rem;
   border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(135deg, #f8bbd0 0%, #ce93d8 100%); /* Modern pink to purple gradient */
+  background: linear-gradient(135deg, #f8bbd0 0%, #ce93d8 100%); 
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -40,7 +39,7 @@
 .title {
   font-size: 2.8rem;
   margin-bottom: 1rem;
-  color: #ab47bc; /* Rich purple */
+  color: #ab47bc;
 }
 
 .subtitle {
@@ -56,7 +55,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  background-color: #ec407a; /* Modern hot pink */
+  background-color: #ec407a; 
   color: #fff;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
@@ -128,7 +127,6 @@
   line-height: 1.5;
 }
 
-/* TESTIMONIALS SECTION */
 .testimonials {
   margin-bottom: 3rem;
   text-align: center;
@@ -163,7 +161,6 @@
   text-align: right;
 }
 
-/* VIDEO SECTION */
 .videoSection {
   margin-bottom: 3rem;
   text-align: center;
@@ -231,7 +228,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* BAKING TIPS SECTION */
 .tips {
   text-align: center;
   margin-bottom: 3rem;
@@ -272,7 +268,6 @@
   line-height: 1.4;
 }
 
-/* NEWSLETTER SECTION */
 .newsletter {
   text-align: center;
   margin-bottom: 2rem;
@@ -324,7 +319,6 @@
   background-color: #d81b60;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .hero {
     padding: 1rem;

@@ -5,7 +5,6 @@ interface ErrorMessagesProps {
 }
 
 const ErrorMessages: React.FC<ErrorMessagesProps> = ({ errors }) => {
-  // If there are no errors, return null
   if (Object.keys(errors).length === 0) return null;
   return (
     <div className="error-messages">

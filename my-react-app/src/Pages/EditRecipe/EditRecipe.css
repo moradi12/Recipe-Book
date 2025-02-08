@@ -139,9 +139,7 @@
      min-height: 80px;
    }
    
-   /* -------------------------------------------------------------
-      4. CATEGORIES CHECKBOXES
-      ------------------------------------------------------------- */
+  
    .categories-container {
      display: flex;
      flex-wrap: wrap;
@@ -157,9 +155,7 @@
      color: #333; /* Slightly darker text for category labels */
    }
    
-   /* -------------------------------------------------------------
-      5. BUTTON STYLES
-      ------------------------------------------------------------- */
+   
    .form-buttons {
      display: flex;
      gap: 1rem;

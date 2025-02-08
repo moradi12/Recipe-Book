@@ -1,4 +1,3 @@
-/* Container for the entire component */
 .create-recipe-container {
     max-width: 800px;
     margin: 0 auto;
@@ -49,7 +48,7 @@
     flex-direction: column;
     gap: 5px;
   }
-  
+
   .form-group label p{
     color: #000;
   }
@@ -172,33 +171,31 @@
       padding: 8px 12px;
     }
   }
-  /* Dropdown styling */
 .add-recipe__select {
     font-size: 14px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    background-color: #f9f9f9; /* Light gray background */
-    color: #3b3b8d; /* Indigo text for options */
+    background-color: #f9f9f9;
+    color: #3b3b8d; 
     transition: border-color 0.3s ease, background-color 0.3s ease;
     outline: none;
   }
   
   .add-recipe__select:focus {
-    border-color: #3b3b8d; /* Indigo on focus */
-    background-color: #ffffff; /* White background on focus for contrast */
+    border-color: #3b3b8d; 
+    background-color: #ffffff; 
   }
   
   .add-recipe__select option {
-    color: #555; /* Neutral dark gray for text */
+    color: #555; 
   }
   
-  /* Dropdown placeholder styling */
   .add-recipe__select option[value=""] {
-    color: #999; /* Light gray placeholder */
+    color: #999; 
   }
 .error-text.submit-error {
-    color: #d32f2f; /* Bright red for errors */
+    color: #d32f2f; 
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -209,8 +206,8 @@
     padding: 10px 15px;
     font-size: 16px;
     font-weight: bold;
-    color: #fff; /* White text */
-    background-color: #3b3b8d; /* Teal */
+    color: #fff;
+    background-color: #3b3b8d; 
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -218,11 +215,11 @@
   }
   
   .submit-button:disabled {
-    background-color: #ccc; /* Gray for disabled button */
+    background-color: #ccc;
     cursor: not-allowed;
   }
   
   .submit-button:hover:not(:disabled) {
-    background-color: #1d6d6a; /* Darker teal */
+    background-color: #1d6d6a;
   }
   

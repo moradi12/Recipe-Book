@@ -1,3 +1,4 @@
+// ...
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +15,16 @@ import ErrorMessages from "./ErrorMessages";
 import IngredientsList from "./IngredientsList";
 import PhotoUploader from "./PhotoUploader";
 
+interface AuthState {
+  isLogged: boolean;
+}
+
+interface RootState {
+  auth: AuthState;
+}
+
 const CreateRecipe: React.FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const auth = useSelector((state: any) => state.auth); // Replace `any` with the appropriate type for your auth state
+  const auth = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
   const {
@@ -34,9 +42,9 @@ const CreateRecipe: React.FC = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
-  // Redirect if user is not logged in
   useEffect(() => {
-    if (!auth.isLogged) {
+    const token = sessionStorage.getItem("jwt");
+    if (!auth.isLogged && !token) {
       notify.error("You must log in to create a recipe.");
       navigate("/login");
     }
@@ -55,7 +63,6 @@ const CreateRecipe: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // Handle category selection
   const handleCategoryChange = useCallback((value: string) => {
     const parsedValue = Number(value);
     if (!isNaN(parsedValue)) {
@@ -65,7 +72,6 @@ const CreateRecipe: React.FC = () => {
     }
   }, []);
 
-  // Handle form submission
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -97,7 +103,6 @@ const CreateRecipe: React.FC = () => {
     }
   };
 
-  // Handle photo selection and convert to base64
   const handlePhotoChange = (file: File) => {
     if (!file) return;
     const reader = new FileReader();
@@ -116,8 +121,8 @@ const CreateRecipe: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  if (!auth.isLogged) {
-    return null; // Prevent rendering the component while redirecting
+  if (!auth.isLogged && !sessionStorage.getItem("jwt")) {
+    return null;
   }
 
   return (
