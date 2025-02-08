@@ -7,7 +7,7 @@ export interface RecipeCreateRequest {
     preparationSteps: string;
     dietaryInfo: string;
     containsGluten: boolean;
-    categoryIds: number[];    // Or categories if you prefer
+    categoryIds: number[];   
     photo?: string | null;
   }
   

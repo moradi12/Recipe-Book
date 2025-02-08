@@ -5,16 +5,20 @@
 
    :root {
      /* Colors */
-     --primary-color: #054e97;
-     --accent-color: #007bff;
-     --secondary-color: #28a745;
-     --danger-color: #dc3545;
-     --text-color: #003366;
-     --muted-text: rgba(0, 0, 0, 0.7);
-     --background-color: #ffffff;
-     --container-bg: #f0f4f8;
-     --border-color: #dddddd;
-     --shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+     --primary-color: #054e97;            /* Main brand color */
+     --accent-color: #007bff;            /* Accent color for focus, highlights */
+     --secondary-color: #28a745;         /* Positive action color */
+     --danger-color: #dc3545;            /* Error/Destructive action color */
+     --text-color: #003366;              /* Primary text color */
+     --muted-text: rgba(0, 0, 0, 0.7);   /* Subtle text color */
+     --background-color: #ffffff;        /* White for card backgrounds */
+     --container-bg: #f0f4f8;            /* Page background */
+     --border-color: #dddddd;            /* Neutral gray for borders */
+     --shadow: 0 3px 6px rgba(0, 0, 0, 0.12); /* Standard shadow for cards */
+   
+     /* Gradients */
+     --gradient-start: #ffffff;          /* Start color for container gradient */
+     --gradient-end: #f8fafc;            /* End color for container gradient */
    }
    
    /* Reset defaults */
@@ -36,10 +40,24 @@
    .edit-recipe-container {
      max-width: 700px;
      margin: 2rem auto;
-     background-color: var(--background-color);
+     padding: 2rem;
      border-radius: 8px;
      box-shadow: var(--shadow);
-     padding: 2rem;
+   
+     /* Subtle gradient background */
+     background: linear-gradient(
+       to bottom right,
+       var(--gradient-start),
+       var(--gradient-end)
+     );
+   
+     /* Hover effect to elevate */
+     transition: transform 0.3s, box-shadow 0.3s;
+   }
+   
+   .edit-recipe-container:hover {
+     transform: translateY(-4px);
+     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
    }
    
    .edit-recipe-container h2 {
@@ -47,6 +65,8 @@
      color: var(--primary-color);
      font-weight: 700;
      margin-bottom: 1.5rem;
+     letter-spacing: 1px;       /* Slight letter spacing */
+     text-transform: uppercase; /* Bold, uppercase heading */
    }
    
    /* Error message */
@@ -65,16 +85,24 @@
      row-gap: 1rem; /* Space out form groups vertically */
    }
    
-   /* Each form field container */
    .form-group {
      display: flex;
      flex-direction: column;
+     gap: 0.5rem;
+     position: relative; /* For focus-within highlight */
+   }
+   
+   /* Highlight the group when an input/textarea inside it is focused */
+   .form-group:focus-within {
+     background-color: #f9fcff; /* Very light background highlight */
+     border-radius: 4px;
+     padding: 0.5rem;
+     transition: background-color 0.3s;
    }
    
    /* Labels */
    .form-group label {
      font-weight: 600;
-     margin-bottom: 0.5rem;
      color: var(--text-color);
    }
    
@@ -126,8 +154,7 @@
      font-weight: 500;
      margin: 0;
      cursor: pointer;
-     color: #000;
-     
+     color: #333; /* Slightly darker text for category labels */
    }
    
    /* -------------------------------------------------------------

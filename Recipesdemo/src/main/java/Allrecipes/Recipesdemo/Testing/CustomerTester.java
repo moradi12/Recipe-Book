@@ -557,6 +557,138 @@ public class CustomerTester implements CommandLineRunner {
                     .photo(encodeImageToBase64("src/main/resources/images/recipes/DecadentDessert.jpg"))
                     .build();
 
+
+            RecipeCreateRequest recipeRequest19 = RecipeCreateRequest.builder()
+                    .title("Decadent Dessert")
+                    .description("An indulgent dessert featuring rich chocolate layers and a velvety ganache.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Dark Chocolate", "300", "grams"),
+                            new IngredientRequest("Heavy Cream", "1", "cup"),
+                            new IngredientRequest("Butter", "50", "grams"),
+                            new IngredientRequest("Sugar", "1/2", "cup"),
+                            new IngredientRequest("Vanilla Extract", "1", "tsp")
+                    ))
+                    .preparationSteps("Melt chocolate with butter, mix in the cream and sugar, then chill until set.")
+                    .cookingTime(30)
+                    .servings(4)
+                    .dietaryInfo("Dessert")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(dessertCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/DecadentDessert.jpg"))
+                    .build();
+
+
+
+// Recipe 20: Belgian Waffles
+            RecipeCreateRequest recipeRequest20 = RecipeCreateRequest.builder()
+                    .title("Belgian Waffles")
+                    .description("Crispy on the outside, soft on the inside—these Belgian waffles are the perfect start to your morning.")
+                    .ingredients(List.of(
+                            new IngredientRequest("All-purpose Flour", "2", "cups"),
+                            new IngredientRequest("Baking Powder", "2", "tsp"),
+                            new IngredientRequest("Salt", "0.5", "tsp"),
+                            new IngredientRequest("Sugar", "2", "tbsp"),
+                            new IngredientRequest("Milk", "1.5", "cups"),
+                            new IngredientRequest("Eggs", "2", "large"),
+                            new IngredientRequest("Melted Butter", "0.33", "cup"),
+                            new IngredientRequest("Vanilla Extract", "1", "tsp")
+                    ))
+                    .preparationSteps("Whisk the dry ingredients in a bowl. In another bowl, combine the milk, eggs, melted butter, and vanilla extract. Gently mix until just combined. Pour the batter into a preheated waffle iron and cook until golden brown.")
+                    .cookingTime(15)
+                    .servings(4)
+                    .dietaryInfo("Vegetarian")
+                    .containsGluten(true)
+                    .categoryIds(Set.of(breakfastCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Waffle.jpg"))
+                    .build();
+
+            Recipe belgianWafflesRecipe = recipeService.createRecipe(recipeRequest20, customer1);
+            System.out.println("Added Recipe 20: " + belgianWafflesRecipe);
+
+// Recipe 21: Assorted Sushi Platter
+            RecipeCreateRequest recipeRequest21 = RecipeCreateRequest.builder()
+                    .title("Assorted Sushi Platter")
+                    .description("A delightful assortment of fresh sushi rolls, nigiri, and sashimi—perfect for seafood enthusiasts.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Sushi Rice", "2", "cups"),
+                            new IngredientRequest("Rice Vinegar", "3", "tbsp"),
+                            new IngredientRequest("Nori Sheets", "5", "pieces"),
+                            new IngredientRequest("Fresh Salmon", "200", "grams"),
+                            new IngredientRequest("Fresh Tuna", "200", "grams"),
+                            new IngredientRequest("Cucumber", "1", "sliced"),
+                            new IngredientRequest("Avocado", "1", "sliced"),
+                            new IngredientRequest("Soy Sauce", "1", "tbsp"),
+                            new IngredientRequest("Wasabi", "0.5", "tsp"),
+                            new IngredientRequest("Pickled Ginger", "1", "tsp")
+                    ))
+                    .preparationSteps("Prepare the sushi rice and season with rice vinegar. Slice the fish and vegetables. Assemble the sushi rolls and nigiri, then serve with soy sauce, wasabi, and pickled ginger.")
+                    .cookingTime(30)
+                    .servings(2)
+                    .dietaryInfo("Seafood")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(seafoodCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Sushi.jpg"))
+                    .build();
+
+            Recipe sushiPlatterRecipe = recipeService.createRecipe(recipeRequest21, customer2);
+            System.out.println("Added Recipe 21: " + sushiPlatterRecipe);
+
+// Recipe 22: Red Tuna Tartare
+            RecipeCreateRequest recipeRequest22 = RecipeCreateRequest.builder()
+                    .title("Red Tuna Tartare")
+                    .description("Fresh red tuna diced and seasoned with soy, sesame oil, and lime—served with avocado for a burst of flavor.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Fresh Red Tuna", "250", "grams"),
+                            new IngredientRequest("Soy Sauce", "2", "tbsp"),
+                            new IngredientRequest("Sesame Oil", "1", "tsp"),
+                            new IngredientRequest("Lime Juice", "1", "tbsp"),
+                            new IngredientRequest("Green Onions", "2", "sliced"),
+                            new IngredientRequest("Sesame Seeds", "1", "tsp"),
+                            new IngredientRequest("Avocado", "1", "diced"),
+                            // Replace "to taste" with numeric values and units
+                            new IngredientRequest("Salt", "0.5", "tsp"),
+                            new IngredientRequest("Black Pepper", "0.5", "tsp")
+                    ))
+                    .preparationSteps("Dice the tuna into small cubes. In a bowl, gently toss the tuna with soy sauce, sesame oil, lime juice, salt, and pepper. Fold in the diced avocado and green onions, sprinkle with sesame seeds, and chill for 10 minutes before serving.")
+                    .cookingTime(10)
+                    .servings(2)
+                    .dietaryInfo("Seafood")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(appetizerCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Tuna.jpg"))
+                    .build();
+
+            Recipe redTunaTartareRecipe = recipeService.createRecipe(recipeRequest22, customer1);
+            System.out.println("Added Recipe 22: " + redTunaTartareRecipe);
+
+            RecipeCreateRequest recipeRequest23 = RecipeCreateRequest.builder()
+                    .title("Chicken Teriyaki")
+                    .description("Tender chicken glazed in a sweet and savory teriyaki sauce—ideal as a hearty main course.")
+                    .ingredients(List.of(
+                            new IngredientRequest("Chicken Thighs", "500", "grams"),
+                            new IngredientRequest("Soy Sauce", "0.25", "cup"),
+                            new IngredientRequest("Mirin", "2", "tbsp"),
+                            new IngredientRequest("Sugar", "2", "tbsp"),
+                            new IngredientRequest("Garlic", "2", "cloves, minced"),
+                            new IngredientRequest("Ginger", "1", "tsp, grated"),
+                            new IngredientRequest("Sesame Seeds", "1", "tsp"),
+                            new IngredientRequest("Green Onions", "2", "sliced")
+                    ))
+                    .preparationSteps("Marinate the chicken thighs in a mixture of soy sauce, mirin, sugar, garlic, and ginger for at least 30 minutes. Grill or pan-fry the chicken until fully cooked, then drizzle with extra teriyaki sauce and garnish with sesame seeds and green onions.")
+                    .cookingTime(25)
+                    .servings(3)
+                    .dietaryInfo("Main Dish")
+                    .containsGluten(false)
+                    .categoryIds(Set.of(mainCourseCategoryId))
+                    .photo(encodeImageToBase64("src/main/resources/images/recipes/Chicken.jpg"))
+                    .build();
+
+            Recipe chickenTeriyakiRecipe = recipeService.createRecipe(recipeRequest23, customer2);
+            System.out.println("Added Recipe 23: " + chickenTeriyakiRecipe);
+
+
+
+
             Recipe decadentDessertRecipe = recipeService.createRecipe(recipeRequest18, customer1);
             System.out.println("Added Recipe 18: " + decadentDessertRecipe);
 

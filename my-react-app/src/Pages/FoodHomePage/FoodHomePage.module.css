@@ -1,10 +1,10 @@
 /* CSS Variables for consistency */
 :root {
-  --color-bright-pink: #e91e63;
+  --color-bright-pink: #aa62c2;
   --color-dark-pink: #000000;
-  --color-medium-pink: #d81b60;
-  --color-light-pink-start: #f48fb1;
-  --color-light-pink-end: #f48fb1;
+  --color-medium-pink: #a645d6;
+  --color-light-pink-start: #a95b99;
+  --color-light-pink-end: #d1b8cc;
   --bg-faded: #fff0f5;
   --bg-testimonial: #f48fb1;
   --text-secondary: #131011;

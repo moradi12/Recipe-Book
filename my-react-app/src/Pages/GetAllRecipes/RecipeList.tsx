@@ -3,24 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { RecipeResponse } from "../../Models/RecipeResponse";
 import "./RecipeList.css";
 
-// Services and store
 import axios, { AxiosResponse } from "axios";
 import FavoriteService from "../../Service/FavoriteService";
 import { notify } from "../../Utiles/notif";
 import recipeSystem from "../Redux/store";
 
-/**
- * Interface for each item returned by `GET /favorites`.
- * Adjust fields if your backend returns something different.
- */
 interface FavoriteItem {
   id: number;             // The favorite entry's ID
   recipe: RecipeResponse; // The favorited recipe
 }
 
-/**
- * Props for RecipeList
- */
+
 interface RecipeListProps {
   recipes: RecipeResponse[];
   onEditRecipe?: (id: number) => void;    // Optional for admins only
@@ -38,13 +31,10 @@ const RecipeList: React.FC<RecipeListProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Keep track of the user's token and whether they are logged in
   const token = recipeSystem.getState().auth.token;
 
-  // Keep track of the IDs of recipes the user has favorited
   const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>([]);
 
-  // On mount, if the user is logged in, fetch their favorites
   useEffect(() => {
     if (!token) return; // Not logged in, so no favorites to fetch
 

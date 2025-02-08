@@ -15,7 +15,7 @@ body, html {
 
 .container {
   padding: 3rem 1rem;
-  background: linear-gradient(120deg, #f48fb1, #f48fb1);
+  background: linear-gradient(120deg, #f3bbe7, #aa9eb9);
   min-height: 100vh; /* Full height of the viewport */
   width: 100%; /* Full width of the page */
   display: flex; /* Flexbox for vertical centering */

@@ -6,21 +6,18 @@ import { AppDispatch, RootState } from "../../Pages/Redux/store"; // <-- Adjust 
 import styles from "./Navbar.module.css";
 
 const Navbar: React.FC = () => {
-  // Redux
   const dispatch = useDispatch<AppDispatch>();
   const isLogged = useSelector((state: RootState) => state.auth.isLogged);
 
-  // Local state for hamburger menu
   const [isOpen, setIsOpen] = useState(false);
-
-  // React Router
   const navigate = useNavigate();
 
-  // Toggle the mobile menu
+  /* Toggle the mobile menu */
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
   };
 
+  /* Logout handler */
   const handleLogout = () => {
     dispatch(logoutAction());
     sessionStorage.removeItem("jwt");
@@ -28,7 +25,7 @@ const Navbar: React.FC = () => {
     setIsOpen(false);
   };
 
-  // Close menu when clicking outside
+  /* Close menu when clicking outside */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(`.${styles.navbar}`);
@@ -71,13 +68,6 @@ const Navbar: React.FC = () => {
             Food
           </NavLink>
         </li>
-
-        {/* <li>
-          <NavLink to="/recipes" onClick={() => setIsOpen(false)}>
-            Recipes
-          </NavLink>
-        </li> */}
-
         <li>
           <NavLink to="/features" onClick={() => setIsOpen(false)}>
             Features
@@ -99,10 +89,10 @@ const Navbar: React.FC = () => {
           </NavLink>
         </li>
         <li>
-              <NavLink to="/userpanel" onClick={() => setIsOpen(false)}>
-                UserPanel
-              </NavLink>
-            </li>
+          <NavLink to="/userpanel" onClick={() => setIsOpen(false)}>
+            UserPanel
+          </NavLink>
+        </li>
 
         {/* Auth Links */}
         {!isLogged ? (
@@ -117,26 +107,21 @@ const Navbar: React.FC = () => {
                 Register
               </NavLink>
             </li>
-
-           
           </>
         ) : (
-          <li>
-            <button
-              className={`${styles.logoutButton} ${styles.button}`}
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
-          </li>
-        )}
 
-        <li className={styles.divider}>|</li>
-        <li>
-          <NavLink to="/dashboard" onClick={() => setIsOpen(false)}>
-            Dashboard
-          </NavLink>
-        </li>
+          <>
+            <li className={styles.divider}>|</li>
+            <li>
+              <button
+                className={`${styles.logoutButton} ${styles.button}`}
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </li>
+          </>
+        )}
       </ul>
     </nav>
   );

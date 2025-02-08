@@ -1,10 +1,14 @@
 import { motion } from "framer-motion";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import AvocadoSaladImage from "../../assets/Pics/AvocadoSaladImage.jpg";
-import ChickenAvocadoImage from "../../assets/Pics/ChickenAvocado.jpg";
+import ChickenImage from "../../assets/Pics/Chicken.jpg";
+import JuicyBurgerImage from "../../assets/Pics/JuicyBurger.jpg";
 import TacosImage from "../../assets/Pics/Mexican+Tacos.jpg";
+import PancakesImage from "../../assets/Pics/Pancakes.jpg";
 import SteakImage from "../../assets/Pics/steak.jpg";
+import SushiImage from "../../assets/Pics/Sushi.jpg";
+import TunaImage from "../../assets/Pics/Tuna.jpg";
+import WafflesImage from "../../assets/Pics/Waffles.jpg";
 import styles from "./FoodHomePage.module.css";
 
 const FoodHomePage: React.FC = () => {
@@ -15,7 +19,7 @@ const FoodHomePage: React.FC = () => {
   };
 
   const handleSubscribe = () => {
-    // You can add subscription functionality here
+    // Add subscription functionality here if needed
     alert("Thank you for subscribing!");
   };
 
@@ -84,7 +88,6 @@ const FoodHomePage: React.FC = () => {
             <p>Learn cooking secrets and pro tips from master chefs.</p>
           </motion.div>
 
-          {/* Additional Platform Highlights */}
           <motion.div
             className={styles.featureCard}
             whileHover={{ scale: 1.05 }}
@@ -93,8 +96,7 @@ const FoodHomePage: React.FC = () => {
             <div className={styles.icon}>💰</div>
             <h3>Budget-Friendly</h3>
             <p>
-              Enjoy meals that are not only delicious but also kind to your
-              wallet.
+              Enjoy meals that are not only delicious but also kind to your wallet.
             </p>
           </motion.div>
         </div>
@@ -104,10 +106,29 @@ const FoodHomePage: React.FC = () => {
       <section className={styles.highlights}>
         <h2>Trending Recipes</h2>
         <div className={styles.recipesGrid}>
-          <motion.div
-            className={styles.recipeCard}
-            whileHover={{ scale: 1.03 }}
-          >
+        
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
+            <img
+              src={PancakesImage}
+              alt="Pancakes"
+              className={styles.recipeImage}
+            />
+            <h3>Pancakes</h3>
+            <p>Fluffy pancakes perfect for a weekend breakfast.</p>
+          </motion.div>
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
+            <img
+              src={WafflesImage}
+              alt="Waffles"
+              className={styles.recipeImage}
+            />
+            <h3>Waffles</h3>
+            <p>Crispy and golden waffles topped with your favorite syrup.</p>
+          </motion.div>
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
             <img
               src={TacosImage}
               alt="Mexican Tacos"
@@ -117,10 +138,7 @@ const FoodHomePage: React.FC = () => {
             <p>Spicy, flavorful, and super easy to make in 15 minutes.</p>
           </motion.div>
 
-          <motion.div
-            className={styles.recipeCard}
-            whileHover={{ scale: 1.03 }}
-          >
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
             <img
               src={SteakImage}
               alt="Beef Steak"
@@ -132,30 +150,48 @@ const FoodHomePage: React.FC = () => {
             </p>
           </motion.div>
 
-          <motion.div
-            className={styles.recipeCard}
-            whileHover={{ scale: 1.03 }}
-          >
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
             <img
-              src={AvocadoSaladImage}
-              alt="Avocado Salad"
+              src={JuicyBurgerImage}
+              alt="Juicy Burger"
               className={styles.recipeImage}
             />
-            <h3>Avocado Salad</h3>
-            <p>Fresh and healthy salad loaded with avocado goodness.</p>
+            <h3>Juicy Burger</h3>
+            <p>The Ultimate Juicy Cheese Burger.</p>
           </motion.div>
 
-          <motion.div
-            className={styles.recipeCard}
-            whileHover={{ scale: 1.03 }}
-          >
+   
+
+          {/* Additional Recipe Cards */}
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
             <img
-              src={ChickenAvocadoImage}
-              alt="Chicken and Avocado"
+              src={TunaImage}
+              alt="Tuna Dish"
               className={styles.recipeImage}
             />
-            <h3>Chicken and Avocado</h3>
-            <p>Fresh and healthy Chicken Salad with Avocado.</p>
+            <h3>Tuna</h3>
+            <p>Fresh and delicious tuna served in a light salad.</p>
+          </motion.div>
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
+            <img
+              src={SushiImage}
+              alt="Sushi Rolls"
+              className={styles.recipeImage}
+            />
+            <h3>Sushi</h3>
+            <p>Delicate sushi rolls with fresh fish and perfectly seasoned rice.</p>
+          </motion.div>
+
+          <motion.div className={styles.recipeCard} whileHover={{ scale: 1.03 }}>
+            <img
+              src={ChickenImage}
+              alt="Grilled Chicken"
+              className={styles.recipeImage}
+            />
+            <h3>Chicken</h3>
+            <p>Juicy grilled chicken seasoned to perfection.</p>
           </motion.div>
         </div>
       </section>
@@ -179,8 +215,7 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "Foodie Haven helped me find easy and healthy meals for my busy
-              schedule!"
+              "Foodie Haven helped me find easy and healthy meals for my busy schedule!"
             </p>
             <h4>- Sarah K.</h4>
           </motion.div>
@@ -193,8 +228,7 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "I'm in love with their authentic international recipes—always a
-              hit at dinner parties."
+              "I'm in love with their authentic international recipes—always a hit at dinner parties."
             </p>
             <h4>- David L.</h4>
           </motion.div>
@@ -207,16 +241,12 @@ const FoodHomePage: React.FC = () => {
             viewport={{ once: true }}
           >
             <p>
-              "The expert tips section has made me a better cook, even though
-              I'm a beginner!"
+              "The expert tips section has made me a better cook, even though I'm a beginner!"
             </p>
             <h4>- Maria R.</h4>
           </motion.div>
         </div>
       </section>
-
-      {/* Featured Chef Section */}
-      {/* You can add the Featured Chef Section here */}
 
       {/* Newsletter Subscription Section */}
       <section className={styles.subscribe}>
