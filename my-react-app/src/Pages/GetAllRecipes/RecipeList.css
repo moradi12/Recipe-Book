@@ -2,6 +2,7 @@
 .recipe-list {
   list-style: none;
   padding: 0;
+  color: #000;
   margin: 0 auto;
   max-width: 1200px; /* Increased to fit three items comfortably */
   display: flex;
@@ -27,11 +28,6 @@
 .recipe-item:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Content container inside the recipe item */
-.recipe-item-content {
-  /* Add any desired styles for content here */
 }
 
 /* Buttons container sticks to the bottom of the card */

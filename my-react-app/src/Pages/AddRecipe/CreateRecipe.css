@@ -50,6 +50,11 @@
     gap: 5px;
   }
   
+  .form-group label p{
+    color: #000;
+  }
+
+  
   label {
     font-size: 14px;
     font-weight: bold;

@@ -23,7 +23,7 @@ const IngredientsList: React.FC<IngredientsListProps> = ({
 }) => {
   return (
     <div className="form-group">
-      <label>Ingredients*</label>
+      <label><><p>Ingredients* </p></></label>
       {ingredients.map((ingredient, index) => (
         <IngredientItem
           key={index}

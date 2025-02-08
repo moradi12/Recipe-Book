@@ -38,7 +38,7 @@ const CreateRecipe: React.FC = () => {
   useEffect(() => {
     if (!auth.isLogged) {
       notify.error("You must log in to create a recipe.");
-      navigate("/login"); 
+      navigate("/login");
     }
   }, [auth.isLogged, navigate]);
 
@@ -129,7 +129,9 @@ const CreateRecipe: React.FC = () => {
       <form onSubmit={handleFormSubmit}>
         {/* Title */}
         <div className="form-group">
-          <label htmlFor="title">Title*</label>
+          <label htmlFor="title">
+            <p>Title*</p>
+          </label>
           <input
             type="text"
             id="title"
@@ -142,7 +144,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Description */}
         <div className="form-group">
-          <label htmlFor="description">Description*</label>
+          <label htmlFor="description">
+            <p>Description*</p>
+          </label>
           <textarea
             id="description"
             value={form.description}
@@ -165,7 +169,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Preparation Steps */}
         <div className="form-group">
-          <label htmlFor="preparationSteps">Preparation Steps*</label>
+          <label htmlFor="preparationSteps">
+            <p>Preparation Steps*</p>
+          </label>
           <textarea
             id="preparationSteps"
             value={form.preparationSteps}
@@ -179,7 +185,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Cooking Time */}
         <div className="form-group">
-          <label htmlFor="cookingTime">Cooking Time (minutes)*</label>
+          <label htmlFor="cookingTime">
+            <p>Cooking Time (minutes)*</p>
+          </label>
           <input
             type="number"
             id="cookingTime"
@@ -195,7 +203,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Servings */}
         <div className="form-group">
-          <label htmlFor="servings">Servings*</label>
+          <label htmlFor="servings">
+            <p>Servings*</p>
+          </label>
           <input
             type="number"
             id="servings"
@@ -211,7 +221,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Dietary Info */}
         <div className="form-group">
-          <label htmlFor="dietaryInfo">Dietary Information</label>
+          <label htmlFor="dietaryInfo">
+            <p>Dietary Information</p>
+          </label>
           <input
             type="text"
             id="dietaryInfo"
@@ -237,7 +249,9 @@ const CreateRecipe: React.FC = () => {
 
         {/* Contains Gluten */}
         <div className="form-group checkbox-group">
-          <label htmlFor="containsGluten">Contains Gluten</label>
+          <label htmlFor="containsGluten">
+            <p>Contains Gluten</p>
+          </label>
           <input
             type="checkbox"
             id="containsGluten"
