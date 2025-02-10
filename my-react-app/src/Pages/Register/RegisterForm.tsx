@@ -4,7 +4,7 @@ import { registerUser } from "../../Utiles/authService";
 import { notify } from "../../Utiles/notif";
 import { authState, loginAction } from "../Redux/AuthReducer";
 import { AppDispatch } from "../Redux/store";
-import "./RegisterForm.css";
+import "./RegisterForm.css"; // This now contains the new class names
 
 const RegisterForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,9 +40,7 @@ const RegisterForm: React.FC = () => {
       };
 
       dispatch(loginAction(userState));
-
       sessionStorage.setItem("jwt", response.token);
-
       notify.success("Registration Successful!");
     } catch (err: unknown) {
       notify.error("Registration Failed");
@@ -51,10 +49,10 @@ const RegisterForm: React.FC = () => {
   }
 
   return (
-    <div className="register-container">
-      <h2>Register</h2>
+    <div className="registerForm-container">
+      <h2 className="registerForm-title">Register</h2>
       <form onSubmit={handleRegister}>
-        <div className="form-group">
+        <div className="registerForm-group">
           <label htmlFor="username">Username</label>
           <input
             id="username"
@@ -62,11 +60,11 @@ const RegisterForm: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="input-field"
+            className="registerForm-input"
           />
         </div>
 
-        <div className="form-group">
+        <div className="registerForm-group">
           <label htmlFor="email">Email</label>
           <input
             id="email"
@@ -74,11 +72,11 @@ const RegisterForm: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="input-field"
+            className="registerForm-input"
           />
         </div>
 
-        <div className="form-group">
+        <div className="registerForm-group">
           <label htmlFor="password">Password</label>
           <input
             id="password"
@@ -86,11 +84,11 @@ const RegisterForm: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="input-field"
+            className="registerForm-input"
           />
         </div>
 
-        <div className="form-group">
+        <div className="registerForm-group">
           <label htmlFor="confirm-password">Confirm Password</label>
           <input
             id="confirm-password"
@@ -98,11 +96,11 @@ const RegisterForm: React.FC = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="input-field"
+            className="registerForm-input"
           />
         </div>
 
-        <button type="submit" className="submit-button">
+        <button type="submit" className="registerForm-submit">
           Register
         </button>
       </form>

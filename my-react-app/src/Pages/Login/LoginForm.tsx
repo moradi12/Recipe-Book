@@ -7,7 +7,7 @@ import { loginUser } from "../../Utiles/authService";
 import { notify } from "../../Utiles/notif";
 import { authState, loginAction } from "../Redux/AuthReducer";
 import { AppDispatch } from "../Redux/store";
-import "./LoginForm.css"; // (Optional dark style)
+import "./LoginForm.css"; // Ensure this CSS file now contains the new class names
 
 const LoginForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -44,11 +44,11 @@ const LoginForm: React.FC = () => {
   }
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
+    <div className="loginForm-container">
+      <h2 className="loginForm-title">Login</h2>
 
       <form onSubmit={handleLogin}>
-        <div className="form-group">
+        <div className="loginForm-group">
           <label htmlFor="usernameOrEmail">Username or Email</label>
           <input
             id="usernameOrEmail"
@@ -56,12 +56,12 @@ const LoginForm: React.FC = () => {
             value={usernameOrEmail}
             onChange={(e) => setUsernameOrEmail(e.target.value)}
             required
-            className="input-field"
+            className="loginForm-input"
             placeholder="Enter username or email"
           />
         </div>
 
-        <div className="form-group">
+        <div className="loginForm-group">
           <label htmlFor="loginPassword">Password</label>
           <input
             id="loginPassword"
@@ -69,12 +69,12 @@ const LoginForm: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="input-field"
+            className="loginForm-input"
             placeholder="Enter your password"
           />
         </div>
 
-        <button type="submit" className="submit-button">
+        <button type="submit" className="loginForm-submit">
           Login
         </button>
       </form>
