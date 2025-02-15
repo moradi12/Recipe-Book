@@ -1,4 +1,5 @@
 // src/components/HomePage/HomePage.tsx
+
 import { motion } from 'framer-motion';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,23 +10,28 @@ import styles from './HomePage.module.css';
 const hoverAnimation = { scale: 1.05 };
 const hoverTransition = { duration: 0.3 };
 
-// Data for features, testimonials, and tips
+// Data for features, testimonials, and new seasonal delights
 const featuresData = [
   {
     icon: '🍰',
     title: 'Handcrafted Treats',
-    description: 'Our desserts are lovingly made from scratch with premium ingredients.',
+    description:
+      'Our desserts are lovingly made from scratch with premium ingredients.',
   },
   {
     icon: '🍭',
     title: 'Variety of Flavors',
-    description: 'From classic vanilla to exotic matcha, there’s something for every sweet tooth.',
+    description:
+      'From classic vanilla to exotic matcha, there’s something for every sweet tooth.',
   },
   {
     icon: '🍪',
     title: 'Tested & Approved',
-    description: 'Every recipe is taste-tested to ensure the perfect balance of flavor.',
+    description:
+      'Every recipe is taste-tested to ensure the perfect balance of flavor.',
   },
+
+  
 ];
 
 const testimonialsData = [
@@ -39,35 +45,55 @@ const testimonialsData = [
     author: '- Jake R., Happy Customer',
     initialX: 60,
   },
+  
   {
     text: `"Highly recommend Dessert Delights for anyone with a sweet tooth."`,
     author: '- Emily J., Dessert Enthusiast',
     initialY: 60,
   },
+
+
+  
 ];
 
-const tipsData = [
+// NEW SECTION: Seasonal Delights
+const seasonalDelightsData = [
   {
-    icon: '🔥',
-    title: 'Preheat Your Oven',
-    description: 'Always preheat for at least 15 minutes for even baking results.',
-  },
-  {
-    icon: '⏲',
-    title: 'Watch the Timer',
+    icon: '🍓',
+    title: 'Strawberry Tart',
     description:
-      'Set multiple timers for mixing, baking, and cooling to avoid mistakes.',
+      'Celebrate spring with fresh strawberries on a buttery crust—light and delicious!',
   },
   {
-    icon: '🧈',
-    title: 'Room-Temp Ingredients',
-    description: 'Butter and eggs at room temperature blend better into batter.',
-  },
-  {
-    icon: '🔪',
-    title: 'Use the Right Tools',
+    icon: '🌴',
+    title: 'Tropical Parfait',
     description:
-      'A quality whisk, spatula, and mixer can elevate your baking game.',
+      'Escape to a tropical paradise with layers of creamy coconut, mango, and pineapple.',
+  },
+  {
+    icon: '🍫',
+    title: 'Double Chocolate Mousse',
+    description:
+      'Indulge in rich, velvety mousse that will satisfy the biggest chocoholics.',
+  },
+  {
+    icon: '🍋',
+    title: 'Zesty Lemon Bars',
+    description:
+      'Brighten your day with tangy lemon curd on a buttery shortbread base.',
+  },
+  // TWO NEW DELIGHTS
+  {
+    icon: '🍎',
+    title: 'Apple Cinnamon Donuts',
+    description:
+      'Warm autumn flavors in every bite, sprinkled with sweet cinnamon sugar.',
+  },
+  {
+    icon: '❄️',
+    title: 'Peppermint Hot Cocoa Cake',
+    description:
+      'A winter wonder, layering rich chocolate cake with cool peppermint frosting.',
   },
 ];
 
@@ -150,7 +176,9 @@ const HomePage: React.FC = () => {
 
         {/* Call-to-Action Section */}
         <section className={styles.cta}>
-          <h2 className={styles.ctaTitle}>Ready to Satisfy Your Sweet Cravings?</h2>
+          <h2 className={styles.ctaTitle}>
+            Ready to Satisfy Your Sweet Cravings?
+          </h2>
           <button
             className={styles.ctaButton}
             aria-label="Start baking delicious desserts now"
@@ -159,20 +187,20 @@ const HomePage: React.FC = () => {
           </button>
         </section>
 
-        {/* Baking Tips Section */}
-        <section className={styles.tips}>
-          <h2 className={styles.sectionTitle}>Top Baking Tips</h2>
-          <div className={styles.tipsGrid}>
-            {tipsData.map((tip) => (
+        {/* NEW: Seasonal Delights Section */}
+        <section className={styles.delights}>
+          <h2 className={styles.sectionTitle}>Seasonal Delights</h2>
+          <div className={styles.delightsGrid}>
+            {seasonalDelightsData.map((item) => (
               <motion.div
-                key={tip.title}
-                className={styles.tipCard}
+                key={item.title}
+                className={styles.delightCard}
                 whileHover={hoverAnimation}
                 transition={hoverTransition}
               >
-                <div className={styles.tipIcon}>{tip.icon}</div>
-                <h3 className={styles.tipTitle}>{tip.title}</h3>
-                <p className={styles.tipDescription}>{tip.description}</p>
+                <div className={styles.delightIcon}>{item.icon}</div>
+                <h3 className={styles.delightTitle}>{item.title}</h3>
+                <p className={styles.delightDescription}>{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -182,7 +210,8 @@ const HomePage: React.FC = () => {
         <section className={styles.newsletter}>
           <h2 className={styles.sectionTitle}>Stay Updated on Sweet Treats</h2>
           <p className={styles.newsletterDescription}>
-            Join our newsletter to get the latest recipes, tips, and dessert inspiration!
+            Join our newsletter to get the latest recipes, tips, and dessert
+            inspiration!
           </p>
           <form className={styles.newsletterForm}>
             <input

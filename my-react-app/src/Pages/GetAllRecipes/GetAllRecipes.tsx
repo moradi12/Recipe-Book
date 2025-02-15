@@ -17,8 +17,11 @@ const GetAllRecipes: React.FC = () => {
   const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("");
+
+  // For Redux auth (any type used for brevity—replace with a proper interface if available)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const auth = useSelector((state: any) => state.auth);
+
   const [pagination, setPagination] = useState({
     page: 0,
     size: 10,
@@ -26,6 +29,7 @@ const GetAllRecipes: React.FC = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
   const navigate = useNavigate();
 
   /* --------------------------------
@@ -40,6 +44,9 @@ const GetAllRecipes: React.FC = () => {
     console.log("Checked user authentication");
   }, []);
 
+  /* --------------------------------
+   * Fetch all categories
+   * -------------------------------- */
   const fetchCategories = useCallback(async () => {
     try {
       const response = await RecipeService.getAllCategories();
@@ -51,6 +58,9 @@ const GetAllRecipes: React.FC = () => {
     }
   }, []);
 
+  /* --------------------------------
+   * Normalize recipe categories
+   * -------------------------------- */
   const normalizeRecipes = (recipes: RecipeResponse[]): RecipeResponse[] => {
     return recipes.map((recipe) => ({
       ...recipe,
@@ -61,6 +71,9 @@ const GetAllRecipes: React.FC = () => {
     }));
   };
 
+  /* --------------------------------
+   * Fetch recipes (with pagination & optional category filter)
+   * -------------------------------- */
   const fetchRecipes = useCallback(async () => {
     try {
       setLoading(true);
@@ -184,9 +197,7 @@ const GetAllRecipes: React.FC = () => {
   );
 
   /* --------------------------------
-   * Update a recipe status (ADMIN or CREATOR logic)
-   * This example shows how a non-admin might update
-   * a recipe’s status. Adjust accordingly.
+   * (Optional) Update a recipe status
    * -------------------------------- */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleChangeRecipeStatus = useCallback(
@@ -214,38 +225,48 @@ const GetAllRecipes: React.FC = () => {
   );
 
   /* --------------------------------
-   * Edit a recipe (ADMIN, EDITOR)
+   * Edit a recipe (ADMIN/EDITOR)
    * -------------------------------- */
   const handleEditRecipe = useCallback(
     (recipeId: number) => {
-      // This navigates to an EditRecipe form for the given recipeId
       navigate(`/edit-recipe/${recipeId}`);
     },
     [navigate]
   );
 
-  // Fetch categories on mount
+  /* --------------------------------
+   * Fetch data on mount and whenever filter/pagination changes
+   * -------------------------------- */
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Fetch recipes whenever filter/pagination changes
   useEffect(() => {
     fetchRecipes();
   }, [fetchRecipes]);
 
   return (
     <div className="get-all-recipes">
-      <h2>
-        All Recipes{" "}
-        {pagination.totalPages > 0 &&
-          `(Page ${pagination.page + 1} of ${pagination.totalPages})`}
-      </h2>
+      {/* Header Container (optional gradient or special styling in CSS) */}
+      <div className="header-container">
+        <h2>
+          All Recipes{" "}
+          {pagination.totalPages > 0 &&
+            `(Page ${pagination.page + 1} of ${pagination.totalPages})`}
+        </h2>
+      </div>
 
-      {loading && <p>Loading...</p>}
+      {/* Show loading spinner instead of plain text */}
+      {loading && (
+        <div className="spinner-container">
+          <div className="spinner" /> {/* Use a CSS-based spinner */}
+          <p>Loading recipes...</p>
+        </div>
+      )}
+
       {error && <p className="error-message">{error}</p>}
 
-      {/* Category Filter */}
+      {/* Category Filter Section */}
       <CategoryFilter
         categories={categories}
         filterCategory={filterCategory}
@@ -254,16 +275,18 @@ const GetAllRecipes: React.FC = () => {
       />
 
       {/* Recipe List */}
-      <RecipeList
-        recipes={recipes}
-        onEditRecipe={canEdit ? handleEditRecipe : undefined}
-        onApproveRecipe={canApproveOrReject ? handleApproveRecipe : undefined}
-        onRejectRecipe={canApproveOrReject ? handleRejectRecipe : undefined}
-        onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
-      />
+      {!loading && (
+        <RecipeList
+          recipes={recipes}
+          onEditRecipe={canEdit ? handleEditRecipe : undefined}
+          onApproveRecipe={canApproveOrReject ? handleApproveRecipe : undefined}
+          onRejectRecipe={canApproveOrReject ? handleRejectRecipe : undefined}
+          onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
+        />
+      )}
 
-      {/* Pagination */}
-      {recipes.length > 0 && (
+      {/* Pagination Controls */}
+      {!loading && recipes.length > 0 && (
         <PaginationControls
           pagination={pagination}
           setPagination={setPagination}
