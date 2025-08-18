@@ -1,34 +1,22 @@
-// src/Components/Services/recipeService.ts
+/**
+ * @deprecated This file is deprecated. Use the new consolidated ApiService instead.
+ * Import: import ApiService from '../Service/ApiService';
+ * 
+ * Migration guide:
+ * - fetchRecipes() -> ApiService.recipes.getAllRecipes().then(r => r.data)
+ * - fetchRecipeById(id) -> ApiService.recipes.getRecipeById(id).then(r => r.data)
+ */
 
-import { getToken } from "../Utiles/OldauthService";
-import { Recipe } from "./Recipe";
+import ApiService from '../Service/ApiService';
+import { Recipe } from './Recipe';
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage || 'An error occurred while fetching data');
-  }
-  return response.json();
-}
-
+// Legacy exports for backward compatibility
 export async function fetchRecipes(): Promise<Recipe[]> {
-  const token = getToken();
-  const response = await fetch('/api/recipes', {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json',
-    },
-  });
-  return handleResponse<Recipe[]>(response);
+  const response = await ApiService.recipes.getAllRecipes();
+  return response.data as unknown as Recipe[];
 }
 
 export async function fetchRecipeById(id: number): Promise<Recipe> {
-  const token = getToken();
-  const response = await fetch(`/api/recipes/${id}`, {
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json',
-    },
-  });
-  return handleResponse<Recipe>(response);
+  const response = await ApiService.recipes.getRecipeById(id);
+  return response.data as unknown as Recipe;
 }

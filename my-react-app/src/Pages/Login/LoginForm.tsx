@@ -1,83 +1,107 @@
-// src/Components/Login/LoginForm.tsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth, useForm, validators } from "../../hooks";
 
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom"; // <-- for navigation
-import { loginUser } from "../../Utiles/authService";
-import { notify } from "../../Utiles/notif";
-import { authState, loginAction } from "../Redux/AuthReducer";
-import { AppDispatch } from "../Redux/store";
-import "./LoginForm.css"; // Ensure this CSS file now contains the new class names
+interface LoginFormData {
+  usernameOrEmail: string;
+  password: string;
+}
 
 const LoginForm: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { login, loginLoading } = useAuth();
 
-  const [usernameOrEmail, setUsernameOrEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-
-    try {
-      // 1) Perform the backend call
-      const response = await loginUser({ usernameOrEmail, password });
-
-      // 2) Build userState from response
-      const userState: authState = {
-        email: response.email,
-        name: response.username,
-        id: response.id,
-        token: response.token,
-        userType: response.userType,
-        isLogged: true,
-      };
-      dispatch(loginAction(userState));
-      sessionStorage.setItem("jwt", response.token);
-
-      notify.success("Login Successful!");
-      navigate("/");
-    } catch (err: unknown) {
-      notify.error("Login Failed please check your credentials");
-      console.error(err);
+  // Form with validation
+  const {
+    values,
+    errors,
+    handleChange,
+    handleSubmit,
+  } = useForm<LoginFormData>(
+    {
+      usernameOrEmail: "",
+      password: "",
+    },
+    {
+      usernameOrEmail: validators.required("Username or email is required"),
+      password: validators.required("Password is required"),
     }
-  }
+  );
+
+  // Handle form submission
+  const onSubmit = async (formData: LoginFormData) => {
+    const success = await login(formData);
+    if (success) {
+      navigate("/");
+    }
+  };
 
   return (
-    <div className="loginForm-container">
-      <h2 className="loginForm-title">Login</h2>
+    <div className="auth-container">
+      <div className="auth-card fade-in">
+        <h1 className="auth-title">Welcome Back</h1>
+        <p className="auth-subtitle">Sign in to your Recipe Book account</p>
 
-      <form onSubmit={handleLogin}>
-        <div className="loginForm-group">
-          <label htmlFor="usernameOrEmail">Username or Email</label>
-          <input
-            id="usernameOrEmail"
-            type="text"
-            value={usernameOrEmail}
-            onChange={(e) => setUsernameOrEmail(e.target.value)}
-            required
-            className="loginForm-input"
-            placeholder="Enter username or email"
-          />
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-group">
+            <label htmlFor="usernameOrEmail" className="form-label">
+              Username or Email
+            </label>
+            <input
+              id="usernameOrEmail"
+              name="usernameOrEmail"
+              type="text"
+              value={values.usernameOrEmail}
+              onChange={handleChange}
+              className={`form-control ${errors.usernameOrEmail ? "error" : ""}`}
+              placeholder="Enter your username or email"
+              aria-describedby={errors.usernameOrEmail ? "usernameOrEmail-error" : undefined}
+            />
+            {errors.usernameOrEmail && (
+              <div id="usernameOrEmail-error" className="form-error" role="alert">
+                {errors.usernameOrEmail}
+              </div>
+            )}
+          </div>
 
-        <div className="loginForm-group">
-          <label htmlFor="loginPassword">Password</label>
-          <input
-            id="loginPassword"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="loginForm-input"
-            placeholder="Enter your password"
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={values.password}
+              onChange={handleChange}
+              className={`form-control ${errors.password ? "error" : ""}`}
+              placeholder="Enter your password"
+              aria-describedby={errors.password ? "password-error" : undefined}
+            />
+            {errors.password && (
+              <div id="password-error" className="form-error" role="alert">
+                {errors.password}
+              </div>
+            )}
+          </div>
 
-        <button type="submit" className="loginForm-submit">
-          Login
-        </button>
-      </form>
+          <button 
+            type="submit" 
+            className="btn btn-primary btn-lg"
+            disabled={loginLoading}
+            style={{ width: '100%', marginTop: 'var(--spacing-md)' }}
+          >
+            {loginLoading ? (
+              <>
+                <span className="loading-spinner" style={{ marginRight: 'var(--spacing-sm)' }}></span>
+                Signing in...
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

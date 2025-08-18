@@ -1,22 +1,28 @@
-import axios from "axios";
+/**
+ * @deprecated This file is deprecated. Use the new consolidated ApiService instead.
+ * Import: import ApiService from '../Service/ApiService';
+ * 
+ * Migration guide:
+ * - fetchCategories() -> ApiService.recipes.getAllCategories()
+ * - fetchRecipes() -> ApiService.recipes.getAllRecipes()
+ * - createRecipe(data) -> ApiService.recipes.createRecipe(data)
+ */
 
-const API_BASE_URL = "http://localhost:8080/api";
+import ApiService from '../Service/ApiService';
 
+// Legacy exports for backward compatibility
 export const fetchCategories = async () => {
-  const response = await axios.get(`${API_BASE_URL}/categories`);
+  const response = await ApiService.recipes.getAllCategories();
   return response.data;
 };
 
 export const fetchRecipes = async () => {
-  const response = await axios.get(`${API_BASE_URL}/recipes`);
+  const response = await ApiService.recipes.getAllRecipes();
   return response.data;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createRecipe = async (recipeData: any) => {
-  const token = localStorage.getItem("token");
-  const response = await axios.post(`${API_BASE_URL}/recipes`, recipeData, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await ApiService.recipes.createRecipe(recipeData);
   return response.data;
 };

@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
+import { BaseApiService } from './BaseApiService';
 import { Category } from '../Models/Category';
 import { RecipeResponse, UpdateStatusResponse } from '../Models/Recipe';
 import { RecipeCreateRequest } from '../Models/RecipeCreateRequest';
@@ -10,18 +11,18 @@ export interface PaginatedRecipes {
   totalElements: number;
   size: number;
   number: number;
-  // ... any other fields from the backend response
 }
 
-class RecipeService {
+class RecipeService extends BaseApiService {
   private static instance: RecipeService;
-  // Base URL for recipe-related endpoints (non-admin)
-  private baseUrl: string = 'http://localhost:8080/api/recipes';
-  // Base URL for admin endpoints (for actions like approving recipes)
-  private adminUrl: string = 'http://localhost:8080/api/admin';
-  private categoriesUrl: string = 'http://localhost:8080/api/categories';
+  private adminUrl: string;
+  private categoriesUrl: string;
 
-  private constructor() {}
+  private constructor() {
+    super('http://localhost:8080/api/recipes');
+    this.adminUrl = 'http://localhost:8080/api/admin';
+    this.categoriesUrl = 'http://localhost:8080/api/categories';
+  }
 
   public static getInstance(): RecipeService {
     if (!RecipeService.instance) {
@@ -33,29 +34,25 @@ class RecipeService {
   // ===========================
   // GET RECIPE BY ID
   // ===========================
-  // Calls: GET http://localhost:8080/api/recipes/{id}
   public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
-    return axios.get<RecipeResponse>(`${this.baseUrl}/${id}`);
+    return this.get<RecipeResponse>(`/${id}`);
   }
 
 
 
   
-  // ==================
-  // =========
+  // ===========================
   // GET ALL CATEGORIES (Recipe-based endpoint)
   // ===========================
-  // Calls: GET http://localhost:8080/api/recipes/categories
   public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
-    return axios.get<Category[]>(`${this.baseUrl}/categories`);
+    return this.get<Category[]>('/categories');
   }
 
   // ===========================
   // GET FOOD CATEGORIES (Separate Categories URL)
   // ===========================
-  // Calls: GET http://localhost:8080/api/categories/food-categories
   public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
-    return axios.get<{ name: string; description: string }[]>(
+    return this.axiosInstance.get<{ name: string; description: string }[]>(
       `${this.categoriesUrl}/food-categories`
     );
   }
@@ -63,9 +60,8 @@ class RecipeService {
   // ===========================
   // GET ALL RECIPES (Non-paginated)
   // ===========================
-  // Calls: GET http://localhost:8080/api/recipes/all
   public async getAllRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
-    return axios.get<RecipeResponse[]>(`${this.baseUrl}/all`);
+    return this.get<RecipeResponse[]>('/all');
   }
 
 
@@ -74,187 +70,137 @@ class RecipeService {
   // ===========================
   // GET ALL RECIPES (Paginated + optional category)
   // ===========================
-  // Calls: GET http://localhost:8080/api/recipes?page=X&size=Y&category=Z
   public async getAllRecipesPaginated(
     pageNumber: number,
     pageSize: number,
     category?: number
   ): Promise<AxiosResponse<PaginatedRecipes>> {
-    let url = `${this.baseUrl}?page=${pageNumber}&size=${pageSize}`;
-
+    const params: Record<string, any> = {
+      page: pageNumber,
+      size: pageSize
+    };
+    
     if (category !== undefined) {
-      url += `&category=${encodeURIComponent(String(category))}`;
+      params.category = category;
     }
 
-    return axios.get<PaginatedRecipes>(url);
+    const url = this.buildUrl('', params);
+    return this.get<PaginatedRecipes>(url);
   }
-// Add below your other methods
-public async updateRecipeAsAdminn(
-  id: number,
-  recipeData: RecipeCreateRequest,
-  token: string
-): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
-  // This calls your ADMIN endpoint
-  return axios.put<{ message: string; recipeId: string }>(
-    `${this.adminUrl}/recipes/${id}`, 
-    recipeData,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-}
-
-// Right after updateRecipe(...)
-public async updateRecipeAsAdmin(
-  id: number,
-  recipeCreateRequest: RecipeCreateRequest,
-  token: string
-): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
-  try {
-    return await axios.put<{ message: string; recipeId: string }>(
+  // ===========================
+  // UPDATE RECIPE AS ADMIN (Consolidated)
+  // ===========================
+  public async updateRecipeAsAdmin(
+    id: number,
+    recipeData: RecipeCreateRequest
+  ): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
+    return this.axiosInstance.put<{ message: string; recipeId: string }>(
       `${this.adminUrl}/recipes/${id}`,
-      recipeCreateRequest,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      recipeData
     );
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error("Axios Error updating recipe:", error.response?.data || error.message);
-    } else {
-      console.error("Unexpected Error updating recipe:", error);
-    }
-    throw error;
   }
-}
   // ===========================
   // CREATE RECIPE
   // ===========================
-  // Calls: POST http://localhost:8080/api/recipes
   public async createRecipe(
-    recipe: RecipeCreateRequest,
-    token: string
+    recipe: RecipeCreateRequest
   ): Promise<AxiosResponse<RecipeResponse>> {
-    return axios.post<RecipeResponse>(this.baseUrl, recipe, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return this.post<RecipeResponse>('', recipe);
   }
 
   // ===========================
   // DELETE RECIPE
   // ===========================
-  // Calls: DELETE http://localhost:8080/api/recipes/{id}
   public async deleteRecipe(
-    id: number,
-    token: string
+    id: number
   ): Promise<AxiosResponse<void>> {
-    return axios.delete(`${this.baseUrl}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return this.delete<void>(`/${id}`);
   }
 
   // ===========================
   // UPDATE RECIPE
   // ===========================
-  // Calls: PUT http://localhost:8080/api/recipes/{id}
   public async updateRecipe(
     id: number,
-    recipe: RecipeResponse,
-    token: string
+    recipe: RecipeResponse
   ): Promise<AxiosResponse<RecipeResponse>> {
-    return axios.put<RecipeResponse>(`${this.baseUrl}/${id}`, recipe, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return this.put<RecipeResponse>(`/${id}`, recipe);
   }
   // ===========================
-// UPDATE RECIPE STATUS (for non-admin users)
-// ===========================
-// Calls: PUT http://localhost:8080/api/recipes/{id}/status
-public async updateRecipeStatus(
-  id: number,
-  newStatus: RecipeStatus,
-  token: string
-): Promise<AxiosResponse<UpdateStatusResponse>> {
-  return axios.put<UpdateStatusResponse>(
-    `${this.baseUrl}/${id}/status`,
-    { status: newStatus },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-}
+  // UPDATE RECIPE STATUS (for non-admin users)
+  // ===========================
+  public async updateRecipeStatus(
+    id: number,
+    newStatus: RecipeStatus
+  ): Promise<AxiosResponse<UpdateStatusResponse>> {
+    return this.put<UpdateStatusResponse>(
+      `/${id}/status`,
+      { status: newStatus }
+    );
+  }
 
 
 
   // ===========================
   // REJECT RECIPE
   // ===========================
-  // Calls: PUT http://localhost:8080/api/admin/recipes/{id}/reject
   public async rejectRecipe(
-    id: number,
-    token: string
+    id: number
   ): Promise<AxiosResponse<UpdateStatusResponse>> {
-    return axios.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/reject`, {}, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    return this.axiosInstance.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/reject`, {});
   }
 
 
   // ===========================
   // SEARCH RECIPES BY TITLE
   // ===========================
-  // Calls: GET http://localhost:8080/api/recipes/search?title=...
   public async searchRecipesByTitle(
     title: string
   ): Promise<AxiosResponse<RecipeResponse[]>> {
-    const url = `${this.baseUrl}/search?title=${encodeURIComponent(title)}`;
-    return axios.get<RecipeResponse[]>(url);
+    const url = this.buildUrl('/search', { title });
+    return this.get<RecipeResponse[]>(url);
   }
 
-// ===========================
-// APPROVE RECIPE
-// ===========================
-// Calls: PUT http://localhost:8080/api/admin/recipes/{id}/approve
-public async approveRecipe(
-  id: number,
-  token: string
-): Promise<AxiosResponse<UpdateStatusResponse>> {
-  console.log("Approving recipe", id, "with token:", token); // Debugging log
-  return axios.put(`${this.adminUrl}/recipes/${id}/approve`, {}, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-}
-public async getMyRecipes(token: string): Promise<AxiosResponse<RecipeResponse[]>> {
-  return axios.get<RecipeResponse[]>(`${this.baseUrl}/my`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-}
+  // ===========================
+  // APPROVE RECIPE
+  // ===========================
+  public async approveRecipe(
+    id: number
+  ): Promise<AxiosResponse<UpdateStatusResponse>> {
+    return this.axiosInstance.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/approve`, {});
+  }
+  // ===========================
+  // GET MY RECIPES
+  // ===========================
+  public async getMyRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
+    return this.get<RecipeResponse[]>('/my');
+  }
+
+  // ===========================
+  // ADMIN METHODS
+  // ===========================
+  
+  public async getPendingRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
+    return this.axiosInstance.get<RecipeResponse[]>(`${this.adminUrl}/recipes/pending`);
+  }
+
+  public async addRecipeAsAdmin(recipeData: RecipeCreateRequest): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
+    return this.axiosInstance.post<{ message: string; recipeId: string }>(`${this.adminUrl}/recipes`, recipeData);
+  }
+
+  public async getAllRecipesAsAdmin(
+    page: number = 0,
+    size: number = 10,
+    sortBy: string = 'createdAt'
+  ): Promise<AxiosResponse<any>> {
+    const params = { page, size, sortBy };
+    const url = this.buildUrl(`${this.adminUrl}/recipes`, params);
+    return this.axiosInstance.get(url);
+  }
+
+  public async deleteRecipeAsAdmin(id: number): Promise<AxiosResponse<{ message: string }>> {
+    return this.axiosInstance.delete<{ message: string }>(`${this.adminUrl}/recipes/${id}`);
+  }
 
 
 

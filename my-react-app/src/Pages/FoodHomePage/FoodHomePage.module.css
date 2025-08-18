@@ -1,18 +1,16 @@
-/* CSS Variables for consistency */
-:root {
-  --color-bright-pink: #aa62c2;
-  --color-dark-pink: #000000;
-  --color-medium-pink: #a645d6;
-  --color-light-pink-start: #a95b99;
-  --color-light-pink-end: #d1b8cc;
-  --bg-faded: #fff0f5;
-  --bg-testimonial: #f48fb1;
-  --text-secondary: #131011;
-  --text-accent: #1b1117;
-}
 
 /* Global Container */
 .container {
+  --color-bright-pink: var(--primary-color);
+  --color-dark-pink: var(--text-primary);
+  --color-medium-pink: var(--primary-light);
+  --color-light-pink-start: var(--primary-color);
+  --color-light-pink-end: var(--primary-light);
+  --bg-faded: var(--background-secondary);
+  --bg-testimonial: var(--primary-light);
+  --text-secondary: var(--text-secondary);
+  --text-accent: var(--text-primary);
+  
   display: flex;
   flex-direction: column;
   max-width: 1200px;

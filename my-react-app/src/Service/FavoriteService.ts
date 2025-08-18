@@ -1,28 +1,42 @@
-import axios from "axios";
+import { AxiosResponse } from 'axios';
+import { BaseApiService } from './BaseApiService';
+import { Favorite } from '../Models/Favorite';
 
-class FavoriteService {
-  private baseUrl = "http://localhost:8080/api/favorites"; 
-  // Adjust this to match your backend endpoint
+class FavoriteService extends BaseApiService {
+  private static instance: FavoriteService;
 
-  public getFavorites(token: string) {
-    return axios.get(this.baseUrl, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  private constructor() {
+    super('http://localhost:8080/api/favorites');
   }
 
-  public addFavorite(token: string, recipeId: number) {
-    return axios.post(
-      `${this.baseUrl}/${recipeId}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  public static getInstance(): FavoriteService {
+    if (!FavoriteService.instance) {
+      FavoriteService.instance = new FavoriteService();
+    }
+    return FavoriteService.instance;
   }
 
-  public removeFavorite(token: string, recipeId: number) {
-    return axios.delete(`${this.baseUrl}/${recipeId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  // ===========================
+  // GET FAVORITES
+  // ===========================
+  public async getFavorites(): Promise<AxiosResponse<Favorite[]>> {
+    return this.get<Favorite[]>('');
+  }
+
+  // ===========================
+  // ADD FAVORITE
+  // ===========================
+  public async addFavorite(recipeId: number): Promise<AxiosResponse<{ message: string }>> {
+    return this.post<{ message: string }>(`/${recipeId}`, {});
+  }
+
+  // ===========================
+  // REMOVE FAVORITE
+  // ===========================
+  public async removeFavorite(recipeId: number): Promise<AxiosResponse<{ message: string }>> {
+    return this.delete<{ message: string }>(`/${recipeId}`);
   }
 }
 
-export default new FavoriteService();
+export default FavoriteService.getInstance();
+export { FavoriteService };

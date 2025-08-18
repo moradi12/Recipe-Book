@@ -11,13 +11,18 @@ import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
 import GetSingleRecipe from "../../GetSingleRecipe/GetSingleRecipe";
-import HomePage from "../../HomePage/OldHomePage";
+import HomePage from "../../HomePage/HomePage";
 import LoginForm from "../../Login/LoginForm";
 import { Page404 } from "../../Page404/Page404";
 import RegisterForm from "../../Register/RegisterForm";
 import SearchRecipes from "../../SearchRecipes/SearchRecipes";
 import UpdateRecipe from "../../UpdateRecipe/UpdateRecipe";
 import UserPanel from "../../UserPanel/UserPanel";
+import Favorites from "../../Favorites/Favorites";
+import UserProfile from "../../UserProfile/UserProfile";
+import RecipeCollections from "../../RecipeCollections/RecipeCollections";
+import NotificationCenter from "../../Notifications/NotificationCenter";
+import EnhancedAdminDashboard from "../../Admin/EnhancedAdminDashboard";
 
 export function MainRoute(): JSX.Element {
   return (
@@ -25,7 +30,7 @@ export function MainRoute(): JSX.Element {
       {/* Top-level routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/food" element={<FoodHomePage />} />
-      {/* <Route path="/recipes" element={<RecipesPage />} /> */}
+      <Route path="/recipes" element={<GetAllRecipes />} />
       <Route path="/features" element={<Features />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<LoginForm />} />
@@ -40,9 +45,25 @@ export function MainRoute(): JSX.Element {
       <Route path="/all/recipes" element={<GetAllRecipes />} />
 
       <Route path="/admin" element={<RecipeAdminDashboard />} />
+      <Route path="/admin/enhanced" element={<EnhancedAdminDashboard />} />
       <Route path="/admin/edit-recipe/:id" element={<EditRecipeAdmin />} />
 
       <Route path="/userpanel" element={<UserPanel />} />
+      <Route path="/user-panel" element={<UserPanel />} />
+      <Route path="/favorites" element={<Favorites />} />
+      <Route path="/my-favorites" element={<Favorites />} />
+      <Route path="/profile/:userId" element={<UserProfile />} />
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/collections" element={<RecipeCollections />} />
+      <Route path="/collections/:collectionId" element={<div>Collection Detail - Coming Soon</div>} />
+      <Route path="/collections/:collectionId/edit" element={<div>Edit Collection - Coming Soon</div>} />
+      <Route path="/meal-plans" element={<RecipeCollections />} />
+      <Route path="/meal-plans/:planId" element={<div>Meal Plan Detail - Coming Soon</div>} />
+      <Route path="/meal-plans/:planId/edit" element={<div>Edit Meal Plan - Coming Soon</div>} />
+      <Route path="/shopping-lists" element={<RecipeCollections />} />
+      <Route path="/shopping-lists/:listId" element={<div>Shopping List Detail - Coming Soon</div>} />
+      <Route path="/shopping-lists/:listId/edit" element={<div>Edit Shopping List - Coming Soon</div>} />
+      <Route path="/notifications" element={<NotificationCenter />} />
 
       {/*
         Additional routes for the other controller methods:

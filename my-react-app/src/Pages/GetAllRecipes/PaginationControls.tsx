@@ -10,12 +10,18 @@ interface Pagination {
 
 interface PaginationControlsProps {
   pagination: Pagination;
-  setPagination: React.Dispatch<React.SetStateAction<Pagination>>;
+  nextPage?: () => void;
+  prevPage?: () => void;
+  goToPage?: (page: number) => void;
+  setPagination?: React.Dispatch<React.SetStateAction<Pagination>>;
   loading: boolean;
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   pagination,
+  nextPage,
+  prevPage,
+  goToPage,
   setPagination,
   loading,
 }) => {
@@ -24,9 +30,13 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   return (
     <div className="pagination">
       <button
-        onClick={() =>
-          setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
-        }
+        onClick={() => {
+          if (prevPage) {
+            prevPage();
+          } else if (setPagination) {
+            setPagination((prev) => ({ ...prev, page: prev.page - 1 }));
+          }
+        }}
         disabled={page === 0 || loading}
       >
         Previous
@@ -35,9 +45,13 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         Page {page + 1} of {totalPages}
       </span>
       <button
-        onClick={() =>
-          setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
-        }
+        onClick={() => {
+          if (nextPage) {
+            nextPage();
+          } else if (setPagination) {
+            setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
+          }
+        }}
         disabled={page >= totalPages - 1 || loading}
       >
         Next

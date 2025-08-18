@@ -1,298 +1,264 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Category } from "../../Models/Category";
-import { RecipeResponse } from "../../Models/RecipeResponse";
-import { RecipeStatus } from "../../Models/RecipeStatus";
-import RecipeService, { PaginatedRecipes } from "../../Service/RecipeService";
+import { useRecipes, useFavorites, useAuth } from "../../hooks";
 import { checkData } from "../../Utiles/checkData";
-import { notify } from "../../Utiles/notif";
-import { recipeSystem } from "../Redux/store";
 import CategoryFilter from "./CategoryFilter";
-import "./GetAllRecipes.css";
+// Using global design system instead of component-specific CSS
 import PaginationControls from "./PaginationControls";
 import RecipeList from "./RecipeList";
+import SearchAndFilters from "./SearchAndFilters";
 
 const GetAllRecipes: React.FC = () => {
-  const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [filterCategory, setFilterCategory] = useState<string>("");
-
-  // For Redux auth (any type used for brevity—replace with a proper interface if available)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const auth = useSelector((state: any) => state.auth);
-
-  const [pagination, setPagination] = useState({
-    page: 0,
-    size: 10,
-    totalPages: 0,
-  });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-
   const navigate = useNavigate();
+  const { requireAuth, isAuthenticated } = useAuth();
+  
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [timeFilter, setTimeFilter] = useState("");
+  const [dietaryFilter, setDietaryFilter] = useState("");
+  
+  const {
+    recipes,
+    categories,
+    pagination,
+    recipesLoading,
+    categoriesLoading,
+    fetchRecipes,
+    fetchCategories,
+    approveRecipe,
+    rejectRecipe,
+    deleteRecipe,
+    updateRecipeStatus,
+    filterCategory,
+    setFilterCategory,
+    nextPage,
+    prevPage,
+    goToPage,
+    canEdit,
+    canApprove,
+    canDelete,
+  } = useRecipes();
 
-  /* --------------------------------
-   * Helpers: define user privileges
-   * -------------------------------- */
-  const canEdit = auth.userType === "ADMIN" || auth.userType === "EDITOR";
-  const canApproveOrReject = auth.userType === "ADMIN";
-  const canDelete = auth.userType === "ADMIN";
-
+  // Check authentication on mount
   useEffect(() => {
     checkData();
-    console.log("Checked user authentication");
   }, []);
 
-  /* --------------------------------
-   * Fetch all categories
-   * -------------------------------- */
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await RecipeService.getAllCategories();
-      console.log("Fetched categories:", response.data);
-      setCategories(response.data);
-    } catch (err) {
-      notify.error("Failed to load categories.");
-      console.error("Error fetching categories:", err);
-    }
-  }, []);
-
-  /* --------------------------------
-   * Normalize recipe categories
-   * -------------------------------- */
-  const normalizeRecipes = (recipes: RecipeResponse[]): RecipeResponse[] => {
-    return recipes.map((recipe) => ({
-      ...recipe,
-      categories:
-        recipe.categories && recipe.categories.length > 0
-          ? recipe.categories
-          : ["Uncategorized"],
-    }));
-  };
-
-  /* --------------------------------
-   * Fetch recipes (with pagination & optional category filter)
-   * -------------------------------- */
-  const fetchRecipes = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const categoryParam = filterCategory ? Number(filterCategory) : undefined;
-      console.log("Fetching recipes with:", {
-        page: pagination.page,
-        size: pagination.size,
-        category: categoryParam || "All",
-      });
-
-      const response = await RecipeService.getAllRecipesPaginated(
-        pagination.page,
-        pagination.size,
-        categoryParam
-      );
-      const data: PaginatedRecipes = response.data;
-      const normalized = normalizeRecipes(data.content);
-
-      setRecipes(normalized);
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: data.totalPages,
-      }));
-    } catch (err: unknown) {
-      let errorMessage = "Failed to load recipes.";
-      if (err instanceof Error) {
-        errorMessage = err.message || errorMessage;
-      }
-      console.error("Error fetching recipes:", err);
-      setError(errorMessage);
-      notify.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, pagination.size, filterCategory]);
-
-  /* --------------------------------
-   * Approve a recipe (ADMIN only)
-   * -------------------------------- */
-  const handleApproveRecipe = useCallback(
-    async (id: number) => {
-      const token = recipeSystem.getState().auth.token;
-      if (!token || token.length < 10) {
-        notify.error("Missing authorization token. Please log in again.");
-        return;
-      }
-      try {
-        await RecipeService.approveRecipe(id, token);
-        console.log("Recipe approved successfully:", id);
-        notify.success("Recipe approved successfully!");
-        fetchRecipes(); // Refresh the list
-      } catch (err: unknown) {
-        let errorMessage = "Failed to approve recipe.";
-        if (err instanceof Error) {
-          errorMessage = err.message || errorMessage;
-        }
-        console.error("Error approving recipe:", err);
-        notify.error(errorMessage);
-      }
-    },
-    [fetchRecipes]
-  );
-
-  /* --------------------------------
-   * Reject a recipe (ADMIN only)
-   * -------------------------------- */
-  const handleRejectRecipe = useCallback(
-    async (id: number) => {
-      const token = recipeSystem.getState().auth.token;
-      if (!token || token.length < 10) {
-        notify.error("Missing authorization token. Please log in again.");
-        return;
-      }
-      try {
-        await RecipeService.rejectRecipe(id, token);
-        console.log("Recipe rejected successfully:", id);
-        notify.success("Recipe rejected successfully!");
-        fetchRecipes(); // Refresh the list
-      } catch (err: unknown) {
-        let errorMessage = "Failed to reject recipe.";
-        if (err instanceof Error) {
-          errorMessage = err.message || errorMessage;
-        }
-        console.error("Error rejecting recipe:", err);
-        notify.error(errorMessage);
-      }
-    },
-    [fetchRecipes]
-  );
-
-  /* --------------------------------
-   * Delete a recipe (ADMIN only)
-   * -------------------------------- */
-  const handleDeleteRecipe = useCallback(
-    async (id: number) => {
-      const state = recipeSystem.getState();
-      const token = state.auth.token;
-      if (!token || token.length < 10) {
-        notify.error("Missing authorization token. Please log in again.");
-        return;
-      }
-      if (window.confirm("Are you sure you want to delete this recipe?")) {
-        try {
-          await RecipeService.deleteRecipe(id, token);
-          console.log("Recipe deleted successfully:", id);
-          notify.success("Recipe deleted successfully!");
-          fetchRecipes();
-        } catch (err: unknown) {
-          let errorMessage = "An unexpected error occurred.";
-          if (err instanceof Error) {
-            errorMessage = err.message || errorMessage;
-          }
-          console.error("Error deleting recipe:", err);
-          notify.error(errorMessage);
-        }
-      }
-    },
-    [fetchRecipes]
-  );
-
-  /* --------------------------------
-   * (Optional) Update a recipe status
-   * -------------------------------- */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleChangeRecipeStatus = useCallback(
-    async (id: number, newStatus: RecipeStatus) => {
-      const token = recipeSystem.getState().auth.token;
-      if (!token || token.length < 10) {
-        notify.error("Missing authorization token. Please log in again.");
-        return;
-      }
-      try {
-        await RecipeService.updateRecipeStatus(id, newStatus, token);
-        console.log("Recipe status updated:", id, newStatus);
-        notify.success("Recipe status updated successfully!");
-        fetchRecipes();
-      } catch (err: unknown) {
-        let errorMessage = "Failed to update recipe status.";
-        if (err instanceof Error) {
-          errorMessage = err.message || errorMessage;
-        }
-        console.error("Error updating recipe status:", err);
-        notify.error(errorMessage);
-      }
-    },
-    [fetchRecipes]
-  );
-
-  /* --------------------------------
-   * Edit a recipe (ADMIN/EDITOR)
-   * -------------------------------- */
-  const handleEditRecipe = useCallback(
-    (recipeId: number) => {
-      navigate(`/edit-recipe/${recipeId}`);
-    },
-    [navigate]
-  );
-
-  /* --------------------------------
-   * Fetch data on mount and whenever filter/pagination changes
-   * -------------------------------- */
+  // Fetch initial data
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
-
-  useEffect(() => {
     fetchRecipes();
-  }, [fetchRecipes]);
+  }, [fetchCategories, fetchRecipes]);
+
+  const handleEditRecipe = (recipeId: number) => {
+    navigate(`/edit-recipe/${recipeId}`);
+  };
+
+  const loading = recipesLoading || categoriesLoading;
+
+  // Filter recipes based on search and filters
+  const filteredRecipes = recipes.filter(recipe => {
+    const matchesSearch = !searchTerm || 
+                         recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         recipe.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         recipe.ingredients.some(ingredient => 
+                           ingredient.toLowerCase().includes(searchTerm.toLowerCase())
+                         );
+    
+    const matchesDietary = !dietaryFilter || 
+                          (dietaryFilter === "gluten-free" && !recipe.containsGluten) ||
+                          (dietaryFilter === "vegetarian" && recipe.dietaryInfo?.toLowerCase().includes("vegetarian"));
+    
+    const matchesTime = !timeFilter ||
+                       (timeFilter === "quick" && recipe.cookingTime <= 30) ||
+                       (timeFilter === "medium" && recipe.cookingTime > 30 && recipe.cookingTime <= 60) ||
+                       (timeFilter === "long" && recipe.cookingTime > 60);
+    
+    // Category filter logic - check if the recipe's categories include the selected category name
+    const matchesCategory = !filterCategory || 
+                           recipe.categories.some(categoryName => {
+                             const selectedCategory = categories.find(cat => String(cat.id) === filterCategory);
+                             return selectedCategory && categoryName === selectedCategory.name;
+                           });
+    
+    return matchesSearch && matchesDietary && matchesTime && matchesCategory;
+  });
+
+  // Sort filtered recipes
+  const sortedRecipes = [...filteredRecipes].sort((a, b) => {
+    switch (sortBy) {
+      case "title":
+        return a.title.localeCompare(b.title);
+      case "cookingTime":
+        return a.cookingTime - b.cookingTime;
+      case "newest":
+      default:
+        return b.id - a.id;
+    }
+  });
 
   return (
-    <div className="get-all-recipes">
-      {/* Header Container (optional gradient or special styling in CSS) */}
-      <div className="header-container">
-        <h2>
-          All Recipes{" "}
-          {pagination.totalPages > 0 &&
-            `(Page ${pagination.page + 1} of ${pagination.totalPages})`}
-        </h2>
+    <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: 'var(--background-primary)' }}>
+      {/* Official Header Section */}
+      <div style={{ 
+        backgroundColor: 'var(--background-secondary)',
+        borderBottom: '1px solid var(--border-light)',
+        padding: 'var(--spacing-2xl) 0'
+      }}>
+        <div className="container">
+          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+            <h1 style={{ 
+              fontSize: '2.5rem', 
+              fontWeight: 'var(--font-weight-bold)', 
+              color: 'var(--text-primary)',
+              marginBottom: 'var(--spacing-md)',
+              fontFamily: 'var(--font-heading)'
+            }}>
+              Recipe Collection
+            </h1>
+            <p style={{ 
+              fontSize: '1.125rem', 
+              color: 'var(--text-secondary)',
+              marginBottom: 'var(--spacing-xl)',
+              lineHeight: '1.6'
+            }}>
+              Browse our comprehensive collection of professionally curated recipes
+            </p>
+            
+            {/* Stats Bar */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: 'var(--spacing-2xl)', 
+              flexWrap: 'wrap',
+              marginTop: 'var(--spacing-lg)'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  fontSize: '1.875rem', 
+                  fontWeight: 'var(--font-weight-bold)', 
+                  color: 'var(--text-primary)',
+                  marginBottom: 'var(--spacing-xs)'
+                }}>
+                  {sortedRecipes.length}
+                </div>
+                <div style={{ 
+                  fontSize: '0.875rem', 
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  {sortedRecipes.length === 1 ? 'Recipe' : 'Recipes'} Found
+                </div>
+              </div>
+              
+              {pagination.totalPages > 0 && (
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ 
+                    fontSize: '1.875rem', 
+                    fontWeight: 'var(--font-weight-bold)', 
+                    color: 'var(--text-primary)',
+                    marginBottom: 'var(--spacing-xs)'
+                  }}>
+                    {pagination.page + 1}
+                  </div>
+                  <div style={{ 
+                    fontSize: '0.875rem', 
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    of {pagination.totalPages} Pages
+                  </div>
+                </div>
+              )}
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ 
+                  fontSize: '1.875rem', 
+                  fontWeight: 'var(--font-weight-bold)', 
+                  color: 'var(--text-primary)',
+                  marginBottom: 'var(--spacing-xs)'
+                }}>
+                  {categories.length}
+                </div>
+                <div style={{ 
+                  fontSize: '0.875rem', 
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Categories
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Show loading spinner instead of plain text */}
       {loading && (
-        <div className="spinner-container">
-          <div className="spinner" /> {/* Use a CSS-based spinner */}
-          <p>Loading recipes...</p>
+        <div className="container" style={{ padding: 'var(--spacing-3xl) 0' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div className="loading-spinner" style={{ 
+              margin: '0 auto var(--spacing-lg) auto',
+              width: '32px',
+              height: '32px'
+            }}></div>
+            <p style={{ 
+              color: 'var(--text-secondary)',
+              fontSize: '1rem',
+              fontWeight: 'var(--font-weight-medium)'
+            }}>
+              Loading recipes...
+            </p>
+          </div>
         </div>
       )}
 
-      {error && <p className="error-message">{error}</p>}
-
-      {/* Category Filter Section */}
-      <CategoryFilter
-        categories={categories}
-        filterCategory={filterCategory}
-        setFilterCategory={setFilterCategory}
-        disabled={loading}
-      />
-
-      {/* Recipe List */}
-      {!loading && (
-        <RecipeList
-          recipes={recipes}
-          onEditRecipe={canEdit ? handleEditRecipe : undefined}
-          onApproveRecipe={canApproveOrReject ? handleApproveRecipe : undefined}
-          onRejectRecipe={canApproveOrReject ? handleRejectRecipe : undefined}
-          onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
+      <div className="container" style={{ padding: 'var(--spacing-xl) 0' }}>
+        {/* Search and Filters Section */}
+        <SearchAndFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          difficultyFilter={difficultyFilter}
+          setDifficultyFilter={setDifficultyFilter}
+          timeFilter={timeFilter}
+          setTimeFilter={setTimeFilter}
+          dietaryFilter={dietaryFilter}
+          setDietaryFilter={setDietaryFilter}
+          categories={categories}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          disabled={loading}
+          resultCount={sortedRecipes.length}
         />
-      )}
 
-      {/* Pagination Controls */}
-      {!loading && recipes.length > 0 && (
-        <PaginationControls
-          pagination={pagination}
-          setPagination={setPagination}
-          loading={loading}
-        />
-      )}
+        {/* Recipe List */}
+        {!loading && (
+          <RecipeList
+            recipes={sortedRecipes}
+            onEditRecipe={canEdit ? handleEditRecipe : undefined}
+            onApproveRecipe={canApprove ? approveRecipe : undefined}
+            onRejectRecipe={canApprove ? rejectRecipe : undefined}
+            onDeleteRecipe={canDelete ? deleteRecipe : undefined}
+          />
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && recipes.length > 0 && (
+          <PaginationControls
+            pagination={pagination}
+            nextPage={nextPage}
+            prevPage={prevPage}
+            goToPage={goToPage}
+            loading={loading}
+          />
+        )}
+      </div>
     </div>
   );
 };

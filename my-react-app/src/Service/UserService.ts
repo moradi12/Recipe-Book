@@ -1,76 +1,83 @@
-import axiosJWT from "../Utiles/axiosJWT";
+import { AxiosResponse } from 'axios';
+import { BaseApiService } from './BaseApiService';
+import { User } from '../Models/Recipe';
 
-const API_BASE_URL = 'http://localhost:8080/api/users';
-
-export async function getCurrentUser(token: string): Promise<unknown> {
-  const response = await axiosJWT.get(`${API_BASE_URL}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export interface UpdateUserRequest {
+  newEmail?: string;
+  newPassword?: string;
 }
 
-export async function updateUserDetails(
-  token: string,
-  newEmail?: string,
-  newPassword?: string
-): Promise<{ message: string }> {
-  const response = await axiosJWT.put(
-    `${API_BASE_URL}/update`,
-    null,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { newEmail, newPassword },
+class UserService extends BaseApiService {
+  private static instance: UserService;
+
+  private constructor() {
+    super('http://localhost:8080/api/users');
+  }
+
+  public static getInstance(): UserService {
+    if (!UserService.instance) {
+      UserService.instance = new UserService();
     }
-  );
-  return response.data;
+    return UserService.instance;
+  }
+
+  // ===========================
+  // GET CURRENT USER
+  // ===========================
+  public async getCurrentUser(): Promise<AxiosResponse<User>> {
+    return this.get<User>('');
+  }
+
+  // ===========================
+  // UPDATE USER DETAILS
+  // ===========================
+  public async updateUserDetails(
+    newEmail?: string,
+    newPassword?: string
+  ): Promise<AxiosResponse<{ message: string }>> {
+    const params: Record<string, any> = {};
+    if (newEmail) params.newEmail = newEmail;
+    if (newPassword) params.newPassword = newPassword;
+    
+    return this.put<{ message: string }>('/update', null, { params });
+  }
+
+  // ===========================
+  // UPDATE PASSWORD
+  // ===========================
+  public async updatePassword(newPassword: string): Promise<AxiosResponse<{ message: string }>> {
+    return this.put<{ message: string }>('/update-password', null, {
+      params: { newPassword }
+    });
+  }
+
+  // ===========================
+  // FAVORITE RECIPE MANAGEMENT
+  // ===========================
+  public async addFavoriteRecipe(
+    userId: number,
+    recipeId: number
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return this.post<{ message: string }>(`/${userId}/favorites/${recipeId}`, null);
+  }
+
+  public async removeFavoriteRecipe(
+    userId: number,
+    recipeId: number
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return this.delete<{ message: string }>(`/${userId}/favorites/${recipeId}`);
+  }
+
+  // ===========================
+  // ADMIN USER MANAGEMENT
+  // ===========================
+  public async getAllUsers(): Promise<AxiosResponse<User[]>> {
+    return this.axiosInstance.get<User[]>('http://localhost:8080/api/admin/users');
+  }
 }
 
-export async function addFavoriteRecipe(
-  token: string,
-  userId: number,
-  recipeId: number
-): Promise<{ message: string }> {
-  const response = await axiosJWT.post(
-    `${API_BASE_URL}/${userId}/favorites/${recipeId}`,
-    null,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-}
+// Export singleton instance
+export default UserService.getInstance();
 
-export async function updatePassword(token: string, newPassword: string): Promise<{ message: string }> {
-  const response = await axiosJWT.put(
-    `${API_BASE_URL}/update-password`,
-    null,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { newPassword },
-    }
-  );
-  return response.data;
-}
-
-export async function removeFavoriteRecipe(
-  token: string,
-  userId: number,
-  recipeId: number
-): Promise<{ message: string }> {
-  const response = await axiosJWT.delete(
-    `${API_BASE_URL}/${userId}/favorites/${recipeId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-}
-
-// Ensure all functions are part of the default export
-export default {
-  getCurrentUser,
-  updateUserDetails,
-  addFavoriteRecipe,
-  updatePassword, // Add `updatePassword` here
-  removeFavoriteRecipe,
-};
+// Export class for type checking
+export { UserService };
