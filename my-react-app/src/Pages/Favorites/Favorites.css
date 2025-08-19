@@ -154,6 +154,60 @@
   transform: scale(1.05);
 }
 
+/* Placeholder Image */
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #6c757d;
+}
+
+.recipe-id {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-text {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.offline-badge {
+  background-color: #ffc107;
+  color: #212529;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Offline Recipe Card Styling */
+.offline-recipe {
+  border: 2px dashed #ffc107;
+  opacity: 0.9;
+}
+
+.offline-recipe .recipe-header {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.offline-indicator {
+  color: #856404;
+  font-size: 1rem;
+}
+
 /* Recipe Content */
 .recipe-content {
   padding: 1.5rem;
@@ -224,6 +278,20 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #6c757d !important;
+}
+
+.btn-icon {
+  font-size: 1rem;
 }
 
 .view-btn {

@@ -215,8 +215,12 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  color: var(--text-secondary);
+  color: var(--text-primary) !important;
   font-size: 0.875rem;
+}
+
+.meta-item span {
+  color: var(--text-primary) !important;
 }
 
 .meta-item .icon {
