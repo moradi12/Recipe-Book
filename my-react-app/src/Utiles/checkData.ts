@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { loginAction } from "../Pages/Redux/AuthReducer";
+import { login } from "../Pages/Redux/slices/unifiedAuthSlice";
 import { recipeSystem } from "../Pages/Redux/store";
 
 type jwtData = {
@@ -33,7 +33,7 @@ export const checkData = () => {
         isLogged: true,
       };
 
-      recipeSystem.dispatch(loginAction(myAuth));
+      recipeSystem.dispatch(login(myAuth));
     } catch (error) {
       console.error("Error decoding JWT", error);
       return;

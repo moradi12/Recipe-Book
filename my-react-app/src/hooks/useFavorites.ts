@@ -50,17 +50,7 @@ export function useFavorites(): FavoritesHookReturn {
       const data = response.data;
       setFavorites(data);
       // Extract recipe IDs for quick lookup
-      const recipeIds = data.map((fav: Favorite) => {
-        // Handle different possible response structures
-        if (typeof fav.recipe === 'object' && fav.recipe?.id) {
-          return fav.recipe.id;
-        } else if (fav.recipeId) {
-          return fav.recipeId;
-        } else if (typeof fav.recipe === 'number') {
-          return fav.recipe;
-        }
-        return fav.id; // fallback
-      });
+      const recipeIds = data.map((fav: Favorite) => fav.recipeId);
       setFavoriteRecipeIds(recipeIds);
     } catch (error) {
       // Check if it's a network error (backend not running) or connection aborted

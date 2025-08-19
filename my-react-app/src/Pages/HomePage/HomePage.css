@@ -8,11 +8,7 @@
   color: var(--text-primary);
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-lg);
-}
+/* Container styles moved to globals.css */
 
 /* Hero Section */
 .hero {
@@ -153,20 +149,7 @@
   gap: var(--spacing-xl);
 }
 
-.feature-card {
-  background: var(--background-primary);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-normal);
-  border: 1px solid var(--border-light);
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-}
+/* Feature card styles moved to globals.css - use .card-feature */
 
 .feature-icon {
   font-size: 3rem;

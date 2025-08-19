@@ -1,328 +1,231 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Category } from "../../Models/Category";
-import {
-  IngredientRequest,
-  RecipeCreateRequest,
-} from "../../Models/RecipeCreateRequest";
+import { useAuth, useRecipes } from "../../hooks";
+import { useRecipeForm } from "../../hooks/useRecipeForm";
+import { IngredientRequest, RecipeCreateRequest } from "../../Models/RecipeCreateRequest";
 import { RecipeResponse } from "../../Models/RecipeResponse";
 import RecipeService from "../../Service/RecipeService";
 import { notify } from "../../Utiles/notif";
+import BasicInfoSection from "../AddRecipe/BasicInfoSection";
+import RecipeDetailsSection from "../AddRecipe/RecipeDetailsSection";
+import IngredientsSection from "../AddRecipe/IngredientsSection";
+import InstructionsSection from "../AddRecipe/InstructionsSection";
+import PhotoSection from "../AddRecipe/PhotoSection";
 
-// Import the CSS
-import "./EditRecipe.css";
+const ErrorMessages: React.FC<{ errors: Record<string, string> }> = ({ errors }) => {
+  if (Object.keys(errors).length === 0) return null;
+  return (
+    <div className="error-messages">
+      <ul>
+        {Object.values(errors).map((error, idx) => (
+          <li key={idx}>{error}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const EditRecipe: React.FC = () => {
-  const { id } = useParams(); // e.g. /edit-recipe/5
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { requireAuth } = useAuth();
+  const { categories, updateRecipe, fetchCategories } = useRecipes();
+  
+  const {
+    form,
+    errors,
+    isSubmitting,
+    handleChange,
+    addIngredient,
+    removeIngredient,
+    handleIngredientChange,
+    validate,
+    setSubmitting,
+    setForm,
+  } = useRecipeForm();
 
-  // Redux store for auth token
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const auth = useSelector((state: any) => state.auth);
-  const token = auth?.token || "";
-
-  // Local states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | "">("");
 
-  const [recipeData, setRecipeData] = useState<RecipeCreateRequest>({
-    title: "",
-    description: "",
-    cookingTime: 0,
-    servings: 0,
-    dietaryInfo: "",
-    containsGluten: true,
-    ingredients: [],
-    preparationSteps: "",
-    categoryIds: [],
-    photo: "",
-  });
-
-  // 1) Fetch existing recipe
+  // Fetch existing recipe and populate form
   const fetchRecipe = useCallback(async () => {
     if (!id) return;
     try {
       setLoading(true);
       setError("");
 
-      // Reset to default to prevent stale data
-      setRecipeData({
-        title: "",
-        description: "",
-        cookingTime: 0,
-        servings: 0,
-        dietaryInfo: "",
-        containsGluten: true,
-        ingredients: [],
-        preparationSteps: "",
-        categoryIds: [],
-        photo: "",
-      });
-
       const response = await RecipeService.getRecipeById(Number(id));
       const existing: RecipeResponse = response.data;
 
-      // Convert the existing RecipeResponse -> RecipeCreateRequest
-      const parsedIngredients: IngredientRequest[] = existing.ingredients.map(
-        (str) => {
-          const parts = str.split(" of ");
-          if (parts.length === 2) {
-            const [qty, unit] = parts[0].split(" ");
-            return {
-              name: parts[1].trim(),
-              quantity: qty || "1",
-              unit: unit || "",
-            };
-          }
+      // Convert RecipeResponse to form data
+      const parsedIngredients: IngredientRequest[] = existing.ingredients.map((str) => {
+        const parts = str.split(" of ");
+        if (parts.length === 2) {
+          const [qty, unit] = parts[0].split(" ");
           return {
-            name: str.trim(),
-            quantity: "1",
-            unit: "",
+            name: parts[1].trim(),
+            quantity: qty || "1",
+            unit: unit || "",
           };
         }
-      );
+        return {
+          name: str.trim(),
+          quantity: "1",
+          unit: "",
+        };
+      });
 
-      const createReq: RecipeCreateRequest = {
+      // Set form data using the hook
+      setForm({
         title: existing.title,
         description: existing.description,
         cookingTime: existing.cookingTime,
         servings: existing.servings,
-        dietaryInfo: existing.dietaryInfo || "",
-        containsGluten: existing.containsGluten,
         ingredients: parsedIngredients,
-        preparationSteps: existing.preparationSteps || "",
-        categoryIds: [],
-        photo: existing.photo || "",
-      };
+        instructions: existing.preparationSteps || "",
+      });
 
-      setRecipeData(createReq);
+      // Set category if available
+      if (existing.categoryIds && existing.categoryIds.length > 0) {
+        setSelectedCategoryId(existing.categoryIds[0]);
+      }
     } catch (err) {
       console.error("Error fetching recipe:", err);
       setError("Failed to load recipe for editing.");
     } finally {
       setLoading(false);
     }
-  }, [id]);
-
-  // 2) Fetch categories
-  const fetchCategories = useCallback(async () => {
-    try {
-      const res = await RecipeService.getAllCategories();
-      setAllCategories(res.data);
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-      setError("Failed to load categories.");
-    }
-  }, []);
+  }, [id, setForm]);
 
   useEffect(() => {
+    if (!requireAuth()) return;
     fetchRecipe();
     fetchCategories();
-  }, [fetchRecipe, fetchCategories, id]);
+  }, [fetchRecipe, fetchCategories, requireAuth]);
 
-  // Handler for changing a field
-  const handleChange = (field: keyof RecipeCreateRequest, value: unknown) => {
-    setRecipeData((prev) => ({ ...prev, [field]: value }));
-  };
+  const handleCategoryChange = useCallback((value: string) => {
+    const parsedValue = Number(value);
+    setSelectedCategoryId(!isNaN(parsedValue) ? parsedValue : "");
+  }, []);
 
-  // Build text for the ingredients textarea
-  const ingredientsText = recipeData.ingredients
-    .map((ing) => `${ing.quantity} ${ing.unit} of ${ing.name}`)
-    .join("\n");
+  const handlePhotoChange = useCallback((file: File) => {
+    console.log('Photo selected:', file.name);
+  }, []);
 
-  // Parse user-input text -> ingredients array
-  const handleIngredientsText = (text: string) => {
-    const lines = text.split("\n");
-    const newIngredients: IngredientRequest[] = lines.map((line) => {
-      const parts = line.split(" of ");
-      if (parts.length === 2) {
-        const [qty, unit] = parts[0].split(" ");
-        return {
-          name: parts[1].trim(),
-          quantity: qty || "1",
-          unit: unit || "",
-        };
-      }
-      return { name: line.trim(), quantity: "1", unit: "" };
-    });
-    setRecipeData((prev) => ({ ...prev, ingredients: newIngredients }));
-  };
-
-  // Toggle category
-  const handleToggleCategory = (catId: number) => {
-    setRecipeData((prev) => {
-      const { categoryIds } = prev;
-      if (categoryIds.includes(catId)) {
-        return { ...prev, categoryIds: categoryIds.filter((c) => c !== catId) };
-      }
-      return { ...prev, categoryIds: [...categoryIds, catId] };
-    });
-  };
-
-  // Submit => PUT /api/admin/recipes/{id}
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!id) {
       notify.error("No recipe ID in the URL!");
       return;
     }
-    if (!token) {
-      notify.error("Missing or invalid auth token.");
+
+    if (!validate() || selectedCategoryId === "") {
+      notify.error(!validate() ? "Please fix the errors in the form." : "Please select a valid category.");
       return;
     }
+
+    if (!requireAuth()) return;
+
+    setSubmitting(true);
+
     try {
-      setLoading(true);
-      const res = await RecipeService.updateRecipeAsAdmin(
-        Number(id),
-        recipeData,
-        token
-      );
-      console.log("Update response:", res.data);
-      notify.success("Recipe updated successfully!");
-      navigate("/all/recipes");
-    } catch (err) {
-      console.error("Error updating recipe:", err);
-      notify.error("Failed to update recipe.");
+      const finalForm = {
+        title: form.title,
+        description: form.description,
+        ingredients: form.ingredients,
+        preparationSteps: form.instructions,
+        cookingTime: form.cookingTime,
+        servings: form.servings,
+        containsGluten: false,
+        categoryIds: [selectedCategoryId],
+      };
+
+      const success = await updateRecipe(Number(id), finalForm as any);
+      if (success) {
+        notify.success("Recipe updated successfully!");
+        navigate("/all/recipes");
+      } else {
+        notify.error("Failed to update recipe. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating recipe:", error);
+      notify.error("Failed to update recipe. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   // Loading states
-  if (loading && !recipeData.title && !error) {
+  if (loading && !form.title && !error) {
     return <div>Loading recipe...</div>;
   }
   if (error) {
     return <div className="error">{error}</div>;
   }
 
-  // -----------------------------------------------------------
-  // RENDER
-  // -----------------------------------------------------------
   return (
     <div className="edit-recipe-container">
-      <h2>Edit Recipe</h2>
-      {/* Show error if needed */}
-      {error && <div className="error">{error}</div>}
+      <div className="edit-recipe-card">
+        <h2 className="edit-recipe-title">Edit Recipe</h2>
+        
+        <ErrorMessages errors={errors} />
 
-      <form className="edit-recipe-form" onSubmit={handleSubmit}>
-        {/* Title */}
-        <div className="form-group">
-          <label>Title:</label>
-          <input
-            type="text"
-            value={recipeData.title}
-            onChange={(e) => handleChange("title", e.target.value)}
+        <form onSubmit={handleFormSubmit} className="edit-recipe-form">
+          <BasicInfoSection
+            form={form}
+            errors={errors}
+            categories={categories}
+            selectedCategoryId={selectedCategoryId}
+            onInputChange={handleChange}
+            onCategoryChange={handleCategoryChange}
           />
-        </div>
 
-        {/* Description */}
-        <div className="form-group">
-          <label>Description:</label>
-          <textarea
-            rows={3}
-            value={recipeData.description}
-            onChange={(e) => handleChange("description", e.target.value)}
+          <RecipeDetailsSection
+            form={form}
+            errors={errors}
+            onInputChange={handleChange}
           />
-        </div>
 
-        {/* Cooking Time */}
-        <div className="form-group">
-          <label>Cooking Time (minutes):</label>
-          <input
-            type="number"
-            value={recipeData.cookingTime}
-            onChange={(e) =>
-              handleChange("cookingTime", Number(e.target.value))
-            }
-          />
-        </div>
-
-        {/* Servings */}
-        <div className="form-group">
-          <label>Servings:</label>
-          <input
-            type="number"
-            value={recipeData.servings}
-            onChange={(e) => handleChange("servings", Number(e.target.value))}
-          />
-        </div>
-
-        {/* Dietary Info */}
-        <div className="form-group">
-          <label>Dietary Info:</label>
-          <input
-            type="text"
-            value={recipeData.dietaryInfo}
-            onChange={(e) => handleChange("dietaryInfo", e.target.value)}
-          />
-        </div>
-
-        {/* Contains Gluten */}
-        <div className="form-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={recipeData.containsGluten}
-              onChange={(e) =>
-                handleChange("containsGluten", e.target.checked)
-              }
+          <div className="form-section">
+            <h3>Ingredients</h3>
+            <IngredientsSection
+              ingredients={form.ingredients}
+              onIngredientChange={handleIngredientChange}
+              onRemoveIngredient={removeIngredient}
+              onAddIngredient={addIngredient}
+              error={errors.ingredients}
             />
-            Contains Gluten
-          </label>
-        </div>
-
-        {/* Ingredients */}
-        <div className="form-group">
-          <label>Ingredients (one per line):</label>
-          <textarea
-            rows={4}
-            value={ingredientsText}
-            onChange={(e) => handleIngredientsText(e.target.value)}
-          />
-        </div>
-
-        {/* Preparation Steps */}
-        <div className="form-group">
-          <label>Preparation Steps:</label>
-          <textarea
-            rows={5}
-            value={recipeData.preparationSteps}
-            onChange={(e) =>
-              handleChange("preparationSteps", e.target.value)
-            }
-          />
-        </div>
-
-        {/* Categories */}
-        <div className="form-group">
-          <label>Categories:</label>
-          <div className="categories-container">
-            {allCategories.map((cat) => (
-              <label key={cat.id}>
-                <input
-                  type="checkbox"
-                  checked={recipeData.categoryIds.includes(cat.id)}
-                  onChange={() => handleToggleCategory(cat.id)}
-                />
-                {cat.name}
-              </label>
-            ))}
           </div>
-        </div>
 
-        {/* Buttons */}
-        <div className="form-buttons">
-          <button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
-          </button>
-          <button type="button" onClick={() => navigate(-1)}>
-            Cancel
-          </button>
-        </div>
-      </form>
+          <InstructionsSection
+            instructions={form.instructions}
+            error={errors.instructions}
+            onInputChange={handleChange}
+          />
+
+          <PhotoSection onPhotoChange={handlePhotoChange} />
+
+          <div className="form-actions">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="submit-button"
+            >
+              {isSubmitting ? "Updating Recipe..." : "Update Recipe"}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => navigate("/all/recipes")}
+              className="cancel-button"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -1,21 +1,18 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import recipeReducer from "../../Pages/Redux/slices/recipeReducer"; // Import the recipe reducer
-import { AuthReducer } from "./AuthReducer";
-import AdminReducer from "./slices/AdminReducer";
+import { configureStore } from "@reduxjs/toolkit";
+import unifiedRecipeReducer from './slices/unifiedRecipeSlice';
+import unifiedAuthReducer from './slices/unifiedAuthSlice';
 
-// Combine all reducers
-const rootReducer = combineReducers({
-  auth: AuthReducer,
-  recipes: recipeReducer, // Add the recipe reducer here
-  admin: AdminReducer,    // Add the admin reducer here
-});
-
-// Configure the store
+// Configure the store with unified reducers
 export const recipeSystem = configureStore({
-  reducer: rootReducer,
+  reducer: {
+    auth: unifiedAuthReducer,
+    recipes: unifiedRecipeReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, 
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
     }),
 });
 

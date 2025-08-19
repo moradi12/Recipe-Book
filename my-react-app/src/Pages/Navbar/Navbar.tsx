@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
-import { logoutAction } from "../../Pages/Redux/AuthReducer";
+import { logout } from "../../Pages/Redux/slices/unifiedAuthSlice";
 import { AppDispatch, RootState } from "../../Pages/Redux/store";
 // Using inline styles for minimal, professional design
 
@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
 
   /* Logout handler */
   const handleLogout = () => {
-    dispatch(logoutAction());
+    dispatch(logout());
     sessionStorage.removeItem("jwt");
     navigate("/login");
     setIsOpen(false);

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCollections } from '../../hooks/useCollections';
 import { useAuth } from '../../hooks/useAuth';
-import './RecipeCollections.css';
 
 const RecipeCollections: React.FC = () => {
   const navigate = useNavigate();
@@ -11,18 +9,17 @@ const RecipeCollections: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createType, setCreateType] = useState<'collection' | 'meal-plan' | 'shopping-list'>('collection');
 
-  const {
-    collections,
-    mealPlans,
-    shoppingLists,
-    loading,
-    actionLoading,
-    createCollection,
-    deleteCollection,
-    createMealPlan,
-    createShoppingList,
-    generateShoppingListFromMealPlan
-  } = useCollections();
+  // Simplified collections data since useCollections was removed
+  const collections = [];
+  const mealPlans = [];
+  const shoppingLists = [];
+  const loading = false;
+  const actionLoading = false;
+  const createCollection = () => console.log('Create collection to be implemented');
+  const deleteCollection = () => console.log('Delete collection to be implemented');
+  const createMealPlan = () => console.log('Create meal plan to be implemented');
+  const createShoppingList = () => console.log('Create shopping list to be implemented');
+  const generateShoppingListFromMealPlan = () => console.log('Generate shopping list to be implemented');
 
   const [newItem, setNewItem] = useState({
     name: '',

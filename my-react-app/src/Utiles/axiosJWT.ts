@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { updateTokenAction } from '../Pages/Redux/AuthReducer';
+import { updateToken } from '../Pages/Redux/slices/unifiedAuthSlice';
 import { recipeSystem } from '../Pages/Redux/store';
 
 const axiosJWT = axios.create();
@@ -15,7 +15,7 @@ axiosJWT.interceptors.request.use(
 axiosJWT.interceptors.response.use(
     response => {
         const authorization:string = response.headers.authorization.split(' ')[1];
-        recipeSystem.dispatch(updateTokenAction(authorization));      
+        recipeSystem.dispatch(updateToken(authorization));      
         sessionStorage.setItem('jwt', authorization);               
         return response;
     }

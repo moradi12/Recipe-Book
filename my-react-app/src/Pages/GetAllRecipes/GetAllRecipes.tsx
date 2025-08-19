@@ -1,16 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecipes, useFavorites, useAuth } from "../../hooks";
+import { useRecipes } from "../../hooks";
 import { checkData } from "../../Utiles/checkData";
-import CategoryFilter from "./CategoryFilter";
-// Using global design system instead of component-specific CSS
-import PaginationControls from "./PaginationControls";
 import RecipeList from "./RecipeList";
 import SearchAndFilters from "./SearchAndFilters";
+import "./GetAllRecipes.css";
+
+// Inline PaginationControls Component
+const PaginationControls: React.FC<{
+  pagination: { page: number; size: number; totalPages: number };
+  nextPage?: () => void;
+  prevPage?: () => void;
+  loading: boolean;
+}> = ({ pagination, nextPage, prevPage, loading }) => {
+  const { page, totalPages } = pagination;
+
+  return (
+    <div className="pagination">
+      <button
+        onClick={prevPage}
+        disabled={page === 0 || loading}
+      >
+        Previous
+      </button>
+      <span>
+        Page {page + 1} of {totalPages}
+      </span>
+      <button
+        onClick={nextPage}
+        disabled={page >= totalPages - 1 || loading}
+      >
+        Next
+      </button>
+    </div>
+  );
+};
 
 const GetAllRecipes: React.FC = () => {
   const navigate = useNavigate();
-  const { requireAuth, isAuthenticated } = useAuth();
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,12 +57,10 @@ const GetAllRecipes: React.FC = () => {
     approveRecipe,
     rejectRecipe,
     deleteRecipe,
-    updateRecipeStatus,
     filterCategory,
     setFilterCategory,
     nextPage,
     prevPage,
-    goToPage,
     canEdit,
     canApprove,
     canDelete,
@@ -78,10 +103,9 @@ const GetAllRecipes: React.FC = () => {
     
     // Category filter logic - check if the recipe's categories include the selected category name
     const matchesCategory = !filterCategory || 
-                           recipe.categories.some(categoryName => {
-                             const selectedCategory = categories.find(cat => String(cat.id) === filterCategory);
-                             return selectedCategory && categoryName === selectedCategory.name;
-                           });
+                           recipe.categories?.some(cat => 
+                             cat.toLowerCase().includes(filterCategory.toLowerCase())
+                           );
     
     return matchesSearch && matchesDietary && matchesTime && matchesCategory;
   });
@@ -95,170 +119,109 @@ const GetAllRecipes: React.FC = () => {
         return a.cookingTime - b.cookingTime;
       case "newest":
       default:
+        // Assuming newer recipes have higher IDs
         return b.id - a.id;
     }
   });
 
+  const handleApproveRecipe = async (recipeId: number) => {
+    try {
+      await approveRecipe(recipeId);
+      // Refresh recipes to see updated status
+      fetchRecipes();
+    } catch (error) {
+      console.error('Error approving recipe:', error);
+    }
+  };
+
+  const handleRejectRecipe = async (recipeId: number) => {
+    try {
+      await rejectRecipe(recipeId);
+      // Refresh recipes to see updated status
+      fetchRecipes();
+    } catch (error) {
+      console.error('Error rejecting recipe:', error);
+    }
+  };
+
+  const handleDeleteRecipe = async (recipeId: number) => {
+    try {
+      await deleteRecipe(recipeId);
+      // Refresh recipes after deletion
+      fetchRecipes();
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading recipes...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: 'var(--background-primary)' }}>
-      {/* Official Header Section */}
-      <div style={{ 
-        backgroundColor: 'var(--background-secondary)',
-        borderBottom: '1px solid var(--border-light)',
-        padding: 'var(--spacing-2xl) 0'
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 'var(--font-weight-bold)', 
-              color: 'var(--text-primary)',
-              marginBottom: 'var(--spacing-md)',
-              fontFamily: 'var(--font-heading)'
-            }}>
-              Recipe Collection
-            </h1>
-            <p style={{ 
-              fontSize: '1.125rem', 
-              color: 'var(--text-secondary)',
-              marginBottom: 'var(--spacing-xl)',
-              lineHeight: '1.6'
-            }}>
-              Browse our comprehensive collection of professionally curated recipes
-            </p>
-            
-            {/* Stats Bar */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
-              gap: 'var(--spacing-2xl)', 
-              flexWrap: 'wrap',
-              marginTop: 'var(--spacing-lg)'
-            }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ 
-                  fontSize: '1.875rem', 
-                  fontWeight: 'var(--font-weight-bold)', 
-                  color: 'var(--text-primary)',
-                  marginBottom: 'var(--spacing-xs)'
-                }}>
-                  {sortedRecipes.length}
-                </div>
-                <div style={{ 
-                  fontSize: '0.875rem', 
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  {sortedRecipes.length === 1 ? 'Recipe' : 'Recipes'} Found
-                </div>
-              </div>
-              
-              {pagination.totalPages > 0 && (
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ 
-                    fontSize: '1.875rem', 
-                    fontWeight: 'var(--font-weight-bold)', 
-                    color: 'var(--text-primary)',
-                    marginBottom: 'var(--spacing-xs)'
-                  }}>
-                    {pagination.page + 1}
-                  </div>
-                  <div style={{ 
-                    fontSize: '0.875rem', 
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    of {pagination.totalPages} Pages
-                  </div>
-                </div>
-              )}
-              
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ 
-                  fontSize: '1.875rem', 
-                  fontWeight: 'var(--font-weight-bold)', 
-                  color: 'var(--text-primary)',
-                  marginBottom: 'var(--spacing-xs)'
-                }}>
-                  {categories.length}
-                </div>
-                <div style={{ 
-                  fontSize: '0.875rem', 
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  Categories
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="get-all-recipes">
+      <div className="recipes-header">
+        <h1>All Recipes</h1>
+        <button 
+          onClick={() => navigate('/create-recipe')}
+          className="create-recipe-btn"
+        >
+          Create New Recipe
+        </button>
       </div>
 
-      {loading && (
-        <div className="container" style={{ padding: 'var(--spacing-3xl) 0' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div className="loading-spinner" style={{ 
-              margin: '0 auto var(--spacing-lg) auto',
-              width: '32px',
-              height: '32px'
-            }}></div>
-            <p style={{ 
-              color: 'var(--text-secondary)',
-              fontSize: '1rem',
-              fontWeight: 'var(--font-weight-medium)'
-            }}>
-              Loading recipes...
-            </p>
-          </div>
+      <SearchAndFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        difficultyFilter={difficultyFilter}
+        setDifficultyFilter={setDifficultyFilter}
+        timeFilter={timeFilter}
+        setTimeFilter={setTimeFilter}
+        dietaryFilter={dietaryFilter}
+        setDietaryFilter={setDietaryFilter}
+        categories={categories}
+        filterCategory={filterCategory}
+        setFilterCategory={setFilterCategory}
+        disabled={loading}
+        resultCount={sortedRecipes.length}
+      />
+
+      <RecipeList
+        recipes={sortedRecipes}
+        onEditRecipe={canEdit ? handleEditRecipe : undefined}
+        onApproveRecipe={canApprove ? handleApproveRecipe : undefined}
+        onRejectRecipe={canApprove ? handleRejectRecipe : undefined}
+        onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
+      />
+
+      {sortedRecipes.length === 0 && !loading && (
+        <div className="no-recipes-found">
+          <h3>No recipes found</h3>
+          <p>Try adjusting your search or filters, or create a new recipe!</p>
+          <button 
+            onClick={() => navigate('/create-recipe')}
+            className="create-recipe-btn"
+          >
+            Create First Recipe
+          </button>
         </div>
       )}
 
-      <div className="container" style={{ padding: 'var(--spacing-xl) 0' }}>
-        {/* Search and Filters Section */}
-        <SearchAndFilters
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          difficultyFilter={difficultyFilter}
-          setDifficultyFilter={setDifficultyFilter}
-          timeFilter={timeFilter}
-          setTimeFilter={setTimeFilter}
-          dietaryFilter={dietaryFilter}
-          setDietaryFilter={setDietaryFilter}
-          categories={categories}
-          filterCategory={filterCategory}
-          setFilterCategory={setFilterCategory}
-          disabled={loading}
-          resultCount={sortedRecipes.length}
+      {pagination.totalPages > 1 && (
+        <PaginationControls
+          pagination={pagination}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          loading={loading}
         />
-
-        {/* Recipe List */}
-        {!loading && (
-          <RecipeList
-            recipes={sortedRecipes}
-            onEditRecipe={canEdit ? handleEditRecipe : undefined}
-            onApproveRecipe={canApprove ? approveRecipe : undefined}
-            onRejectRecipe={canApprove ? rejectRecipe : undefined}
-            onDeleteRecipe={canDelete ? deleteRecipe : undefined}
-          />
-        )}
-
-        {/* Pagination Controls */}
-        {!loading && recipes.length > 0 && (
-          <PaginationControls
-            pagination={pagination}
-            nextPage={nextPage}
-            prevPage={prevPage}
-            goToPage={goToPage}
-            loading={loading}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ export { useFavorites } from './useFavorites';
 export { useUser } from './useUser';
 export { useForm, validators } from './useForm';
 export { useAdmin } from './useAdmin';
+export { useRecipeForm } from './useRecipeForm';
 
 // Re-export types for convenience
 export type { ApiHookReturn, ApiState } from './useApi';

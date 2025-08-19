@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { recipeSystem } from '../Pages/Redux/store';
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -29,7 +28,8 @@ export class BaseApiService {
     // Request interceptor to add auth token
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        const token = recipeSystem.getState().auth.token;
+        // Get token from localStorage/sessionStorage to avoid circular dependency
+        const token = localStorage.getItem('token') || sessionStorage.getItem('jwt');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -43,9 +43,18 @@ export class BaseApiService {
       (response) => {
         const newToken = response.headers.authorization?.split(' ')[1];
         if (newToken) {
-          const { updateTokenAction } = require('../Pages/Redux/AuthReducer');
-          recipeSystem.dispatch(updateTokenAction(newToken));
+          // Update both storage locations
+          localStorage.setItem('token', newToken);
           sessionStorage.setItem('jwt', newToken);
+          
+          // Update Redux store if available (avoid circular dependency)
+          try {
+            const { recipeSystem } = require('../Pages/Redux/store');
+            const { updateTokenAction } = require('../Pages/Redux/slices/unifiedAuthSlice');
+            recipeSystem.dispatch(updateTokenAction(newToken));
+          } catch (error) {
+            console.warn('Could not update Redux store with new token:', error);
+          }
         }
         return response;
       },

@@ -3,7 +3,6 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import { RecipeResponse } from '../../Models/Recipe';
 import { RecipeCreateRequest } from '../../Models/RecipeCreateRequest';
 import RecipeService, { PaginatedRecipes } from '../../Service/RecipeService';
-import './RecipeAdminDashboard.css';
 
 const RecipeAdminDashboard: React.FC = () => {
   // State for paginated recipes from getAllRecipesPaginated
@@ -81,11 +80,9 @@ const RecipeAdminDashboard: React.FC = () => {
       const updatedRecipeRequest = buildRecipeRequest();
       // Note: The updateRecipe method in RecipeService.ts expects a RecipeResponse as the recipe parameter.
       // In a real application, you might have a separate update request type.
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const result = await RecipeService.updateRecipe(
+      await RecipeService.updateRecipe(
         updateId,
-        updatedRecipeRequest as unknown as RecipeResponse,
-        token
+        updatedRecipeRequest as unknown as RecipeResponse
       );
       alert(`Updated recipe ID ${updateId}.`);
       fetchRecipes();
@@ -110,8 +107,7 @@ const RecipeAdminDashboard: React.FC = () => {
   const handleApproveRecipe = async (id: number) => {
     try {
       // Assume RecipeService.approveRecipe is implemented on the service side.
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const result = await RecipeService.approveRecipe(id, token);
+      await RecipeService.approveRecipe(id);
       alert(`Approved recipe ID ${id}.`);
       fetchRecipes();
     } catch (err: unknown) {

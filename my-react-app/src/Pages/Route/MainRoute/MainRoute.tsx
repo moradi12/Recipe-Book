@@ -7,7 +7,6 @@ import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
 import EditRecipe from "../../EditRecipe/EditRecipe";
 import EditRecipeAdmin from "../../EditRecipe/EditRecipeAdmin";
-import Features from "../../Features/Features";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
 import GetSingleRecipe from "../../GetSingleRecipe/GetSingleRecipe";
@@ -31,7 +30,6 @@ export function MainRoute(): JSX.Element {
       <Route path="/" element={<HomePage />} />
       <Route path="/food" element={<FoodHomePage />} />
       <Route path="/recipes" element={<GetAllRecipes />} />
-      <Route path="/features" element={<Features />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/register" element={<RegisterForm />} />

@@ -1,20 +1,9 @@
 /* src/components/Contact/Contact.module.css */
-
-:root {
-  --primary-color: #6B73FF;
-  --primary-hover: #575bff;
-  --background-color: #f5f5f5;
-  --white: #ffffff;
-  --dark: #333333;
-  --text-color: #555555;
-  --error-color: #ff4d4f;
-  --success-color: #52c41a;
-  --border-color: #cccccc;
-}
+/* Uses global CSS variables from globals.css */
 
 .container {
   padding: 4rem 2rem;
-  background-color: var(--background-color);
+  background-color: var(--background-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,7 +12,7 @@
 .heading {
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  color: var(--dark);
+  color: var(--text-primary);
   text-align: center;
 }
 
@@ -39,7 +28,7 @@
 .contactForm {
   width: 100%;
   max-width: 600px;
-  background-color: var(--white);
+  background-color: var(--background-primary);
   padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -54,18 +43,18 @@
 .formGroup label {
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--text-secondary);
 }
 
 .required {
-  color: var(--error-color);
+  color: var(--danger-color);
   margin-left: 0.25rem;
 }
 
 .formGroup input,
 .formGroup textarea {
   padding: 0.75rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-medium);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
@@ -83,7 +72,7 @@
 }
 
 .error {
-  color: var(--error-color);
+  color: var(--danger-color);
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -114,32 +103,32 @@
 
 .submitButton {
   background-color: var(--primary-color);
-  color: var(--white);
+  color: var(--text-light);
 }
 
 .submitButton:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--primary-dark);
 }
 
 .resetButton {
-  background-color: #cccccc;
-  color: var(--dark);
+  background-color: var(--border-medium);
+  color: var(--text-primary);
 }
 
 .resetButton:hover {
-  background-color: #b3b3b3;
+  background-color: var(--border-dark);
 }
 
 .submitButton:disabled,
 .resetButton:disabled {
-  background-color: #a3a3a3;
+  background-color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .contactInfo {
   width: 100%;
   max-width: 400px;
-  background-color: var(--white);
+  background-color: var(--background-primary);
   padding: 2rem;
   border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -147,12 +136,12 @@
 
 .contactInfo h3 {
   margin-bottom: 1rem;
-  color: var(--dark);
+  color: var(--text-primary);
 }
 
 .contactInfo p {
   margin-bottom: 0.75rem;
-  color: var(--text-color);
+  color: var(--text-secondary);
 }
 
 .socialMedia {

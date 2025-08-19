@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '../../hooks/useNotifications';
 import { useAuth } from '../../hooks/useAuth';
 import './NotificationCenter.css';
 
@@ -10,18 +9,17 @@ const NotificationCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
   const [showPreferences, setShowPreferences] = useState(false);
 
-  const {
-    notifications,
-    unreadCount,
-    loading,
-    actionLoading,
-    preferences,
-    markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    clearAllNotifications,
-    updatePreferences
-  } = useNotifications();
+  // Simplified notifications data since useNotifications was removed
+  const notifications = [];
+  const unreadCount = 0;
+  const loading = false;
+  const actionLoading = false;
+  const preferences = { emailNotifications: true, pushNotifications: true };
+  const markAsRead = () => console.log('Mark as read to be implemented');
+  const markAllAsRead = () => console.log('Mark all as read to be implemented');
+  const deleteNotification = () => console.log('Delete notification to be implemented');
+  const clearAllNotifications = () => console.log('Clear all notifications to be implemented');
+  const updatePreferences = () => console.log('Update preferences to be implemented');
 
   const filteredNotifications = activeTab === 'unread' 
     ? notifications.filter(n => !n.isRead)

@@ -244,6 +244,100 @@ p {
   font-size: 1rem;
 }
 
+.btn-xl {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: 1.1rem;
+}
+
+/* Additional Button Variants */
+.btn-warning {
+  background-color: var(--warning-color);
+  color: var(--text-light);
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: #e68900;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: var(--text-light);
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #138496;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-light {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+}
+
+.btn-light:hover:not(:disabled) {
+  background-color: var(--border-light);
+  border-color: var(--border-medium);
+}
+
+.btn-dark {
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  border: none;
+}
+
+.btn-dark:hover:not(:disabled) {
+  background-color: #1a1f36;
+}
+
+/* Button Styles */
+.btn-rounded {
+  border-radius: var(--radius-full);
+}
+
+.btn-square {
+  border-radius: 0;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  color: var(--text-light);
+  border: none;
+}
+
+.btn-gradient:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+  transform: translateY(-1px);
+}
+
+/* Icon Buttons */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+}
+
+.btn-icon-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.btn-icon-lg {
+  width: 48px;
+  height: 48px;
+}
+
 /* ===================================
    FORM SYSTEM
    =================================== */
@@ -335,6 +429,104 @@ p {
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
+/* Card Variants */
+.card-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-flat {
+  box-shadow: none;
+  border: 1px solid var(--border-light);
+}
+
+.card-feature {
+  background: var(--background-primary);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-light);
+}
+
+.card-feature:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-recipe {
+  background: var(--background-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-recipe:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-recipe-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-recipe-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.card-recipe:hover .card-recipe-image img {
+  transform: scale(1.05);
+}
+
+.card-recipe-content {
+  padding: var(--spacing-lg);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-recipe-actions {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
+  background-color: var(--background-secondary);
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.card-stat {
+  background: var(--background-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.card-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-compact {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
 /* ===================================
    LAYOUT SYSTEM
    =================================== */
@@ -356,12 +548,51 @@ p {
   padding: 0 var(--spacing-md);
 }
 
+.container-sm {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.container-lg {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.container-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  min-height: 80vh;
+}
+
+.container-centered {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .section {
   padding: var(--spacing-3xl) 0;
 }
 
 .section-sm {
   padding: var(--spacing-xl) 0;
+}
+
+.section-lg {
+  padding: var(--spacing-3xl) 0 var(--spacing-2xl);
+}
+
+.section-hero {
+  padding: var(--spacing-3xl) 0;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
 }
 
 /* ===================================

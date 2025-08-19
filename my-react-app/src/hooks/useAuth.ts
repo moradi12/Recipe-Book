@@ -2,9 +2,8 @@ import { useCallback, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { RootState } from '../Pages/Redux/RootState';
-import type { AppDispatch } from '../Pages/Redux/store';
-import { loginAction, logoutAction, authState } from '../Pages/Redux/AuthReducer';
+import { RootState, AppDispatch } from '../Pages/Redux/store';
+import { login as loginAction, logout as logoutAction, AuthState } from '../Pages/Redux/slices/unifiedAuthSlice';
 import { loginUser, registerUser, ILoginRequest, IRegisterRequest } from '../Utiles/authService';
 import { notify } from '../Utiles/notif';
 
@@ -17,7 +16,7 @@ type DecodedJwt = {
 
 export interface AuthHookReturn {
   // Auth state
-  auth: authState;
+  auth: AuthState;
   isAuthenticated: boolean;
   userInfo: DecodedJwt | null;
   
@@ -57,7 +56,7 @@ export function useAuth(): AuthHookReturn {
           
           // Check if token is not expired
           if (decoded.exp * 1000 > Date.now()) {
-            const userState: authState = {
+            const userState: AuthState = {
               email: '', // We don't have email in JWT, will be filled later
               name: decoded.userName,
               id: decoded.id,
@@ -110,7 +109,7 @@ export function useAuth(): AuthHookReturn {
       const response = await loginUser(credentials);
       
       if (response) {
-        const userState: authState = {
+        const userState: AuthState = {
           email: response.email,
           name: response.username,
           id: response.id,
@@ -144,7 +143,7 @@ export function useAuth(): AuthHookReturn {
       const response = await registerUser(data);
       
       if (response) {
-        const userState: authState = {
+        const userState: AuthState = {
           email: response.email,
           name: response.username,
           id: response.id,

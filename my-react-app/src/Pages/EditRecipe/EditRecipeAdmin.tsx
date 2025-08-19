@@ -1,5 +1,4 @@
 // src/Pages/EditRecipeAdmin/EditRecipeAdmin.tsx
-import "./EditRecipe.css";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";

@@ -1,8 +1,8 @@
 /* Enhanced Admin Dashboard */
 .admin-dashboard-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  font-family: var(--font-primary);
 }
 
 /* Auth Required / Access Denied */
@@ -34,8 +34,8 @@
 
 .btn-login,
 .btn-home {
-  background: white;
-  color: #667eea;
+  background: var(--background-primary);
+  color: var(--primary-color);
   border: none;
   padding: 0.75rem 2rem;
   border-radius: 25px;
@@ -47,7 +47,7 @@
 .btn-login:hover,
 .btn-home:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Loading */
@@ -64,8 +64,8 @@
 
 /* Header */
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: var(--text-light);
   padding: 2rem 0;
 }
 
@@ -84,7 +84,7 @@
   margin: 0;
   font-size: 2.5rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-light);
 }
 
 .header-actions {
@@ -110,8 +110,8 @@
 
 /* Navigation */
 .dashboard-navigation {
-  background: white;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
   z-index: 100;
