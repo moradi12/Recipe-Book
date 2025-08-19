@@ -101,11 +101,13 @@ const GetAllRecipes: React.FC = () => {
                        (timeFilter === "medium" && recipe.cookingTime > 30 && recipe.cookingTime <= 60) ||
                        (timeFilter === "long" && recipe.cookingTime > 60);
     
-    // Category filter logic - check if the recipe's categories include the selected category name
-    const matchesCategory = !filterCategory || 
-                           recipe.categories?.some(cat => 
-                             cat.toLowerCase().includes(filterCategory.toLowerCase())
-                           );
+    // Category filter logic - find the category name by ID and check if recipe categories include it
+    const matchesCategory = !filterCategory || (() => {
+      const selectedCategory = categories.find(cat => cat.id === parseInt(filterCategory));
+      return selectedCategory && recipe.categories?.some(cat => 
+        cat.toLowerCase() === selectedCategory.name.toLowerCase()
+      );
+    })();
     
     return matchesSearch && matchesDietary && matchesTime && matchesCategory;
   });
