@@ -27,10 +27,104 @@
   opacity: 0.9;
 }
 
-/* Loading State */
+/* Warning Banner */
+.warning-banner {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  color: #856404;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid #ffeaa7;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.warning-icon {
+  font-size: 1.2rem;
+}
+
+/* Loading State & Skeletons */
 .loading-state {
   text-align: center;
   padding: 4rem;
+}
+
+/* Skeleton Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  border-radius: 4px;
+}
+
+.favorite-recipe-card.skeleton {
+  pointer-events: none;
+}
+
+.skeleton-title {
+  height: 1.3rem;
+  width: 70%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-button {
+  height: 2.5rem;
+  width: 2.5rem;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 50%;
+}
+
+.recipe-actions .skeleton-button {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-meta {
+  height: 1.5rem;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 20px;
 }
 
 
@@ -350,6 +444,64 @@
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
+.retry-btn {
+  background: linear-gradient(135deg, #ffc107 0%, #e68900 100%);
+  color: #212529;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Error State */
+.error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 1px solid #f5c6cb;
+  border-radius: 15px;
+  margin: 2rem 0;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.error-state h3 {
+  color: #721c24;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+.error-state p {
+  color: #721c24;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.error-state .retry-btn {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+}
+
+.error-state .retry-btn:hover {
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* Hidden utility class */
+.hidden {
+  display: none !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .favorites-page {
@@ -390,7 +542,17 @@
     gap: 1rem;
   }
 
-  .back-btn, .explore-more-btn {
+  .back-btn, .explore-more-btn, .retry-btn {
     width: 100%;
+  }
+  
+  .favorites-actions {
+    gap: 0.75rem;
+  }
+  
+  .warning-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.25rem;
   }
 }

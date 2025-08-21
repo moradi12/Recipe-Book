@@ -16,52 +16,66 @@ const RecipeDetailsSection: React.FC<RecipeDetailsSectionProps> = ({
   onInputChange
 }) => {
   return (
-    <div className="form-section">
-      <h3>Recipe Details</h3>
+    <div className="form-section fade-in">
+      <h3>
+        <svg className="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Recipe Details
+      </h3>
       
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="preparationTime">Prep Time (minutes)*</label>
-          <input
-            type="number"
-            id="preparationTime"
-            name="preparationTime"
-            value={form.preparationTime}
-            onChange={onInputChange}
-            required
-            min="1"
-            className="add-recipe__input"
-          />
+          <div className="input-wrapper">
+            <input
+              type="number"
+              id="preparationTime"
+              name="preparationTime"
+              value={form.preparationTime}
+              onChange={onInputChange}
+              required
+              min="1"
+              placeholder="15"
+              className="add-recipe__input"
+            />
+          </div>
           {errors.preparationTime && <span className="error-text">{errors.preparationTime}</span>}
         </div>
 
         <div className="form-group">
           <label htmlFor="cookingTime">Cook Time (minutes)*</label>
-          <input
-            type="number"
-            id="cookingTime"
-            name="cookingTime"
-            value={form.cookingTime}
-            onChange={onInputChange}
-            required
-            min="1"
-            className="add-recipe__input"
-          />
+          <div className="input-wrapper">
+            <input
+              type="number"
+              id="cookingTime"
+              name="cookingTime"
+              value={form.cookingTime}
+              onChange={onInputChange}
+              required
+              min="1"
+              placeholder="30"
+              className="add-recipe__input"
+            />
+          </div>
           {errors.cookingTime && <span className="error-text">{errors.cookingTime}</span>}
         </div>
 
         <div className="form-group">
           <label htmlFor="servings">Servings*</label>
-          <input
-            type="number"
-            id="servings"
-            name="servings"
-            value={form.servings}
-            onChange={onInputChange}
-            required
-            min="1"
-            className="add-recipe__input"
-          />
+          <div className="input-wrapper">
+            <input
+              type="number"
+              id="servings"
+              name="servings"
+              value={form.servings}
+              onChange={onInputChange}
+              required
+              min="1"
+              placeholder="4"
+              className="add-recipe__input"
+            />
+          </div>
           {errors.servings && <span className="error-text">{errors.servings}</span>}
         </div>
       </div>

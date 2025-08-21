@@ -323,50 +323,6 @@
   color: var(--text-light);
 }
 
-.admin-toggle {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-medium);
-}
-
-.admin-toggle:hover {
-  background: var(--background-tertiary);
-  color: var(--text-primary);
-}
-
-.admin-actions {
-  display: flex;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
-}
-
-.approve-button {
-  background: transparent;
-  color: var(--success-color);
-  border: 1px solid var(--success-color);
-}
-
-.approve-button:hover:not(:disabled) {
-  background: var(--success-color);
-  color: var(--text-light);
-}
-
-.approve-button.approved {
-  background: var(--success-color);
-  color: var(--text-light);
-  opacity: 0.8;
-}
-
-.reject-button {
-  background: transparent;
-  color: var(--danger-color);
-  border: 1px solid var(--danger-color);
-}
-
-.reject-button:hover {
-  background: var(--danger-color);
-  color: var(--text-light);
-}
 
 .delete-button {
   background: transparent;
@@ -514,10 +470,6 @@
     padding: var(--spacing-xs) var(--spacing-sm);
   }
 
-  .admin-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 
 @media (max-width: 480px) {
@@ -536,10 +488,6 @@
     justify-content: center;
   }
 
-  .admin-actions {
-    flex-direction: column;
-    width: 100%;
-  }
 }
 
 /* ===================================

@@ -7,17 +7,11 @@ import RecipeCard from "./RecipeCard";
 interface RecipeListProps {
   recipes: RecipeResponse[];
   onEditRecipe?: (id: number) => void;
-  onApproveRecipe?: (id: number) => void;
-  onRejectRecipe?: (id: number) => void;
-  onDeleteRecipe?: (id: number) => Promise<void>;
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
   recipes,
   onEditRecipe,
-  onApproveRecipe,
-  onRejectRecipe,
-  onDeleteRecipe,
 }) => {
   const token = recipeSystem.getState().auth.token;
   const { favoriteRecipeIds, toggleFavorite, loading: favoritesLoading } = useFavorites();
@@ -44,9 +38,6 @@ const RecipeList: React.FC<RecipeListProps> = ({
           favoritesLoading={favoritesLoading}
           onToggleFavorite={toggleFavorite}
           onEditRecipe={onEditRecipe}
-          onApproveRecipe={onApproveRecipe}
-          onRejectRecipe={onRejectRecipe}
-          onDeleteRecipe={onDeleteRecipe}
           token={token}
         />
       ))}

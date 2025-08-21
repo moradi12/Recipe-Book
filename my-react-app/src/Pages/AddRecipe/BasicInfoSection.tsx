@@ -22,58 +22,69 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   onCategoryChange
 }) => {
   return (
-    <div className="form-section">
-      <h3>Basic Information</h3>
+    <div className="form-section fade-in">
+      <h3>
+        <svg className="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Basic Information
+      </h3>
       
       <div className="form-group">
         <label htmlFor="title">Recipe Title*</label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={form.title}
-          onChange={onInputChange}
-          required
-          placeholder="Enter recipe title"
-          className="add-recipe__input"
-        />
+        <div className="input-wrapper">
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={form.title}
+            onChange={onInputChange}
+            required
+            placeholder="What's the name of your delicious creation?"
+            className="add-recipe__input"
+          />
+        </div>
         {errors.title && <span className="error-text">{errors.title}</span>}
       </div>
 
       <div className="form-group">
         <label htmlFor="description">Description*</label>
-        <textarea
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={onInputChange}
-          required
-          placeholder="Describe your recipe"
-          className="add-recipe__textarea"
-          rows={3}
-        />
+        <div className="input-wrapper">
+          <textarea
+            id="description"
+            name="description"
+            value={form.description}
+            onChange={onInputChange}
+            required
+            placeholder="Tell us what makes this recipe special. What inspired you to create it?"
+            className="add-recipe__textarea"
+            rows={4}
+          />
+        </div>
         {errors.description && <span className="error-text">{errors.description}</span>}
       </div>
 
       <div className="form-group">
         <label htmlFor="category">Category*</label>
-        <select
-          id="category"
-          value={selectedCategoryId}
-          onChange={(e) => onCategoryChange(e.target.value)}
-          required
-          className="add-recipe__select"
-        >
-          <option value="" disabled>
-            Select Category
-          </option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
+        <div className="input-wrapper">
+          <select
+            id="category"
+            value={selectedCategoryId}
+            onChange={(e) => onCategoryChange(e.target.value)}
+            required
+            className="add-recipe__select"
+          >
+            <option value="" disabled>
+              Choose the perfect category for your recipe
             </option>
-          ))}
-        </select>
-        {selectedCategoryId === "" && <span className="error-text">Category is required</span>}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {selectedCategoryId === "" && <span className="error-text">Please select a category to help others find your recipe</span>}
       </div>
     </div>
   );

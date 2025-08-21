@@ -9,9 +9,6 @@ interface RecipeCardProps {
   favoritesLoading: boolean;
   onToggleFavorite: (id: number) => void;
   onEditRecipe?: (id: number) => void;
-  onApproveRecipe?: (id: number) => void;
-  onRejectRecipe?: (id: number) => void;
-  onDeleteRecipe?: (id: number) => Promise<void>;
   token: string | null;
 }
 
@@ -21,13 +18,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   favoritesLoading,
   onToggleFavorite,
   onEditRecipe,
-  onApproveRecipe,
-  onRejectRecipe,
-  onDeleteRecipe,
   token
 }) => {
   const navigate = useNavigate();
-  const isApproved = recipe.status === "approved" || recipe.status === "APPROVED";
 
   return (
     <li className="recipe-item">
@@ -120,11 +113,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         favoritesLoading={favoritesLoading}
         onToggleFavorite={onToggleFavorite}
         onEditRecipe={onEditRecipe}
-        onApproveRecipe={onApproveRecipe}
-        onRejectRecipe={onRejectRecipe}
-        onDeleteRecipe={onDeleteRecipe}
         token={token}
-        isApproved={isApproved}
         onViewRecipe={() => navigate(`/recipes/${recipe.id}`)}
       />
     </li>

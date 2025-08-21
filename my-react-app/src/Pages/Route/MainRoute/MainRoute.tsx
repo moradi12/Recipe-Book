@@ -1,12 +1,10 @@
 // src/Routes/MainRoute.tsx
 import { Route, Routes } from "react-router-dom";
 import CreateRecipe from "../../AddRecipe/CreateRecipe";
-import RecipeAdminDashboard from "../../Admin/AdminDashboard";
 import CategoryDropdown from "../../CategoryDropdown/CategoryDropdown";
 import Contact from "../../Contact Page/Contact";
 import Dashboard from "../../Dashboard/Dashboard";
 import EditRecipe from "../../EditRecipe/EditRecipe";
-import EditRecipeAdmin from "../../EditRecipe/EditRecipeAdmin";
 import FoodHomePage from "../../FoodHomePage/FoodHomePage";
 import GetAllRecipes from "../../GetAllRecipes/GetAllRecipes";
 import GetSingleRecipe from "../../GetSingleRecipe/GetSingleRecipe";
@@ -21,7 +19,6 @@ import Favorites from "../../Favorites/Favorites";
 import UserProfile from "../../UserProfile/UserProfile";
 import RecipeCollections from "../../RecipeCollections/RecipeCollections";
 import NotificationCenter from "../../Notifications/NotificationCenter";
-import EnhancedAdminDashboard from "../../Admin/EnhancedAdminDashboard";
 
 export function MainRoute(): JSX.Element {
   return (
@@ -37,14 +34,12 @@ export function MainRoute(): JSX.Element {
       <Route path="/categories" element={<CategoryDropdown />} />
       <Route path="/create" element={<CreateRecipe />} />
       <Route path="/recipes/:recipeId" element={<GetSingleRecipe />} />
+      <Route path="/recipe/:recipeId" element={<GetSingleRecipe />} />
       <Route path="/edit-recipe/:id" element={<EditRecipe />} />
 
       {/* Existing "All Recipes" route */}
       <Route path="/all/recipes" element={<GetAllRecipes />} />
 
-      <Route path="/admin" element={<RecipeAdminDashboard />} />
-      <Route path="/admin/enhanced" element={<EnhancedAdminDashboard />} />
-      <Route path="/admin/edit-recipe/:id" element={<EditRecipeAdmin />} />
 
       <Route path="/userpanel" element={<UserPanel />} />
       <Route path="/user-panel" element={<UserPanel />} />

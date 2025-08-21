@@ -27,6 +27,9 @@ class FavoriteService extends BaseApiService {
   // ADD FAVORITE
   // ===========================
   public async addFavorite(recipeId: number): Promise<AxiosResponse<{ message: string }>> {
+    console.log('Adding favorite for recipe ID:', recipeId);
+    console.log('Token in localStorage:', localStorage.getItem('token'));
+    console.log('Token in sessionStorage:', sessionStorage.getItem('jwt'));
     return this.post<{ message: string }>(`/${recipeId}`, {});
   }
 

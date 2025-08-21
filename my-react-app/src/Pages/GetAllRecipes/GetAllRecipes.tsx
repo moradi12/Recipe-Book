@@ -54,16 +54,11 @@ const GetAllRecipes: React.FC = () => {
     categoriesLoading,
     fetchRecipes,
     fetchCategories,
-    approveRecipe,
-    rejectRecipe,
-    deleteRecipe,
     filterCategory,
     setFilterCategory,
     nextPage,
     prevPage,
     canEdit,
-    canApprove,
-    canDelete,
   } = useRecipes();
 
   // Check authentication on mount
@@ -126,35 +121,6 @@ const GetAllRecipes: React.FC = () => {
     }
   });
 
-  const handleApproveRecipe = async (recipeId: number) => {
-    try {
-      await approveRecipe(recipeId);
-      // Refresh recipes to see updated status
-      fetchRecipes();
-    } catch (error) {
-      console.error('Error approving recipe:', error);
-    }
-  };
-
-  const handleRejectRecipe = async (recipeId: number) => {
-    try {
-      await rejectRecipe(recipeId);
-      // Refresh recipes to see updated status
-      fetchRecipes();
-    } catch (error) {
-      console.error('Error rejecting recipe:', error);
-    }
-  };
-
-  const handleDeleteRecipe = async (recipeId: number) => {
-    try {
-      await deleteRecipe(recipeId);
-      // Refresh recipes after deletion
-      fetchRecipes();
-    } catch (error) {
-      console.error('Error deleting recipe:', error);
-    }
-  };
 
   if (loading) {
     return (
@@ -198,9 +164,6 @@ const GetAllRecipes: React.FC = () => {
       <RecipeList
         recipes={sortedRecipes}
         onEditRecipe={canEdit ? handleEditRecipe : undefined}
-        onApproveRecipe={canApprove ? handleApproveRecipe : undefined}
-        onRejectRecipe={canApprove ? handleRejectRecipe : undefined}
-        onDeleteRecipe={canDelete ? handleDeleteRecipe : undefined}
       />
 
       {sortedRecipes.length === 0 && !loading && (

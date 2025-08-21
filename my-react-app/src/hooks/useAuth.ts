@@ -66,12 +66,15 @@ export function useAuth(): AuthHookReturn {
             };
             
             dispatch(loginAction(userState));
+            localStorage.setItem('token', storedToken); // Sync to localStorage for BaseApiService
           } else {
             sessionStorage.removeItem('jwt');
+            localStorage.removeItem('token');
           }
         } catch (error) {
           console.error('Invalid stored token:', error);
           sessionStorage.removeItem('jwt');
+          localStorage.removeItem('token');
         }
       }
     };
@@ -90,6 +93,7 @@ export function useAuth(): AuthHookReturn {
       if (decoded.exp * 1000 < Date.now()) {
         dispatch(logoutAction());
         sessionStorage.removeItem('jwt');
+        localStorage.removeItem('token');
         return null;
       }
       
@@ -98,6 +102,7 @@ export function useAuth(): AuthHookReturn {
       console.error('Invalid token:', error);
       dispatch(logoutAction());
       sessionStorage.removeItem('jwt');
+      localStorage.removeItem('token');
       return null;
     }
   }, [auth.token, dispatch]);
@@ -120,6 +125,7 @@ export function useAuth(): AuthHookReturn {
         
         dispatch(loginAction(userState));
         sessionStorage.setItem('jwt', response.token);
+        localStorage.setItem('token', response.token); // Also store in localStorage for BaseApiService
         notify.success('Login successful!');
         return true;
       }
@@ -154,6 +160,7 @@ export function useAuth(): AuthHookReturn {
         
         dispatch(loginAction(userState));
         sessionStorage.setItem('jwt', response.token);
+        localStorage.setItem('token', response.token); // Also store in localStorage for BaseApiService
         notify.success('Registration successful!');
         return true;
       }
@@ -171,6 +178,7 @@ export function useAuth(): AuthHookReturn {
   const logout = useCallback(() => {
     dispatch(logoutAction());
     sessionStorage.removeItem('jwt');
+    localStorage.removeItem('token');
     navigate('/login');
     notify.success('Logged out successfully');
   }, [dispatch, navigate]);

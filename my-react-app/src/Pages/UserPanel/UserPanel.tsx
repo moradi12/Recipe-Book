@@ -234,14 +234,6 @@ const UserPanel: React.FC = () => {
                 Change Password
               </button>
               
-              {userInfo.userType === 'ADMIN' && (
-                <button 
-                  className="action-btn admin" 
-                  onClick={() => navigate('/admin')}
-                >
-                  Admin Dashboard
-                </button>
-              )}
             </div>
           </div>
 
