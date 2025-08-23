@@ -1,6 +1,7 @@
 package Allrecipes.Recipesdemo.Entities;
 
 import Allrecipes.Recipesdemo.Recipe.Recipe;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -30,6 +31,7 @@ public class Ingredient {
 
     @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
+    @JsonIgnore
     private Recipe recipe;
 
     public void setRecipe(Recipe recipe) {

@@ -16,6 +16,18 @@
 }
 
 /* ===================================
+   RECIPE ACTIONS HEADER
+   =================================== */
+
+.recipe-actions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  gap: var(--spacing-md);
+}
+
+/* ===================================
    BACK BUTTON
    =================================== */
 
@@ -32,7 +44,6 @@
   transition: all var(--transition-normal);
   font-weight: var(--font-weight-medium);
   text-decoration: none;
-  margin-bottom: var(--spacing-xl);
   box-shadow: var(--shadow-sm);
 }
 
@@ -52,6 +63,61 @@
 
 .back-button:hover svg {
   transform: translateX(-2px);
+}
+
+/* ===================================
+   FAVORITE BUTTON
+   =================================== */
+
+.favorite-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--background-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-medium);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.favorite-button:hover {
+  background: var(--danger-light);
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.favorite-button.favorited {
+  background: var(--danger-color);
+  color: var(--text-light);
+  border-color: var(--danger-color);
+}
+
+.favorite-button.favorited:hover {
+  background: var(--danger-dark);
+  border-color: var(--danger-dark);
+}
+
+.favorite-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.favorite-button svg {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--transition-normal);
+}
+
+.favorite-button:hover svg {
+  transform: scale(1.1);
 }
 
 /* ===================================
@@ -105,14 +171,14 @@
 }
 
 .recipe-image {
-  width: calc(100% + 4rem);
+  width: 100%;
   height: 70vh;
   min-height: 600px;
   max-height: 800px;
   overflow: hidden;
   position: relative;
   order: 3;
-  margin: var(--spacing-2xl) -2rem 0;
+  margin: var(--spacing-2xl) 0 0;
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
   display: flex;
@@ -559,11 +625,11 @@
   }
   
   .recipe-image {
-    width: calc(100% + 2rem);
+    width: 100%;
     height: 60vh;
     min-height: 400px;
     max-height: 600px;
-    margin: var(--spacing-xl) -1rem 0;
+    margin: var(--spacing-xl) 0 0;
   }
   
   .ingredient-item {
@@ -593,10 +659,20 @@
 }
 
 @media (max-width: 480px) {
+  .recipe-actions-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+  
   .back-button {
     width: 100%;
     justify-content: center;
-    margin-bottom: var(--spacing-lg);
+  }
+  
+  .favorite-button {
+    width: 100%;
+    justify-content: center;
   }
   
   .recipe-title {
@@ -625,11 +701,11 @@
   }
   
   .recipe-image {
-    width: calc(100% + 1.5rem);
+    width: 100%;
     height: 50vh;
     min-height: 300px;
     max-height: 500px;
-    margin: var(--spacing-lg) -0.75rem 0;
+    margin: var(--spacing-lg) 0 0;
   }
 
   .recipe-image img {

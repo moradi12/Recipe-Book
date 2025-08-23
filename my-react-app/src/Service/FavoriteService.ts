@@ -16,28 +16,19 @@ class FavoriteService extends BaseApiService {
     return FavoriteService.instance;
   }
 
-  // ===========================
-  // GET FAVORITES
-  // ===========================
+  // GET /api/favorites - Get all favorites for the logged-in user
   public async getFavorites(): Promise<AxiosResponse<Favorite[]>> {
     return this.get<Favorite[]>('');
   }
 
-  // ===========================
-  // ADD FAVORITE
-  // ===========================
-  public async addFavorite(recipeId: number): Promise<AxiosResponse<{ message: string }>> {
-    console.log('Adding favorite for recipe ID:', recipeId);
-    console.log('Token in localStorage:', localStorage.getItem('token'));
-    console.log('Token in sessionStorage:', sessionStorage.getItem('jwt'));
-    return this.post<{ message: string }>(`/${recipeId}`, {});
+  // POST /api/favorites/{recipeId} - Add a recipe to favorites
+  public async addFavorite(recipeId: number): Promise<AxiosResponse<string>> {
+    return this.post<string>(`/${recipeId}`, {});
   }
 
-  // ===========================
-  // REMOVE FAVORITE
-  // ===========================
-  public async removeFavorite(recipeId: number): Promise<AxiosResponse<{ message: string }>> {
-    return this.delete<{ message: string }>(`/${recipeId}`);
+  // DELETE /api/favorites/{recipeId} - Remove a recipe from favorites
+  public async removeFavorite(recipeId: number): Promise<AxiosResponse<string>> {
+    return this.delete<string>(`/${recipeId}`);
   }
 }
 

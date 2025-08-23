@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFavorites } from '../../hooks/useFavorites';
 import { useAuth } from '../../hooks/useAuth';
+import { useFavorites } from '../../hooks/useFavorites';
 import { RecipeResponse } from '../../Models/RecipeResponse';
 import RecipeService from '../../Service/RecipeService';
-import { notify } from '../../Utiles/notif';
 import './Favorites.css';
 
 // Loading skeleton component for better UX
@@ -47,13 +46,9 @@ const Favorites: React.FC = () => {
   const { requireAuth } = useAuth();
   const { 
     favoriteRecipeIds, 
-    toggleFavorite, 
     loading: favoritesLoading,
-    fetchFavorites,
-    isInitialized,
     error: favoritesError,
-    clearError,
-    refetch
+    removeFavorite 
   } = useFavorites();
 
   const [favoriteRecipes, setFavoriteRecipes] = useState<RecipeResponse[]>([]);
@@ -62,8 +57,8 @@ const Favorites: React.FC = () => {
   
   // Memoized loading state
   const loading = useMemo(() => {
-    return !isInitialized || recipesLoading;
-  }, [isInitialized, recipesLoading]);
+    return favoritesLoading || recipesLoading;
+  }, [favoritesLoading, recipesLoading]);
   
   // Memoized error state
   const error = useMemo(() => {
@@ -152,23 +147,21 @@ const Favorites: React.FC = () => {
 
   // Effect to fetch recipe details when favoriteRecipeIds changes
   useEffect(() => {
-    if (isInitialized) {
-      fetchRecipeDetails(favoriteRecipeIds);
-    }
-  }, [favoriteRecipeIds, isInitialized, fetchRecipeDetails]);
+    fetchRecipeDetails(favoriteRecipeIds);
+  }, [favoriteRecipeIds, fetchRecipeDetails]);
 
-  // Optimized handlers with better UX
+  // Handle remove favorite with optimistic update
   const handleRemoveFavorite = useCallback(async (recipeId: number) => {
-    // Optimistic update for better UX
+    // Optimistic update
     setFavoriteRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
     
     try {
-      await toggleFavorite(recipeId);
+      await removeFavorite(recipeId);
     } catch (error) {
       // Revert optimistic update on failure
-      await fetchRecipeDetails(favoriteRecipeIds);
+      fetchRecipeDetails(favoriteRecipeIds);
     }
-  }, [toggleFavorite, favoriteRecipeIds, fetchRecipeDetails]);
+  }, [removeFavorite, favoriteRecipeIds, fetchRecipeDetails]);
 
   const handleViewRecipe = useCallback((recipeId: number) => {
     navigate(`/recipe/${recipeId}`);
@@ -179,10 +172,9 @@ const Favorites: React.FC = () => {
   }, [navigate]);
   
   const handleRetry = useCallback(() => {
-    clearError();
     setRecipesError(null);
-    refetch();
-  }, [clearError, refetch]);
+    console.log('Retry disabled - will rebuild from scratch');
+  }, []);
 
   // Show error state if there's an unrecoverable error
   if (error && !loading && favoriteRecipes.length === 0) {

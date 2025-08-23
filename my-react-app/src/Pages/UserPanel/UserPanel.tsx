@@ -38,8 +38,7 @@ const UserPanel: React.FC = () => {
     recipesThisMonth: 0
   });
 
-  // Use the favorites hook
-  const { favoriteRecipeIds, toggleFavorite, loading: favoritesLoading } = useFavorites();
+  const { favoriteRecipeIds } = useFavorites();
 
   const navigate = useNavigate();
 
@@ -298,22 +297,10 @@ const UserPanel: React.FC = () => {
             ) : (
               <div className="recipes-grid">
                 {myRecipes.map((recipe) => {
-                  const isFav = favoriteRecipeIds.includes(recipe.id);
-
                   return (
                     <div key={recipe.id} className="recipe-card">
                       <div className="recipe-header">
                         <h4>{recipe.title}</h4>
-                        <div className="recipe-actions">
-                          <button 
-                            className={`favorite-btn ${isFav ? 'favorited' : ''}`}
-                            onClick={() => toggleFavorite(recipe.id)}
-                            disabled={favoritesLoading}
-                            title={isFav ? 'Remove from favorites' : 'Add to favorites'}
-                          >
-                            {favoritesLoading ? '⏳' : (isFav ? '❤️' : '🤍')}
-                          </button>
-                        </div>
                       </div>
                       
                       <p className="recipe-description">{recipe.description}</p>

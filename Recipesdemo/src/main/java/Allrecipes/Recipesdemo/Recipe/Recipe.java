@@ -76,16 +76,19 @@ public class Recipe {
     @Column(nullable = false)
     private boolean containsGluten = true;
 @ManyToMany
+@JsonIgnore
 private Set<Category> categories;
 
     @ManyToMany(mappedBy = "favorites", fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     private Set<User> favorites = new HashSet<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     private Set<RecipeReview> recipeReviews = new HashSet<>();
 
     public String getPhotoAsBase64() {

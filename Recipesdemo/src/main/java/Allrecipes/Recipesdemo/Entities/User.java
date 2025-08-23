@@ -2,6 +2,7 @@ package Allrecipes.Recipesdemo.Entities;
 
 import Allrecipes.Recipesdemo.Entities.Enums.UserType;
 import Allrecipes.Recipesdemo.Recipe.Recipe;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import jakarta.persistence.*;
@@ -44,11 +45,13 @@ public class User {
     )
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     private Set<Recipe> favorites = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     private Set<RecipeReview> recipeReviews = new HashSet<>();
 
     public void addFavorite(Recipe recipe) {

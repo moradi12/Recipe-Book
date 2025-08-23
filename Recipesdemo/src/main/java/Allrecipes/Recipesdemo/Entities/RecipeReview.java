@@ -2,6 +2,7 @@ package Allrecipes.Recipesdemo.Entities;
 
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import Allrecipes.Recipesdemo.Entities.Enums.UserType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,11 +32,13 @@ public class RecipeReview {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
     @ToString.Exclude
+    @JsonIgnore
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
+    @JsonIgnore
     private User user;
 
     private LocalDateTime createdAt;

@@ -1,5 +1,6 @@
 package Allrecipes.Recipesdemo.Controllers;
 
+import Allrecipes.Recipesdemo.DTOs.FavoriteDTO;
 import Allrecipes.Recipesdemo.Entities.Favorite;
 import Allrecipes.Recipesdemo.Entities.User;
 import Allrecipes.Recipesdemo.Entities.UserDetails;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.LoginException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/favorites")
@@ -93,11 +95,37 @@ public class FavoriteController {
 
             // Get all favorites for the user
             List<Favorite> favorites = favoriteRepository.findByUserId(user.getId());
-            return ResponseEntity.ok(favorites);
+            
+            // Convert to DTOs
+            List<FavoriteDTO> favoriteDTOs = favorites.stream().map(this::convertToDTO).collect(Collectors.toList());
+            
+            return ResponseEntity.ok(favoriteDTOs);
         } catch (Exception e) {
             log.error("Error fetching favorites:", e);
             return ResponseEntity.badRequest().body("Could not fetch favorites: " + e.getMessage());
         }
+    }
+
+    /**
+     * Helper method to convert Favorite entity to DTO
+     */
+    private FavoriteDTO convertToDTO(Favorite favorite) {
+        FavoriteDTO.UserDTO userDTO = new FavoriteDTO.UserDTO(
+            favorite.getUser().getId(),
+            favorite.getUser().getUsername()
+        );
+        
+        FavoriteDTO.RecipeDTO recipeDTO = new FavoriteDTO.RecipeDTO(
+            favorite.getRecipe().getId(),
+            favorite.getRecipe().getTitle()
+        );
+        
+        return new FavoriteDTO(
+            favorite.getId(),
+            userDTO,
+            recipeDTO,
+            favorite.getFavoritedAt()
+        );
     }
 
     /**

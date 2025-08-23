@@ -114,7 +114,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         onToggleFavorite={onToggleFavorite}
         onEditRecipe={onEditRecipe}
         token={token}
-        onViewRecipe={() => navigate(`/recipes/${recipe.id}`)}
+        onViewRecipe={() => navigate(`/recipe/${recipe.id}`)}
       />
     </li>
   );

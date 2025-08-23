@@ -1,11 +1,13 @@
-// Models/Favorite.ts
+// Based on backend Favorite entity
 export interface Favorite {
   id: number;
-  userId: number;
-  recipeId: number;
-  createdAt: string; // ISO date string
-}
-export interface FavoriteDTO {
-  id: number;
-  recipeId: number;
+  user: {
+    id: number;
+    userName: string;
+  };
+  recipe: {
+    id: number;
+    title: string;
+  };
+  favoritedAt: string; // ISO date string
 }

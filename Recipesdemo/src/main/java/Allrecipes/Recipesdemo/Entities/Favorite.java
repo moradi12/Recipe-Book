@@ -27,4 +27,9 @@ public class Favorite {
 
     @Column(name = "favorited_at")
     private LocalDateTime favoritedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        favoritedAt = LocalDateTime.now();
+    }
 }

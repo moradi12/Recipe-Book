@@ -14,7 +14,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
   onEditRecipe,
 }) => {
   const token = recipeSystem.getState().auth.token;
-  const { favoriteRecipeIds, toggleFavorite, loading: favoritesLoading } = useFavorites();
+  const { toggleFavorite, isFavorite, loading: favoritesLoading } = useFavorites();
 
   if (!recipes.length) {
     return (
@@ -34,7 +34,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
         <RecipeCard
           key={recipe.id}
           recipe={recipe}
-          isFavorite={favoriteRecipeIds.includes(recipe.id)}
+          isFavorite={isFavorite(recipe.id)}
           favoritesLoading={favoritesLoading}
           onToggleFavorite={toggleFavorite}
           onEditRecipe={onEditRecipe}

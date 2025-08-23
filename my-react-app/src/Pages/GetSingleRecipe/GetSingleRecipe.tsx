@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { RecipeResponse } from "../../Models/RecipeResponse";
 import RecipeService from "../../Service/RecipeService";
 import { notify } from "../../Utiles/notif";
+import { useAuth } from "../../hooks/useAuth";
+import { useFavorites } from "../../hooks/useFavorites";
 import RecipeHeader from "./RecipeHeader";
 import RecipeIngredients from "./RecipeIngredients";
 import RecipeInstructions from "./RecipeInstructions";
@@ -15,6 +17,15 @@ const GetSingleRecipe: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  
+  const { isAuthenticated } = useAuth();
+  const { toggleFavorite, isFavorite, loading: favoritesLoading } = useFavorites();
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = async () => {
+    if (!recipe) return;
+    await toggleFavorite(recipe.id);
+  };
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -43,6 +54,7 @@ const GetSingleRecipe: React.FC = () => {
 
     fetchRecipe();
   }, [recipeId]);
+
 
   if (loading) {
     return (
@@ -76,15 +88,32 @@ const GetSingleRecipe: React.FC = () => {
   return (
     <div className="recipe-view">
       <div className="recipe-container">
-        <button
-          className="back-button"
-          onClick={() => navigate("/all/recipes")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M19 12H5m0 0l7 7m-7-7l7-7"/>
-          </svg>
-          Back to recipes
-        </button>
+        <div className="recipe-actions-header">
+          <button
+            className="back-button"
+            onClick={() => navigate("/all/recipes")}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M19 12H5m0 0l7 7m-7-7l7-7"/>
+            </svg>
+            Back to recipes
+          </button>
+
+          {isAuthenticated && recipe && (
+            <button
+              className={`favorite-button ${isFavorite(recipe.id) ? 'favorited' : ''}`}
+              onClick={handleFavoriteToggle}
+              disabled={favoritesLoading}
+              title={isFavorite(recipe.id) ? "Remove from favorites" : "Add to favorites"}
+            >
+              <svg viewBox="0 0 24 24" fill={isFavorite(recipe.id) ? "currentColor" : "none"} stroke="currentColor">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              {favoritesLoading ? 'Updating...' : (isFavorite(recipe.id) ? 'Favorited' : 'Favorite')}
+            </button>
+          )}
+
+        </div>
 
         <div className="recipe-layout">
           <div className="recipe-main">

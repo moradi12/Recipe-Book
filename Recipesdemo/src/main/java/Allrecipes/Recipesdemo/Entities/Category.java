@@ -2,6 +2,7 @@ package Allrecipes.Recipesdemo.Entities;
 
 import Allrecipes.Recipesdemo.Recipe.Recipe;
 import Allrecipes.Recipesdemo.Entities.Enums.FoodCategories;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,7 @@ public class Category {
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     private Set<Recipe> recipes = new HashSet<>();
 
     public void addRecipe(Recipe recipe) {

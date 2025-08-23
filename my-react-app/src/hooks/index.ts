@@ -11,6 +11,6 @@ export { useRecipeForm } from './useRecipeForm';
 export type { ApiHookReturn, ApiState } from './useApi';
 export type { AuthHookReturn } from './useAuth';
 export type { RecipesHookReturn, PaginationState } from './useRecipes';
-export type { FavoritesHookReturn } from './useFavorites';
+export type { UseFavoritesReturn } from './useFavorites';
 export type { UserHookReturn } from './useUser';
 export type { UseFormReturn, FormConfig } from './useForm';
