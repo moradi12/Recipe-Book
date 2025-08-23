@@ -11,6 +11,7 @@ import RecipeDetailsSection from "../AddRecipe/RecipeDetailsSection";
 import IngredientsSection from "../AddRecipe/IngredientsSection";
 import InstructionsSection from "../AddRecipe/InstructionsSection";
 import PhotoSection from "../AddRecipe/PhotoSection";
+import "./EditRecipe.css";
 
 const ErrorMessages: React.FC<{ errors: Record<string, string> }> = ({ errors }) => {
   if (Object.keys(errors).length === 0) return null;

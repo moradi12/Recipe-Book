@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
+import { tokenManager } from '../utils/tokenManager';
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -28,24 +29,23 @@ export class BaseApiService {
     // Request interceptor to add auth token
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        // Get token from localStorage/sessionStorage to avoid circular dependency
-        const token = localStorage.getItem('token') || sessionStorage.getItem('jwt');
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        // Use centralized token manager
+        const authHeader = tokenManager.getAuthHeader();
+        if (authHeader) {
+          config.headers.Authorization = authHeader;
         }
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // Response interceptor to handle token updates
+    // Response interceptor to handle token updates and errors
     this.axiosInstance.interceptors.response.use(
       (response) => {
+        // Handle token refresh if server sends new token
         const newToken = response.headers.authorization?.split(' ')[1];
         if (newToken) {
-          // Update both storage locations
-          localStorage.setItem('token', newToken);
-          sessionStorage.setItem('jwt', newToken);
+          tokenManager.setToken(newToken);
           
           // Update Redux store if available (avoid circular dependency)
           try {
@@ -58,7 +58,20 @@ export class BaseApiService {
         }
         return response;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        // Handle authentication errors
+        if (error.response?.status === 401) {
+          console.log('Authentication failed, cleaning up token...');
+          tokenManager.removeToken();
+          
+          // Redirect to login if not already there
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+        }
+        
+        return Promise.reject(error);
+      }
     );
   }
 

@@ -3,8 +3,10 @@ package Allrecipes.Recipesdemo.Security.JWT;
 import Allrecipes.Recipesdemo.Entities.UserDetails;
 import Allrecipes.Recipesdemo.Entities.Enums.UserType;
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.login.LoginException;
@@ -26,15 +28,25 @@ public class JWT {
     private String signatureAlgorithm = SignatureAlgorithm.HS384.getJcaName();
 
     // ====================================================
-    // 2) Your secret key for signing/validation
+    // 2) Your secret key for signing/validation (from application properties)
     // ====================================================
-    private String encodedSecretKey = "jwt+secret+key+is+used+for+signing+and+validating+tokens+in+the+app";
+    @Value("${jwt.secret:jwt+secret+key+is+used+for+signing+and+validating+tokens+in+the+app}")
+    private String encodedSecretKey;
 
-    // This decodes the Base64 key and uses your chosen algorithm
-    private Key decodedSecretKey = new SecretKeySpec(
-            Base64.getDecoder().decode(encodedSecretKey),
-            this.signatureAlgorithm
-    );
+    // This will be initialized after @Value injection
+    private Key decodedSecretKey;
+
+    // ====================================================
+    // Initialize the decoded secret key after @Value injection
+    // ====================================================
+    @PostConstruct
+    public void init() {
+        this.decodedSecretKey = new SecretKeySpec(
+                Base64.getDecoder().decode(encodedSecretKey),
+                this.signatureAlgorithm
+        );
+        System.out.println("JWT initialized with configurable secret key");
+    }
 
     // ====================================================
     // Generate token from UserDetails object

@@ -9,6 +9,7 @@ import Allrecipes.Recipesdemo.Repositories.RecipeRepository;
 import Allrecipes.Recipesdemo.Repositories.UserRepository;
 import Allrecipes.Recipesdemo.Security.JWT.JWT;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,16 @@ public class CustomerService {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final JWT jwt;
+    
+    // Admin configuration from environment variables
+    @Value("${admin.email:admin@admin.com}")
+    private String adminEmail;
+    
+    @Value("${admin.password:admin}")
+    private String adminPassword;
+    
+    @Value("${admin.username:admin}")
+    private String adminUsername;
 
     public CustomerService(UserRepository userRepository, RecipeRepository recipeRepository) {
         this.userRepository = userRepository;
@@ -31,14 +42,21 @@ public class CustomerService {
     @PostConstruct
     @Transactional
     public void seedAdminUser() {
-        if (!userRepository.findByEmail("admin@admin.com").isPresent()) {
+        // Check if admin user exists using environment variable email
+        if (!userRepository.findByEmail(adminEmail).isPresent()) {
+            System.out.println("Creating admin user with email: " + adminEmail);
+            
             User admin = User.builder()
-                    .username("admin")
-                    .email("admin@admin.com")
-                    .password("admin")
+                    .username(adminUsername)
+                    .email(adminEmail)
+                    .password(adminPassword)
                     .userType(UserType.ADMIN)
                     .build();
             userRepository.save(admin);
+            
+            System.out.println("Admin user created successfully!");
+        } else {
+            System.out.println("Admin user already exists: " + adminEmail);
         }
     }
 
