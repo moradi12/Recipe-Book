@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { BaseApiService } from './BaseApiService';
+import { ErrorHandler } from '../errors/ErrorHandler';
 import { Category } from '../Models/Category';
 import { RecipeResponse, UpdateStatusResponse } from '../Models/Recipe';
 import { RecipeCreateRequest } from '../Models/RecipeCreateRequest';
@@ -19,7 +20,7 @@ class RecipeService extends BaseApiService {
   private categoriesUrl: string;
 
   private constructor() {
-    super('http://localhost:8080/api/recipes');
+    super('http://localhost:8080/api');
     this.adminUrl = 'http://localhost:8080/api/admin';
     this.categoriesUrl = 'http://localhost:8080/api/categories';
   }
@@ -35,7 +36,16 @@ class RecipeService extends BaseApiService {
   // GET RECIPE BY ID
   // ===========================
   public async getRecipeById(id: number): Promise<AxiosResponse<RecipeResponse>> {
-    return this.get<RecipeResponse>(`/${id}`);
+    return this.get<RecipeResponse>(`/recipes/${id}`);
+  }
+
+  // ===========================
+  // GET MULTIPLE RECIPES BY IDS (BATCH)
+  // ===========================
+  public async getRecipesByIds(ids: number[]): Promise<AxiosResponse<RecipeResponse[]>> {
+    if (ids.length === 0) return Promise.resolve({ data: [] } as AxiosResponse<RecipeResponse[]>);
+    const url = this.buildUrl('/recipes/batch', { ids: ids.join(',') });
+    return this.get<RecipeResponse[]>(url);
   }
 
 
@@ -45,23 +55,27 @@ class RecipeService extends BaseApiService {
   // GET ALL CATEGORIES (Recipe-based endpoint)
   // ===========================
   public async getAllCategories(): Promise<AxiosResponse<Category[]>> {
-    return this.get<Category[]>('/categories');
+    return this.get<Category[]>('/recipes/categories');
   }
 
   // ===========================
   // GET FOOD CATEGORIES (Separate Categories URL)
   // ===========================
   public async getFoodCategories(): Promise<AxiosResponse<{ name: string; description: string }[]>> {
-    return this.axiosInstance.get<{ name: string; description: string }[]>(
-      `${this.categoriesUrl}/food-categories`
-    );
+    try {
+      return this.client.get<{ name: string; description: string }[]>(
+        `${this.categoriesUrl}/food-categories`
+      );
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
   // ===========================
   // GET ALL RECIPES (Non-paginated)
   // ===========================
   public async getAllRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
-    return this.get<RecipeResponse[]>('/all');
+    return this.get<RecipeResponse[]>('/recipes/all');
   }
 
 
@@ -75,7 +89,7 @@ class RecipeService extends BaseApiService {
     pageSize: number,
     category?: number
   ): Promise<AxiosResponse<PaginatedRecipes>> {
-    const params: Record<string, any> = {
+    const params: Record<string, unknown> = {
       page: pageNumber,
       size: pageSize
     };
@@ -84,7 +98,7 @@ class RecipeService extends BaseApiService {
       params.category = category;
     }
 
-    const url = this.buildUrl('', params);
+    const url = this.buildUrl('/recipes', params);
     return this.get<PaginatedRecipes>(url);
   }
   // ===========================
@@ -94,10 +108,14 @@ class RecipeService extends BaseApiService {
     id: number,
     recipeData: RecipeCreateRequest
   ): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
-    return this.axiosInstance.put<{ message: string; recipeId: string }>(
-      `${this.adminUrl}/recipes/${id}`,
-      recipeData
-    );
+    try {
+      return this.client.put<{ message: string; recipeId: string }>(
+        `${this.adminUrl}/recipes/${id}`,
+        recipeData
+      );
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
   // ===========================
   // CREATE RECIPE
@@ -105,7 +123,7 @@ class RecipeService extends BaseApiService {
   public async createRecipe(
     recipe: RecipeCreateRequest
   ): Promise<AxiosResponse<RecipeResponse>> {
-    return this.post<RecipeResponse>('', recipe);
+    return this.post<RecipeResponse>('/recipes', recipe);
   }
 
   // ===========================
@@ -114,7 +132,7 @@ class RecipeService extends BaseApiService {
   public async deleteRecipe(
     id: number
   ): Promise<AxiosResponse<void>> {
-    return this.delete<void>(`/${id}`);
+    return this.delete<void>(`/recipes/${id}`);
   }
 
   // ===========================
@@ -124,7 +142,7 @@ class RecipeService extends BaseApiService {
     id: number,
     recipe: RecipeResponse
   ): Promise<AxiosResponse<RecipeResponse>> {
-    return this.put<RecipeResponse>(`/${id}`, recipe);
+    return this.put<RecipeResponse>(`/recipes/${id}`, recipe);
   }
   // ===========================
   // UPDATE RECIPE STATUS (for non-admin users)
@@ -134,7 +152,7 @@ class RecipeService extends BaseApiService {
     newStatus: RecipeStatus
   ): Promise<AxiosResponse<UpdateStatusResponse>> {
     return this.put<UpdateStatusResponse>(
-      `/${id}/status`,
+      `/recipes/${id}/status`,
       { status: newStatus }
     );
   }
@@ -147,7 +165,11 @@ class RecipeService extends BaseApiService {
   public async rejectRecipe(
     id: number
   ): Promise<AxiosResponse<UpdateStatusResponse>> {
-    return this.axiosInstance.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/reject`, {});
+    try {
+      return this.client.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/reject`, {});
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
 
@@ -157,7 +179,7 @@ class RecipeService extends BaseApiService {
   public async searchRecipesByTitle(
     title: string
   ): Promise<AxiosResponse<RecipeResponse[]>> {
-    const url = this.buildUrl('/search', { title });
+    const url = this.buildUrl('/recipes/search', { title });
     return this.get<RecipeResponse[]>(url);
   }
 
@@ -167,13 +189,17 @@ class RecipeService extends BaseApiService {
   public async approveRecipe(
     id: number
   ): Promise<AxiosResponse<UpdateStatusResponse>> {
-    return this.axiosInstance.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/approve`, {});
+    try {
+      return this.client.put<UpdateStatusResponse>(`${this.adminUrl}/recipes/${id}/approve`, {});
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
   // ===========================
   // GET MY RECIPES
   // ===========================
   public async getMyRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
-    return this.get<RecipeResponse[]>('/my');
+    return this.get<RecipeResponse[]>('/recipes/my');
   }
 
   // ===========================
@@ -181,25 +207,41 @@ class RecipeService extends BaseApiService {
   // ===========================
   
   public async getPendingRecipes(): Promise<AxiosResponse<RecipeResponse[]>> {
-    return this.axiosInstance.get<RecipeResponse[]>(`${this.adminUrl}/recipes/pending`);
+    try {
+      return this.client.get<RecipeResponse[]>(`${this.adminUrl}/recipes/pending`);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
   public async addRecipeAsAdmin(recipeData: RecipeCreateRequest): Promise<AxiosResponse<{ message: string; recipeId: string }>> {
-    return this.axiosInstance.post<{ message: string; recipeId: string }>(`${this.adminUrl}/recipes`, recipeData);
+    try {
+      return this.client.post<{ message: string; recipeId: string }>(`${this.adminUrl}/recipes`, recipeData);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
   public async getAllRecipesAsAdmin(
     page: number = 0,
     size: number = 10,
     sortBy: string = 'createdAt'
-  ): Promise<AxiosResponse<any>> {
-    const params = { page, size, sortBy };
-    const url = this.buildUrl(`${this.adminUrl}/recipes`, params);
-    return this.axiosInstance.get(url);
+  ): Promise<AxiosResponse<PaginatedRecipes>> {
+    try {
+      const params = { page, size, sortBy };
+      const url = this.buildUrl(`${this.adminUrl}/recipes`, params);
+      return this.client.get<PaginatedRecipes>(url);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
   public async deleteRecipeAsAdmin(id: number): Promise<AxiosResponse<{ message: string }>> {
-    return this.axiosInstance.delete<{ message: string }>(`${this.adminUrl}/recipes/${id}`);
+    try {
+      return this.client.delete<{ message: string }>(`${this.adminUrl}/recipes/${id}`);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
 

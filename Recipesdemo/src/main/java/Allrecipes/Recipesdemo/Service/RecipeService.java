@@ -313,6 +313,20 @@ public class RecipeService {
     }
 
     // ================================
+    //  GET RECIPES BY IDS (BATCH)
+    // ================================
+    @Transactional(readOnly = true)
+    public List<RecipeResponse> getRecipesByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Recipe> recipes = recipeRepository.findAllById(ids);
+        return recipes.stream()
+                .map(this::toRecipeResponse)
+                .collect(Collectors.toList());
+    }
+
+    // ================================
     //  SEARCH RECIPE BY TITLE
     // ================================
     public List<RecipeResponse> searchRecipesByTitle(String title) {

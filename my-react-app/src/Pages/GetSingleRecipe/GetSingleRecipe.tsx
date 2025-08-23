@@ -5,6 +5,7 @@ import RecipeService from "../../Service/RecipeService";
 import { notify } from "../../Utiles/notif";
 import { useAuth } from "../../hooks/useAuth";
 import { useFavorites } from "../../hooks/useFavorites";
+import { AppError } from "../../errors/AppError";
 import RecipeHeader from "./RecipeHeader";
 import RecipeIngredients from "./RecipeIngredients";
 import RecipeInstructions from "./RecipeInstructions";
@@ -40,11 +41,10 @@ const GetSingleRecipe: React.FC = () => {
 
         const response = await RecipeService.getRecipeById(Number(recipeId));
         setRecipe(response.data);
-      } catch (err: unknown) {
-        let errorMessage = "Failed to load the recipe.";
-        if (err instanceof Error) {
-          errorMessage = err.message || errorMessage;
-        }
+      } catch (error) {
+        const errorMessage = error instanceof AppError 
+          ? error.getUserMessage() 
+          : "Failed to load the recipe.";
         setError(errorMessage);
         notify.error(errorMessage);
       } finally {

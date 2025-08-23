@@ -25,7 +25,7 @@ class AuthService extends BaseApiService {
 
   private constructor() {
     // Auth service doesn't need automatic auth headers
-    super('http://localhost:8080/api/auth', false);
+    super('http://localhost:8080/api', false);
   }
 
   public static getInstance(): AuthService {
@@ -39,28 +39,28 @@ class AuthService extends BaseApiService {
   // LOGIN USER
   // ===========================
   public async loginUser(loginData: ILoginRequest): Promise<AxiosResponse<IAuthResponse>> {
-    return this.post<IAuthResponse>('/login', loginData);
+    return this.post<IAuthResponse>('/auth/login', loginData);
   }
 
   // ===========================
   // REGISTER USER
   // ===========================
   public async registerUser(registerData: IRegisterRequest): Promise<AxiosResponse<IAuthResponse>> {
-    return this.post<IAuthResponse>('/register', registerData);
+    return this.post<IAuthResponse>('/auth/register', registerData);
   }
 
   // ===========================
   // CHECK USERNAME AVAILABILITY
   // ===========================
   public async checkUsernameAvailability(username: string): Promise<AxiosResponse<{ available: boolean }>> {
-    return this.get<{ available: boolean }>(`/check-username?username=${encodeURIComponent(username)}`);
+    return this.get<{ available: boolean }>(`/auth/check-username?username=${encodeURIComponent(username)}`);
   }
 
   // ===========================
   // CHECK EMAIL AVAILABILITY
   // ===========================
   public async checkEmailAvailability(email: string): Promise<AxiosResponse<{ available: boolean }>> {
-    return this.get<{ available: boolean }>(`/check-email?email=${encodeURIComponent(email)}`);
+    return this.get<{ available: boolean }>(`/auth/check-email?email=${encodeURIComponent(email)}`);
   }
 }
 

@@ -22,7 +22,6 @@ export const checkData = () => {
       }
 
       const decoded_jwt = jwtDecode<jwtData>(storedJwt);
-      console.log(decoded_jwt);
 
       const myAuth = {
         id: decoded_jwt.id,

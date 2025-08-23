@@ -43,32 +43,53 @@ export function useUser(): UserHookReturn {
   const {
     execute: executeUpdateUserDetails,
     loading: updateDetailsLoading,
-  } = useApi(ApiService.users.updateUserDetails, {
-    showSuccessNotification: true,
-    successMessage: 'User details updated successfully!',
-  });
+  } = useApi(
+    (...args: unknown[]) => ApiService.users.updateUserDetails(
+      args[0] as string | undefined,
+      args[1] as string | undefined
+    ),
+    {
+      showSuccessNotification: true,
+      successMessage: 'User details updated successfully!',
+    }
+  );
 
   const {
     execute: executeUpdatePassword,
     loading: updatePasswordLoading,
-  } = useApi(ApiService.users.updatePassword, {
-    showSuccessNotification: true,
-    successMessage: 'Password updated successfully!',
-  });
+  } = useApi(
+    (...args: unknown[]) => ApiService.users.updatePassword(args[0] as string),
+    {
+      showSuccessNotification: true,
+      successMessage: 'Password updated successfully!',
+    }
+  );
 
   const {
     execute: executeAddFavorite,
-  } = useApi(ApiService.users.addFavoriteRecipe, {
-    showSuccessNotification: true,
-    successMessage: 'Recipe added to favorites!',
-  });
+  } = useApi(
+    (...args: unknown[]) => ApiService.users.addFavoriteRecipe(
+      args[0] as number,
+      args[1] as number
+    ),
+    {
+      showSuccessNotification: true,
+      successMessage: 'Recipe added to favorites!',
+    }
+  );
 
   const {
     execute: executeRemoveFavorite,
-  } = useApi(ApiService.users.removeFavoriteRecipe, {
-    showSuccessNotification: true,
-    successMessage: 'Recipe removed from favorites!',
-  });
+  } = useApi(
+    (...args: unknown[]) => ApiService.users.removeFavoriteRecipe(
+      args[0] as number,
+      args[1] as number
+    ),
+    {
+      showSuccessNotification: true,
+      successMessage: 'Recipe removed from favorites!',
+    }
+  );
 
   const updateLoading = updateDetailsLoading || updatePasswordLoading;
 

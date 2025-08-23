@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { notify } from '../../Utiles/notif';
+import { AppError } from '../../errors/AppError';
 import styles from './Dashboard.module.css';
 
 interface UserData {
@@ -31,12 +32,11 @@ const Dashboard: React.FC = () => {
         } else {
           notify.error('Failed to fetch user data.');
         }
-      } catch (err: unknown) {
-        if (axios.isAxiosError(err)) {
-          notify.error(err.response?.data?.message || 'An unexpected error occurred.');
-        } else {
-          notify.error('An unknown error occurred.');
-        }
+      } catch (error) {
+        const errorMessage = error instanceof AppError 
+          ? error.getUserMessage() 
+          : 'Failed to fetch user data';
+        notify.error(errorMessage);
       } finally {
         setLoading(false);
       }

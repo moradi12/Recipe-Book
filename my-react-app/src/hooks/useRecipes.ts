@@ -6,9 +6,9 @@ import { RecipeStatus } from '../Models/RecipeStatus';
 import { Category } from '../Models/Category';
 import axios from 'axios';
 import { recipeSystem } from '../Pages/Redux/store';
-import { PaginatedRecipes } from '../Service/RecipeService';
 import { notify } from '../Utiles/notif';
 import { useAuth } from './useAuth';
+import { AppError } from '../errors/AppError';
 
 export interface PaginationState {
   page: number;
@@ -108,7 +108,6 @@ export function useRecipes(): RecipesHookReturn {
       }
       
       const url = `${baseUrl}?${params.toString()}`;
-      console.log('Making request to:', url);
       
       // Get token for auth
       const token = recipeSystem.getState().auth.token;
@@ -130,17 +129,16 @@ export function useRecipes(): RecipesHookReturn {
         totalPages: data.totalPages,
         totalElements: data.totalElements,
       }));
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching recipes:', error);
-      console.error('Request URL:', error.config?.url);
-      console.error('Request method:', error.config?.method);
-      console.error('Response status:', error.response?.status);
-      console.error('Response data:', error.response?.data);
-      notify.error(`Failed to load recipes (${error.response?.status || 'Network Error'})`);
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to load recipes';
+      notify.error(errorMessage);
     } finally {
       setRecipesLoading(false);
     }
-  }, [pagination.page, pagination.size, filterCategory, normalizeRecipes]);
+  }, [normalizeRecipes]); // Remove pagination dependencies to prevent infinite loop
 
   // Fetch categories
   const fetchCategories = useCallback(async () => {
@@ -154,9 +152,12 @@ export function useRecipes(): RecipesHookReturn {
         }
       });
       setCategories(response.data);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching categories:', error);
-      notify.error('Failed to load categories');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to load categories';
+      notify.error(errorMessage);
     } finally {
       setCategoriesLoading(false);
     }
@@ -178,9 +179,12 @@ export function useRecipes(): RecipesHookReturn {
       await fetchRecipes(); // Refresh recipes
       navigate('/all/recipes');
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating recipe:', error);
-      notify.error('Failed to create recipe');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to create recipe';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes, navigate]);
@@ -200,9 +204,12 @@ export function useRecipes(): RecipesHookReturn {
       notify.success('Recipe updated successfully!');
       await fetchRecipes();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating recipe:', error);
-      notify.error('Failed to update recipe');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to update recipe';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes]);
@@ -226,9 +233,12 @@ export function useRecipes(): RecipesHookReturn {
       notify.success('Recipe deleted successfully!');
       await fetchRecipes();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting recipe:', error);
-      notify.error('Failed to delete recipe');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to delete recipe';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes]);
@@ -248,9 +258,12 @@ export function useRecipes(): RecipesHookReturn {
       notify.success('Recipe approved successfully!');
       await fetchRecipes();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error approving recipe:', error);
-      notify.error('Failed to approve recipe');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to approve recipe';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes]);
@@ -270,9 +283,12 @@ export function useRecipes(): RecipesHookReturn {
       notify.success('Recipe rejected successfully!');
       await fetchRecipes();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error rejecting recipe:', error);
-      notify.error('Failed to reject recipe');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to reject recipe';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes]);
@@ -292,9 +308,12 @@ export function useRecipes(): RecipesHookReturn {
       notify.success('Recipe status updated successfully!');
       await fetchRecipes();
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating recipe status:', error);
-      notify.error('Failed to update recipe status');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to update recipe status';
+      notify.error(errorMessage);
       return false;
     }
   }, [requireAuth, fetchRecipes]);
@@ -310,9 +329,12 @@ export function useRecipes(): RecipesHookReturn {
         }
       });
       return normalizeRecipes(response.data);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error searching recipes:', error);
-      notify.error('Failed to search recipes');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to search recipes';
+      notify.error(errorMessage);
       return null;
     }
   }, [normalizeRecipes]);
@@ -330,9 +352,12 @@ export function useRecipes(): RecipesHookReturn {
         }
       });
       return normalizeRecipes(response.data);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching my recipes:', error);
-      notify.error('Failed to load your recipes');
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to load your recipes';
+      notify.error(errorMessage);
       return null;
     }
   }, [requireAuth, normalizeRecipes]);
@@ -372,10 +397,14 @@ export function useRecipes(): RecipesHookReturn {
     setPagination(prev => ({ ...prev, page: 0 }));
   }, []);
 
-  // Auto-fetch recipes when filter changes
+  // Auto-fetch recipes when filter changes (with debounce)
   useEffect(() => {
-    fetchRecipes();
-  }, [filterCategory]);
+    const timeoutId = setTimeout(() => {
+      fetchRecipes(pagination.page, pagination.size, filterCategory === 'all' ? undefined : parseInt(filterCategory));
+    }, 100); // Small debounce to prevent rapid successive calls
+    
+    return () => clearTimeout(timeoutId);
+  }, [filterCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     // Data

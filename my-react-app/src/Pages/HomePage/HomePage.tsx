@@ -18,7 +18,7 @@ const HomePage: React.FC = () => {
       await fetchRecipes(0, 8); // Fetch first 8 recipes to have more options
     };
     loadFeaturedRecipes();
-  }, [fetchRecipes]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update featured recipes when recipes change
   useEffect(() => {

@@ -1,98 +1,63 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { tokenManager } from '../utils/tokenManager';
-
-export interface ApiResponse<T = any> {
-  data: T;
-  message?: string;
-}
+import { AxiosResponse, AxiosRequestConfig } from 'axios';
+import ApiClient from '../services/apiClient';
+import { config } from '../config/environment';
+import { ErrorHandler } from '../errors/ErrorHandler';
 
 export class BaseApiService {
-  protected axiosInstance: AxiosInstance;
   protected baseUrl: string;
+  protected client = ApiClient.getInstance();
 
-  constructor(baseUrl: string, useAuth: boolean = true) {
-    this.baseUrl = baseUrl;
-    this.axiosInstance = axios.create({
-      baseURL: baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      timeout: 10000, // 10 second timeout
-    });
+  constructor(baseUrl: string, _useAuth: boolean = true) { // eslint-disable-line @typescript-eslint/no-unused-vars
+    // Convert relative URLs to absolute using environment config
+    this.baseUrl = baseUrl.startsWith('http') 
+      ? baseUrl 
+      : `${config.API_BASE_URL}${baseUrl.startsWith('/') ? baseUrl : '/' + baseUrl}`;
+  }
 
-    if (useAuth) {
-      this.setupAuthInterceptors();
+  // Updated methods to use centralized ApiClient instance (not static methods)
+  // Using getInstance() directly to get full AxiosResponse objects
+  protected async get<T>(endpoint: string, requestConfig?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    try {
+      return this.client.get<T>(this.buildUrl(endpoint), requestConfig);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
     }
   }
 
-  private setupAuthInterceptors(): void {
-    // Request interceptor to add auth token
-    this.axiosInstance.interceptors.request.use(
-      (config) => {
-        // Use centralized token manager
-        const authHeader = tokenManager.getAuthHeader();
-        if (authHeader) {
-          config.headers.Authorization = authHeader;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
-    // Response interceptor to handle token updates and errors
-    this.axiosInstance.interceptors.response.use(
-      (response) => {
-        // Handle token refresh if server sends new token
-        const newToken = response.headers.authorization?.split(' ')[1];
-        if (newToken) {
-          tokenManager.setToken(newToken);
-          
-          // Update Redux store if available (avoid circular dependency)
-          try {
-            const { recipeSystem } = require('../Pages/Redux/store');
-            const { updateTokenAction } = require('../Pages/Redux/slices/unifiedAuthSlice');
-            recipeSystem.dispatch(updateTokenAction(newToken));
-          } catch (error) {
-            console.warn('Could not update Redux store with new token:', error);
-          }
-        }
-        return response;
-      },
-      (error) => {
-        // Handle authentication errors
-        if (error.response?.status === 401) {
-          console.log('Authentication failed, cleaning up token...');
-          tokenManager.removeToken();
-          
-          // Redirect to login if not already there
-          if (window.location.pathname !== '/login') {
-            window.location.href = '/login';
-          }
-        }
-        
-        return Promise.reject(error);
-      }
-    );
+  protected async post<T>(endpoint: string, data?: unknown, requestConfig?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    try {
+      return this.client.post<T>(this.buildUrl(endpoint), data, requestConfig);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
-  protected async get<T>(endpoint: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.get<T>(endpoint, config);
+  protected async put<T>(endpoint: string, data?: unknown, requestConfig?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    try {
+      return this.client.put<T>(this.buildUrl(endpoint), data, requestConfig);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
-  protected async post<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.post<T>(endpoint, data, config);
+  protected async delete<T>(endpoint: string, requestConfig?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    try {
+      return this.client.delete<T>(this.buildUrl(endpoint), requestConfig);
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 
-  protected async put<T>(endpoint: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.put<T>(endpoint, data, config);
-  }
-
-  protected async delete<T>(endpoint: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.axiosInstance.delete<T>(endpoint, config);
-  }
-
-  protected buildUrl(path: string, params?: Record<string, any>): string {
-    let url = path;
+  protected buildUrl(endpoint: string, params?: Record<string, unknown>): string {
+    // Handle absolute URLs
+    if (endpoint.startsWith('http')) {
+      return endpoint;
+    }
+    
+    // Build relative URL from baseUrl
+    let url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    
+    // Add query parameters if provided
     if (params) {
       const searchParams = new URLSearchParams();
       Object.entries(params).forEach(([key, value]) => {
@@ -105,6 +70,7 @@ export class BaseApiService {
         url += `?${queryString}`;
       }
     }
+    
     return url;
   }
 }

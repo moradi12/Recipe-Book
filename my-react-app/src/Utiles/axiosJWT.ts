@@ -7,7 +7,6 @@ const axiosJWT = axios.create();
 axiosJWT.interceptors.request.use(
     request => {       
         request.headers.Authorization = `Bearer ${recipeSystem.getState().auth.token}`;
-        console.log("BEFORE POST",request.headers.Authorization)
         return request;
     }
 );

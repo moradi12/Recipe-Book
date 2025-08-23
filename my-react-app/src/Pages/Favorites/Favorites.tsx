@@ -72,7 +72,7 @@ const Favorites: React.FC = () => {
     }
   }, [requireAuth]);
 
-  // Optimized recipe details fetching with better error handling
+  // Optimized recipe details fetching with batch request to prevent 431 header errors
   const fetchRecipeDetails = useCallback(async (recipeIds: number[]) => {
     if (recipeIds.length === 0) {
       setFavoriteRecipes([]);
@@ -83,63 +83,43 @@ const Favorites: React.FC = () => {
       setRecipesLoading(true);
       setRecipesError(null);
       
-      const recipePromises = recipeIds.map(async (recipeId) => {
-        try {
-          const response = await RecipeService.getRecipeById(recipeId);
-          return { success: true, data: response.data };
-        } catch (error: any) {
-          const isNetworkError = error?.code === 'ERR_NETWORK';
-          
-          if (isNetworkError) {
-            // Create a placeholder for offline mode
-            return {
-              success: true,
-              data: {
-                id: recipeId,
-                title: `Recipe #${recipeId}`,
-                description: 'Recipe details unavailable - server offline. Click "View Recipe" to try loading full details.',
-                photo: null,
-                cookingTime: null,
-                servings: null,
-                containsGluten: undefined,
-                dietaryInfo: 'Server offline - info unavailable',
-                ingredients: [],
-                instructions: [],
-                category: { id: 0, name: 'Unknown' },
-                status: 'APPROVED',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                user: null,
-                offline: true
-              } as RecipeResponse & { offline?: boolean }
-            };
-          }
-          
-          console.error(`Error fetching recipe ${recipeId}:`, error);
-          return { success: false, error: error.message };
-        }
-      });
-
-      const results = await Promise.all(recipePromises);
-      const validRecipes = results
-        .filter((result): result is { success: true; data: RecipeResponse } => result.success)
-        .map(result => result.data);
-      
-      const failedCount = results.filter(result => !result.success).length;
-      
-      setFavoriteRecipes(validRecipes);
-      
-      // Show appropriate notifications
-      const offlineCount = validRecipes.filter((recipe: any) => recipe.offline).length;
-      if (offlineCount > 0) {
-        setRecipesError(`${offlineCount} recipe${offlineCount > 1 ? 's' : ''} loaded in offline mode`);
-      } else if (failedCount > 0) {
-        setRecipesError(`Failed to load ${failedCount} recipe${failedCount > 1 ? 's' : ''}`);
-      }
+      // Use batch endpoint to reduce header size and improve performance
+      const response = await RecipeService.getRecipesByIds(recipeIds);
+      setFavoriteRecipes(response.data);
       
     } catch (error) {
-      console.error('Error fetching recipe details:', error);
-      setRecipesError('Failed to load recipe details');
+      const isNetworkError = error?.code === 'ERR_NETWORK';
+      
+      if (isNetworkError) {
+        // Create placeholders for all recipes in offline mode
+        const offlineRecipes = recipeIds.map(recipeId => ({
+          id: recipeId,
+          title: `Recipe #${recipeId}`,
+          description: 'Recipe details unavailable - server offline. Click "View Recipe" to try loading full details.',
+          photo: null,
+          cookingTime: null,
+          servings: null,
+          containsGluten: undefined,
+          dietaryInfo: 'Server offline - info unavailable',
+          ingredients: [],
+          instructions: [],
+          category: { id: 0, name: 'Unknown' },
+          status: 'APPROVED',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          user: null,
+          offline: true
+        } as RecipeResponse & { offline?: boolean }));
+        
+        setFavoriteRecipes(offlineRecipes);
+        setRecipesError(`${recipeIds.length} recipe${recipeIds.length > 1 ? 's' : ''} loaded in offline mode`);
+      } else {
+        console.error('Error fetching recipe details:', error);
+        const errorMessage = error instanceof AppError 
+          ? error.getUserMessage() 
+          : 'Failed to load recipe details';
+        setRecipesError(errorMessage);
+      }
     } finally {
       setRecipesLoading(false);
     }

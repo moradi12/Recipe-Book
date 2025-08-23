@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { AxiosResponse } from 'axios';
 import { notify } from '../Utiles/notif';
+import { AppError } from '../errors/AppError';
 
 export interface ApiState<T> {
   data: T | null;
@@ -9,15 +10,15 @@ export interface ApiState<T> {
 }
 
 export interface ApiHookReturn<T> extends ApiState<T> {
-  execute: (...args: any[]) => Promise<T | null>;
+  execute: (...args: unknown[]) => Promise<T | null>;
   reset: () => void;
 }
 
 /**
  * Generic hook for API calls with loading, error states, and notifications
  */
-export function useApi<T = any>(
-  apiFunction: (...args: any[]) => Promise<AxiosResponse<T>>,
+export function useApi<T = unknown>(
+  apiFunction: (...args: unknown[]) => Promise<AxiosResponse<T>>,
   options: {
     onSuccess?: (data: T) => void;
     onError?: (error: string) => void;
@@ -43,7 +44,7 @@ export function useApi<T = any>(
   } = options;
 
   const execute = useCallback(
-    async (...args: any[]): Promise<T | null> => {
+    async (...args: unknown[]): Promise<T | null> => {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
       try {
@@ -61,8 +62,10 @@ export function useApi<T = any>(
         }
 
         return data;
-      } catch (error: any) {
-        const errorMsg = error.response?.data?.message || error.message || errorMessage;
+      } catch (error) {
+        const errorMsg = error instanceof AppError 
+          ? error.getUserMessage() 
+          : errorMessage;
         
         setState(prev => ({ ...prev, loading: false, error: errorMsg }));
 

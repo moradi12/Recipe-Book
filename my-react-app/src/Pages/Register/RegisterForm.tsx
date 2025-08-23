@@ -6,6 +6,7 @@ import { registerUser } from "../../Utiles/authService";
 import { notify } from "../../Utiles/notif";
 import { AuthState, login } from "../Redux/slices/unifiedAuthSlice";
 import { AppDispatch } from "../Redux/store";
+import { AppError, ValidationError } from "../../errors/AppError";
 import "./RegisterForm.css";
 
 interface FormData {
@@ -54,20 +55,25 @@ const RegisterForm: React.FC = () => {
       sessionStorage.setItem("jwt", response.token);
       notify.success("Welcome to Recipe Book! 🎉");
       navigate("/");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const serverError = error && typeof error === 'object' && 'response' in error 
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
-        : null;
-
-      if (serverError?.includes("username")) {
-        setError("username", { message: "Username is already taken" });
-      } else if (serverError?.includes("email")) {
-        setError("email", { message: "Email is already registered" });
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      if (error instanceof ValidationError) {
+        // Handle validation errors from the server
+        if (error.hasFieldError('username')) {
+          setError("username", { message: error.getFieldError('username') });
+        }
+        if (error.hasFieldError('email')) {
+          setError("email", { message: error.getFieldError('email') });
+        }
+        // Don't show additional notification as field errors are shown inline
+      } else if (error instanceof AppError) {
+        // Handle other app errors with user-friendly messages
+        notify.error(error.getUserMessage());
       } else {
+        // Fallback for unexpected errors
         notify.error("Registration failed. Please try again.");
       }
-      console.error("Registration error:", errorMessage);
     }
   };
 

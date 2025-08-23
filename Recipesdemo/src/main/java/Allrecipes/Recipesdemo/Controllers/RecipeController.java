@@ -71,6 +71,29 @@ public class RecipeController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/batch")
+    public ResponseEntity<?> getRecipesByIds(@RequestParam String ids) {
+        try {
+            log.debug("Fetching recipes by batch IDs: {}", ids);
+            String[] idArray = ids.split(",");
+            List<Long> recipeIds = List.of(idArray)
+                    .stream()
+                    .map(String::trim)
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            
+            List<RecipeResponse> responses = recipeService.getRecipesByIds(recipeIds);
+            log.info("Retrieved {} recipes from batch request.", responses.size());
+            return ResponseEntity.ok(responses);
+        } catch (NumberFormatException e) {
+            log.warn("Invalid recipe ID format in batch request: {}", ids);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid recipe ID format.");
+        } catch (Exception e) {
+            log.error("Error retrieving recipes by batch IDs: {}", ids, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorMessages.INTERNAL_ERROR);
+        }
+    }
+
     @GetMapping("/old/{id}")
     public ResponseEntity<?> OldgetRecipeById(@PathVariable Long id) {
         try {

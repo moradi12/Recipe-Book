@@ -3,6 +3,8 @@ import { Favorite } from '../Models/Favorite';
 import FavoriteService from '../Service/FavoriteService';
 import { useAuth } from './useAuth';
 import { notify } from '../Utiles/notif';
+import { AppError } from '../errors/AppError';
+import { debugAuth } from '../utils/debugAuth';
 
 export interface UseFavoritesReturn {
   favorites: Favorite[];
@@ -28,20 +30,17 @@ export function useFavorites(): UseFavoritesReturn {
   useEffect(() => {
     const ids = favorites.map(fav => fav.recipe.id);
     setFavoriteRecipeIds(ids);
-    console.log('Updated favorite recipe IDs:', ids);
   }, [favorites]);
 
   // Check if a recipe is in favorites
   const isFavorite = useCallback((recipeId: number): boolean => {
     const result = favoriteRecipeIds.includes(recipeId);
-    console.log(`isFavorite(${recipeId}):`, result, 'from IDs:', favoriteRecipeIds);
     return result;
   }, [favoriteRecipeIds]);
 
   // Fetch favorites from server
   const fetchFavorites = useCallback(async () => {
     if (!isAuthenticated) {
-      console.log('Not authenticated, clearing favorites');
       setFavorites([]);
       setError(null);
       return;
@@ -51,15 +50,17 @@ export function useFavorites(): UseFavoritesReturn {
       setLoading(true);
       setError(null);
       
-      console.log('Fetching favorites from server...');
+      debugAuth.checkAuthStatus(); // Debug authentication
+      
       const response = await FavoriteService.getFavorites();
-      console.log('Server response:', response.data);
       
       setFavorites(response.data);
       
-    } catch (err: any) {
-      console.error('Error fetching favorites:', err);
-      const errorMessage = err?.response?.data || 'Failed to load favorites';
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to load favorites';
       setError(errorMessage);
       setFavorites([]);
     } finally {
@@ -76,12 +77,10 @@ export function useFavorites(): UseFavoritesReturn {
 
     // Check if already favorite
     if (isFavorite(recipeId)) {
-      console.log('Recipe already in favorites:', recipeId);
       notify.info('Recipe is already in your favorites');
       return;
     }
 
-    console.log('Adding favorite for recipe:', recipeId);
     
     // Optimistic update - add to local state immediately
     const newFavoriteIds = [...favoriteRecipeIds, recipeId];
@@ -92,19 +91,20 @@ export function useFavorites(): UseFavoritesReturn {
       setError(null);
       
       await FavoriteService.addFavorite(recipeId);
-      console.log('Successfully added favorite');
       notify.success('Recipe added to favorites!');
       
       // Fetch fresh data to ensure sync
       await fetchFavorites();
       
-    } catch (err: any) {
-      console.error('Error adding favorite:', err);
+    } catch (error) {
+      console.error('Error adding favorite:', error);
       
       // Revert optimistic update on error
       setFavoriteRecipeIds(favoriteRecipeIds);
       
-      const errorMessage = err?.response?.data || 'Failed to add favorite';
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to add favorite';
       setError(errorMessage);
       notify.error(errorMessage);
     } finally {
@@ -121,12 +121,10 @@ export function useFavorites(): UseFavoritesReturn {
 
     // Check if not in favorites
     if (!isFavorite(recipeId)) {
-      console.log('Recipe not in favorites:', recipeId);
       notify.info('Recipe is not in your favorites');
       return;
     }
 
-    console.log('Removing favorite for recipe:', recipeId);
     
     // Optimistic update - remove from local state immediately
     const newFavoriteIds = favoriteRecipeIds.filter(id => id !== recipeId);
@@ -137,19 +135,20 @@ export function useFavorites(): UseFavoritesReturn {
       setError(null);
       
       await FavoriteService.removeFavorite(recipeId);
-      console.log('Successfully removed favorite');
       notify.success('Recipe removed from favorites!');
       
       // Fetch fresh data to ensure sync
       await fetchFavorites();
       
-    } catch (err: any) {
-      console.error('Error removing favorite:', err);
+    } catch (error) {
+      console.error('Error removing favorite:', error);
       
       // Revert optimistic update on error
       setFavoriteRecipeIds(favoriteRecipeIds);
       
-      const errorMessage = err?.response?.data || 'Failed to remove favorite';
+      const errorMessage = error instanceof AppError 
+        ? error.getUserMessage() 
+        : 'Failed to remove favorite';
       setError(errorMessage);
       notify.error(errorMessage);
     } finally {
@@ -159,7 +158,6 @@ export function useFavorites(): UseFavoritesReturn {
 
   // Toggle favorite
   const toggleFavorite = useCallback(async (recipeId: number) => {
-    console.log('Toggle favorite for recipe:', recipeId, 'Current state:', isFavorite(recipeId));
     
     if (isFavorite(recipeId)) {
       await removeFavorite(recipeId);
@@ -170,9 +168,8 @@ export function useFavorites(): UseFavoritesReturn {
 
   // Load favorites when user authenticates
   useEffect(() => {
-    console.log('Auth state changed, authenticated:', isAuthenticated);
     fetchFavorites();
-  }, [fetchFavorites]);
+  }, [fetchFavorites, isAuthenticated]);
 
   return {
     favorites,

@@ -1,10 +1,10 @@
 import { useState, useCallback, ChangeEvent } from 'react';
 
 export interface FormField {
-  value: any;
+  value: unknown;
   error?: string;
   required?: boolean;
-  validate?: (value: any) => string | undefined;
+  validate?: (value: unknown) => string | undefined;
 }
 
 export interface FormConfig {
@@ -19,7 +19,7 @@ export interface UseFormReturn<T> {
   isSubmitting: boolean;
   
   // Field operations
-  setValue: (field: keyof T, value: any) => void;
+  setValue: (field: keyof T, value: unknown) => void;
   setError: (field: keyof T, error: string) => void;
   setTouched: (field: keyof T, touched: boolean) => void;
   
@@ -32,9 +32,9 @@ export interface UseFormReturn<T> {
   setSubmitting: (submitting: boolean) => void;
 }
 
-export function useForm<T extends Record<string, any>>(
+export function useForm<T extends Record<string, unknown>>(
   initialValues: T,
-  validationRules?: Partial<Record<keyof T, (value: any) => string | undefined>>
+  validationRules?: Partial<Record<keyof T, (value: unknown) => string | undefined>>
 ): UseFormReturn<T> {
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Record<keyof T, string>>({} as Record<keyof T, string>);
@@ -42,7 +42,7 @@ export function useForm<T extends Record<string, any>>(
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Set individual field value
-  const setValue = useCallback((field: keyof T, value: any) => {
+  const setValue = useCallback((field: keyof T, value: unknown) => {
     setValues(prev => ({ ...prev, [field]: value }));
     
     // Clear error when value changes
@@ -62,7 +62,7 @@ export function useForm<T extends Record<string, any>>(
   }, []);
 
   // Validate individual field
-  const validateField = useCallback((field: keyof T, value: any): string => {
+  const validateField = useCallback((field: keyof T, value: unknown): string => {
     if (validationRules && validationRules[field]) {
       return validationRules[field]!(value) || '';
     }
@@ -89,7 +89,7 @@ export function useForm<T extends Record<string, any>>(
   // Handle input change
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    let newValue: any = value;
+    let newValue: unknown = value;
 
     // Handle different input types
     if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
@@ -182,7 +182,7 @@ export function useForm<T extends Record<string, any>>(
 
 // Common validation rules
 export const validators = {
-  required: (message = 'This field is required') => (value: any) => {
+  required: (message = 'This field is required') => (value: unknown) => {
     if (!value || (typeof value === 'string' && !value.trim())) {
       return message;
     }

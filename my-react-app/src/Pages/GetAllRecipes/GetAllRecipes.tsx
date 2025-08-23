@@ -70,7 +70,7 @@ const GetAllRecipes: React.FC = () => {
   useEffect(() => {
     fetchCategories();
     fetchRecipes();
-  }, [fetchCategories, fetchRecipes]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEditRecipe = (recipeId: number) => {
     navigate(`/edit-recipe/${recipeId}`);

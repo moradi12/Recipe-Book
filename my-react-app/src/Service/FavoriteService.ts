@@ -6,7 +6,7 @@ class FavoriteService extends BaseApiService {
   private static instance: FavoriteService;
 
   private constructor() {
-    super('http://localhost:8080/api/favorites');
+    super('http://localhost:8080/api');
   }
 
   public static getInstance(): FavoriteService {
@@ -18,17 +18,17 @@ class FavoriteService extends BaseApiService {
 
   // GET /api/favorites - Get all favorites for the logged-in user
   public async getFavorites(): Promise<AxiosResponse<Favorite[]>> {
-    return this.get<Favorite[]>('');
+    return this.get<Favorite[]>('/favorites');
   }
 
   // POST /api/favorites/{recipeId} - Add a recipe to favorites
   public async addFavorite(recipeId: number): Promise<AxiosResponse<string>> {
-    return this.post<string>(`/${recipeId}`, {});
+    return this.post<string>(`/favorites/${recipeId}`, {});
   }
 
   // DELETE /api/favorites/{recipeId} - Remove a recipe from favorites
   public async removeFavorite(recipeId: number): Promise<AxiosResponse<string>> {
-    return this.delete<string>(`/${recipeId}`);
+    return this.delete<string>(`/favorites/${recipeId}`);
   }
 }
 

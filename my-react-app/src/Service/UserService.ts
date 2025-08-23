@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { BaseApiService } from './BaseApiService';
+import { ErrorHandler } from '../errors/ErrorHandler';
 import { User } from '../Models/Recipe';
 
 export interface UpdateUserRequest {
@@ -11,7 +12,7 @@ class UserService extends BaseApiService {
   private static instance: UserService;
 
   private constructor() {
-    super('http://localhost:8080/api/users');
+    super('http://localhost:8080/api');
   }
 
   public static getInstance(): UserService {
@@ -25,7 +26,7 @@ class UserService extends BaseApiService {
   // GET CURRENT USER
   // ===========================
   public async getCurrentUser(): Promise<AxiosResponse<User>> {
-    return this.get<User>('');
+    return this.get<User>('/users');
   }
 
   // ===========================
@@ -35,18 +36,18 @@ class UserService extends BaseApiService {
     newEmail?: string,
     newPassword?: string
   ): Promise<AxiosResponse<{ message: string }>> {
-    const params: Record<string, any> = {};
+    const params: Record<string, unknown> = {};
     if (newEmail) params.newEmail = newEmail;
     if (newPassword) params.newPassword = newPassword;
     
-    return this.put<{ message: string }>('/update', null, { params });
+    return this.put<{ message: string }>('/users/update', null, { params });
   }
 
   // ===========================
   // UPDATE PASSWORD
   // ===========================
   public async updatePassword(newPassword: string): Promise<AxiosResponse<{ message: string }>> {
-    return this.put<{ message: string }>('/update-password', null, {
+    return this.put<{ message: string }>('/users/update-password', null, {
       params: { newPassword }
     });
   }
@@ -58,21 +59,25 @@ class UserService extends BaseApiService {
     userId: number,
     recipeId: number
   ): Promise<AxiosResponse<{ message: string }>> {
-    return this.post<{ message: string }>(`/${userId}/favorites/${recipeId}`, null);
+    return this.post<{ message: string }>(`/users/${userId}/favorites/${recipeId}`, null);
   }
 
   public async removeFavoriteRecipe(
     userId: number,
     recipeId: number
   ): Promise<AxiosResponse<{ message: string }>> {
-    return this.delete<{ message: string }>(`/${userId}/favorites/${recipeId}`);
+    return this.delete<{ message: string }>(`/users/${userId}/favorites/${recipeId}`);
   }
 
   // ===========================
   // ADMIN USER MANAGEMENT
   // ===========================
   public async getAllUsers(): Promise<AxiosResponse<User[]>> {
-    return this.axiosInstance.get<User[]>('http://localhost:8080/api/admin/users');
+    try {
+      return this.client.get<User[]>('http://localhost:8080/api/admin/users');
+    } catch (error) {
+      throw ErrorHandler.handleApiError(error);
+    }
   }
 }
 
